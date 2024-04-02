@@ -7,7 +7,7 @@
 - connect with homebrew?
 - ubuntu installation instructions?
 - look into upgrade plugin
-- test upgrade on macos, test on ubuntu
+- test upgrade on macos, ubuntu (+fedora + other OSs on hetzner/DO), windows
 - look into https://github.com/oclif/plugin-warn-if-update-available
 - look into autocomplete
 - public as letsdiscodev/cli
