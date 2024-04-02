@@ -1,6 +1,7 @@
 - FIND PERMANENT FIX for yarn --- right now, running `npm run pack` requires manual hack explained here -- https://github.com/oclif/oclif/issues/759#issuecomment-1516581856 -- i.e. need to manually change lib/tarballs/build.js to have different `yarn workspaces ......` line
-- add init command
-- how to remotely ssh?
+- add init command - finish
+- read/write auth in .disco/config
+- should read auth from config call be a oclif hook..? or just utility func called every time? or a parent class to all commands that require auth?
 - how to deal with server side events?
 - build for macos, ubuntu
 - connect with homebrew?
@@ -12,4 +13,9 @@
 - public as letsdiscodev/cli
 - archive disco-cli, point to /cli
 - update docs re: installing/upgrading
-- disable 'plugins'..?
+- disable 'plugins'..? i.e. ability to have/add plugins? (and see them in binary's help)
+- disable most/all github workflows
+- look into what s3 tarballs upload does (only uploads?) - would prefer to push to releases on github
+- github workflow to actually build tarballs + make those part of releases? when adding tag (i.e. tag -> build tarball -> release with files)
+- add some tests to commands
+- run tests as part of release process
