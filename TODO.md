@@ -10,8 +10,7 @@
 - test upgrade on macos, ubuntu (+fedora + other OSs on hetzner/DO), windows
 - look into https://github.com/oclif/plugin-warn-if-update-available
 - look into autocomplete
-- public as letsdiscodev/cli
-- archive disco-cli, point to /cli
+- once cutover, archive disco-cli, point to /cli
 - update docs re: installing/upgrading
 - disable 'plugins'..? i.e. ability to have/add plugins? (and see them in binary's help)
 - disable most/all github workflows
