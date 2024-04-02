@@ -1,0 +1,13 @@
+- add init command
+- how to remotely ssh?
+- how to deal with server side events?
+- build for macos, ubuntu
+- connect with homebrew?
+- ubuntu installation instructions?
+- look into upgrade plugin
+- test upgrade on macos, test on ubuntu
+- look into https://github.com/oclif/plugin-warn-if-update-available
+- look into autocomplete
+- public as letsdiscodev/cli
+- archive disco-cli, point to /cli
+- update docs re: installing/upgrading
