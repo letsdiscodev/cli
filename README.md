@@ -26,9 +26,8 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`disco hello PERSON`](#disco-hello-person)
-* [`disco hello world`](#disco-hello-world)
 * [`disco help [COMMAND]`](#disco-help-command)
+* [`disco init SSHSTRING`](#disco-init-sshstring)
 * [`disco plugins`](#disco-plugins)
 * [`disco plugins:install PLUGIN...`](#disco-pluginsinstall-plugin)
 * [`disco plugins:inspect PLUGIN...`](#disco-pluginsinspect-plugin)
@@ -39,48 +38,6 @@ USAGE
 * [`disco plugins:uninstall PLUGIN...`](#disco-pluginsuninstall-plugin-1)
 * [`disco plugins:uninstall PLUGIN...`](#disco-pluginsuninstall-plugin-2)
 * [`disco plugins update`](#disco-plugins-update)
-
-## `disco hello PERSON`
-
-Say hello
-
-```
-USAGE
-  $ disco hello PERSON -f <value>
-
-ARGUMENTS
-  PERSON  Person to say hello to
-
-FLAGS
-  -f, --from=<value>  (required) Who is saying hello
-
-DESCRIPTION
-  Say hello
-
-EXAMPLES
-  $ oex hello friend --from oclif
-  hello friend from oclif! (./src/commands/hello/index.ts)
-```
-
-_See code: [src/commands/hello/index.ts](https://github.com/letsdiscodev/cli/blob/v0.0.0/src/commands/hello/index.ts)_
-
-## `disco hello world`
-
-Say hello world
-
-```
-USAGE
-  $ disco hello world
-
-DESCRIPTION
-  Say hello world
-
-EXAMPLES
-  $ disco hello world
-  hello world! (./src/commands/hello/world.ts)
-```
-
-_See code: [src/commands/hello/world.ts](https://github.com/letsdiscodev/cli/blob/v0.0.0/src/commands/hello/world.ts)_
 
 ## `disco help [COMMAND]`
 
@@ -101,6 +58,26 @@ DESCRIPTION
 ```
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.0.20/src/commands/help.ts)_
+
+## `disco init SSHSTRING`
+
+initializes a new server
+
+```
+USAGE
+  $ disco init SSHSTRING [--version <value>]
+
+FLAGS
+  --version=<value>  [default: latest] version of disco daemon to install
+
+DESCRIPTION
+  initializes a new server
+
+EXAMPLES
+  $ disco init root@12.34.56.78
+```
+
+_See code: [src/commands/init.ts](https://github.com/letsdiscodev/cli/blob/v0.0.0/src/commands/init.ts)_
 
 ## `disco plugins`
 
