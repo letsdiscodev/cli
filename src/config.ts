@@ -116,6 +116,7 @@ export function writeCert(ip: string, publicKey: string): void {
   fs.writeFileSync(certPath(ip), publicKey, 'utf8')
 }
 
+// FIXME this isn't actually used and should also be renamed
 export function requestsVerify(discoConfig: DiscoConfig): string | true {
   /**
    * Returns the value for the param 'verify' in requests.

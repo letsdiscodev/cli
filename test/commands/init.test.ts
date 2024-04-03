@@ -1,22 +1,6 @@
-import {expect, test} from '@oclif/test'
+import {expect} from '@oclif/test'
 
 import {extractApiKey, extractPublicKeyCertificate} from '../../src/commands/init'
-
-describe.skip('init', () => {
-  test
-    .stdout()
-    .command(['init'])
-    .it('runs hello', (ctx) => {
-      expect(ctx.stdout).to.contain('hello world')
-    })
-
-  test
-    .stdout()
-    .command(['init', '--name', 'jeff'])
-    .it('runs hello --name jeff', (ctx) => {
-      expect(ctx.stdout).to.contain('hello jeff')
-    })
-})
 
 describe('init utils', () => {
   describe('extractApiKey', () => {
