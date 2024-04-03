@@ -1,3 +1,42 @@
+- rewrite disco-cli
+
+  - config.py
+    - get/save config
+    - deal with certs
+  - init
+    - try both .ssh/id_rsa and id_ed25519 keys
+    - need to see fingerprinting message if hadn't connected to server before
+    - check if same machine already exists in config, fail if that's the case
+  - meta_info
+  - meta_upgrade
+  - meta_host
+  - projects_add
+  - projects_remove
+  - projects_move
+  - projects_list
+  - volumes_list
+  - volumes_export
+  - volumes_import
+  - deploy
+  - deploy_list
+  - deploy_output
+  - run
+  - env_var_set
+  - env_var_get
+  - env_var_remove
+  - env_var_list
+  - logs
+  - syslog_add
+  - syslog_remove
+  - syslog_list
+  - command
+  - nodes_add
+  - scale
+  - invite_create
+  - invite_accept
+  - apikeys_list
+  - apikeys_remove
+
 - FIND PERMANENT FIX for yarn --- right now, running `npm run pack` requires manual hack explained here -- https://github.com/oclif/oclif/issues/759#issuecomment-1516581856 -- i.e. need to manually change lib/tarballs/build.js to have different `yarn workspaces ......` line
 - add init command
 - how to remotely ssh?
@@ -13,3 +52,8 @@
 - archive disco-cli, point to /cli
 - update docs re: installing/upgrading
 - disable 'plugins'..?
+- workflows:
+  - create release on tag (test + build)
+  - test on every push
+- use `npm run readme` - but copy/paste into docs // generate CLI.md or something instead of readme? and don't git add readme
+- set the version (something that's +0.1 more than current homebrew? in line with the python cli version?)

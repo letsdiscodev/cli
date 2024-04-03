@@ -29,7 +29,8 @@
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
     "posttest": "npm run lint",
     "version": "oclif readme && git add README.md",
-    "pack": "oclif pack tarballs"
+    "pack-tarballs": "oclif pack tarballs",
+    "pack-macos": "oclif pack macos"
   },
   "oclif": {
     "bin": "disco",
@@ -44,6 +45,9 @@
       "hello": {
         "description": "Say hello to the world and others"
       }
+    },
+    "macos": {
+      "identifier": "dev.letsdisco.cli"
     }
   },
   "dependencies": {
