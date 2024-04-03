@@ -39,9 +39,6 @@ export default class Logs extends Command {
     }
 
     const es = new EventSource(url, {
-      // agentOptions: {
-      //   ca: fs.readFileSync('certs/ca.cert.pem'),
-      // },
       headers: {
         Accept: 'text/event-stream',
         Authorization: 'Basic ' + Buffer.from(`${discoConfig.apiKey}:`).toString('base64'),
