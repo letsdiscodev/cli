@@ -1,12 +1,8 @@
 - rewrite disco-cli
 
   - config.py
-    - get/save config
-    - deal with certs
-  - init
-    - try both .ssh/id_rsa and id_ed25519 keys
-    - need to see fingerprinting message if hadn't connected to server before
-    - check if same machine already exists in config, fail if that's the case
+    - DONE, except certs that aren't used during connections
+  - logs
   - meta_info
   - meta_upgrade
   - meta_host
@@ -25,7 +21,6 @@
   - env_var_get
   - env_var_remove
   - env_var_list
-  - logs
   - syslog_add
   - syslog_remove
   - syslog_list
@@ -36,6 +31,8 @@
   - invite_accept
   - apikeys_list
   - apikeys_remove
+  - init
+    - DONE
 
 - FIND PERMANENT FIX for yarn --- right now, running `npm run pack` requires manual hack explained here -- https://github.com/oclif/oclif/issues/759#issuecomment-1516581856 -- i.e. need to manually change lib/tarballs/build.js to have different `yarn workspaces ......` line
 - add init command - finish

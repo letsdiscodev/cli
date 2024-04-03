@@ -18,6 +18,11 @@ interface HostDiscoConfig {
   [name: string]: DiscoConfig
 }
 
+export function isDiscoAlreadyInConfig(name: string): boolean {
+  const config = getConfig()
+  return Object.keys(config.discos).includes(name)
+}
+
 export function addDisco(
   name: string,
   host: string,

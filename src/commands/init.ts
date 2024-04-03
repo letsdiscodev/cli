@@ -5,7 +5,7 @@ import * as os from 'node:os'
 import * as path from 'node:path'
 import {NodeSSH} from 'node-ssh'
 
-import {addDisco} from '../config'
+import {addDisco, isDiscoAlreadyInConfig} from '../config'
 
 const getInitScriptUrl = (version: string) => `https://downloads.letsdisco.dev/${version}/init`
 
@@ -45,6 +45,10 @@ export default class Init extends Command {
 
     const [username, host] = args.sshString.split('@')
 
+    if (isDiscoAlreadyInConfig(host)) {
+      this.error('host already present in .disco config')
+    }
+
     // make sure that host is an IP address, otherwise fail.
     // validate ipv4 addresses only for now
     if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(host)) {
@@ -55,6 +59,7 @@ export default class Init extends Command {
     // (we only accept IPs for now, but that's because there seems to be a bug
     // when running init with a domain name for a host. if/when that bug is fixed,
     // we'll probably want to do the dns lookup below. so keep it for now.)
+    // https://github.com/letsdiscodev/disco-daemon/issues/3
     const ip: string = await new Promise((resolve, reject) => {
       dns.lookup(host, (err, address, _) => {
         if (err) {

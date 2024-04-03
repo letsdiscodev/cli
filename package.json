@@ -56,12 +56,14 @@
     "@oclif/plugin-plugins": "^4",
     "@types/ssh2-streams": "^0.1.12",
     "chalk": "^4",
+    "eventsource": "^2.0.2",
     "node-ssh": "^13.1.0"
   },
   "devDependencies": {
     "@oclif/prettier-config": "^0.2.1",
     "@oclif/test": "^3",
     "@types/chai": "^4",
+    "@types/eventsource": "^1.1.15",
     "@types/mocha": "^10.0.0",
     "@types/node": "^18",
     "chai": "^4",
