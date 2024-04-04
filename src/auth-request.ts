@@ -45,6 +45,7 @@ export function request({
   discoConfig: DiscoConfig
   body?: unknown
 }) {
+  // will only be used if host === ip
   const sslConfiguredAgent = new https.Agent({
     ca: fs.readFileSync(certPath(discoConfig.ip)),
     rejectUnauthorized: true,
@@ -52,11 +53,14 @@ export function request({
 
   const params: fetch.RequestInit = {
     method,
-    agent: sslConfiguredAgent,
     headers: {
       Accept: 'application/json',
       Authorization: 'Basic ' + Buffer.from(`${discoConfig.apiKey}:`).toString('base64'),
     },
+  }
+
+  if (discoConfig.host === discoConfig.ip) {
+    params.agent = sslConfiguredAgent
   }
 
   if (method === 'POST') {

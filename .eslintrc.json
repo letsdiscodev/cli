@@ -7,7 +7,8 @@
     "perfectionist/sort-imports": "off",
     "perfectionist/sort-named-imports": "off",
     "perfectionist/sort-interfaces": "off",
-    "perfectionist/sort-object-types": "off"
+    "perfectionist/sort-object-types": "off",
+    "perfectionist/sort-classes": "off"
   },
   "ignorePatterns": ["**/*.d.ts"]
 }
