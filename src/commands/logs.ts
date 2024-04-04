@@ -9,9 +9,9 @@ export default class Logs extends Command {
   static examples = ['<%= config.bin %> <%= command.id %>']
 
   static flags = {
-    disco: Flags.string({required: false}),
     project: Flags.string({required: false}),
     service: Flags.string({required: false}),
+    disco: Flags.string({required: false}),
   }
 
   public async run(): Promise<void> {
@@ -33,7 +33,7 @@ export default class Logs extends Command {
       url = `${url}/${flags.service}`
     }
 
-    initAuthEventSource(url, discoConfig, {
+    initAuthEventSource(url, discoConfig, 'text/event-stream', {
       onMessage: (event: MessageEvent) => {
         const logItem = JSON.parse(event.data)
 

@@ -1,14 +1,5 @@
 - rewrite disco-cli
 
-  - config.py
-    - DONE
-    - not exactly validating certs only when connecting to ip
-  - logs
-    - DONE
-  - create child EventSource class that encapsulates:
-    - basic auth + passing cert + rejectUnauthorized:true
-    - AND does check of only passing cert when connecting to ip, not host
-    - reuse everywhere!
   - meta_info
   - meta_upgrade
   - meta_host
@@ -37,6 +28,10 @@
   - invite_accept
   - apikeys_list
   - apikeys_remove
+  - config.py
+    - DONE
+  - logs
+    - DONE
   - init
     - DONE
 
