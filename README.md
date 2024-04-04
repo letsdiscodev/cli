@@ -28,16 +28,13 @@ USAGE
 <!-- commands -->
 * [`disco help [COMMAND]`](#disco-help-command)
 * [`disco init SSHSTRING`](#disco-init-sshstring)
-* [`disco plugins`](#disco-plugins)
-* [`disco plugins:install PLUGIN...`](#disco-pluginsinstall-plugin)
-* [`disco plugins:inspect PLUGIN...`](#disco-pluginsinspect-plugin)
-* [`disco plugins:install PLUGIN...`](#disco-pluginsinstall-plugin-1)
-* [`disco plugins:link PLUGIN`](#disco-pluginslink-plugin)
-* [`disco plugins:uninstall PLUGIN...`](#disco-pluginsuninstall-plugin)
-* [`disco plugins reset`](#disco-plugins-reset)
-* [`disco plugins:uninstall PLUGIN...`](#disco-pluginsuninstall-plugin-1)
-* [`disco plugins:uninstall PLUGIN...`](#disco-pluginsuninstall-plugin-2)
-* [`disco plugins update`](#disco-plugins-update)
+* [`disco logs`](#disco-logs)
+* [`disco meta host DOMAIN`](#disco-meta-host-domain)
+* [`disco meta info`](#disco-meta-info)
+* [`disco meta upgrade`](#disco-meta-upgrade)
+* [`disco projects add`](#disco-projects-add)
+* [`disco projects list`](#disco-projects-list)
+* [`disco projects remove [PROJECT]`](#disco-projects-remove-project)
 
 ## `disco help [COMMAND]`
 
@@ -79,282 +76,154 @@ EXAMPLES
 
 _See code: [src/commands/init.ts](https://github.com/letsdiscodev/cli/blob/v0.0.0/src/commands/init.ts)_
 
-## `disco plugins`
+## `disco logs`
 
-List installed plugins.
+fetch logs
 
 ```
 USAGE
-  $ disco plugins [--json] [--core]
+  $ disco logs [--project <value>] [--service <value>] [--disco <value>]
 
 FLAGS
-  --core  Show core plugins.
-
-GLOBAL FLAGS
-  --json  Format output as json.
+  --disco=<value>
+  --project=<value>
+  --service=<value>
 
 DESCRIPTION
-  List installed plugins.
+  fetch logs
 
 EXAMPLES
-  $ disco plugins
+  $ disco logs
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v4.3.10/src/commands/plugins/index.ts)_
+_See code: [src/commands/logs.ts](https://github.com/letsdiscodev/cli/blob/v0.0.0/src/commands/logs.ts)_
 
-## `disco plugins:install PLUGIN...`
+## `disco meta host DOMAIN`
 
-Installs a plugin into the CLI.
+set a host for the server
 
 ```
 USAGE
-  $ disco plugins add plugins:install PLUGIN...
+  $ disco meta host DOMAIN [--disco <value>]
+
+FLAGS
+  --disco=<value>
+
+DESCRIPTION
+  set a host for the server
+
+EXAMPLES
+  $ disco meta host example.com
+```
+
+_See code: [src/commands/meta/host.ts](https://github.com/letsdiscodev/cli/blob/v0.0.0/src/commands/meta/host.ts)_
+
+## `disco meta info`
+
+fetch info about the server
+
+```
+USAGE
+  $ disco meta info [--disco <value>]
+
+FLAGS
+  --disco=<value>
+
+DESCRIPTION
+  fetch info about the server
+
+EXAMPLES
+  $ disco meta info
+```
+
+_See code: [src/commands/meta/info.ts](https://github.com/letsdiscodev/cli/blob/v0.0.0/src/commands/meta/info.ts)_
+
+## `disco meta upgrade`
+
+upgrade server
+
+```
+USAGE
+  $ disco meta upgrade [--image <value>] [--dontPull] [--disco <value>]
+
+FLAGS
+  --disco=<value>
+  --dontPull       don't pull the image before upgrading
+  --image=<value>  the image to use. Defaults to letsdiscodev/daemon:latest
+
+DESCRIPTION
+  upgrade server
+
+EXAMPLES
+  $ disco meta upgrade
+```
+
+_See code: [src/commands/meta/upgrade.ts](https://github.com/letsdiscodev/cli/blob/v0.0.0/src/commands/meta/upgrade.ts)_
+
+## `disco projects add`
+
+add a project
+
+```
+USAGE
+  $ disco projects add --name <value> [--domain <value>] [--github-repo <value>] [--disco <value>] [--deploy]
+
+FLAGS
+  --deploy               deploy the project after adding it
+  --disco=<value>        server to use
+  --domain=<value>       domain name where the app will be served, e.g. www.example.com
+  --github-repo=<value>  URL used to clone the repo, e.g. git@github.com:example/example.git
+  --name=<value>         (required) project name
+
+DESCRIPTION
+  add a project
+
+EXAMPLES
+  $ disco projects add
+```
+
+_See code: [src/commands/projects/add.ts](https://github.com/letsdiscodev/cli/blob/v0.0.0/src/commands/projects/add.ts)_
+
+## `disco projects list`
+
+list projects
+
+```
+USAGE
+  $ disco projects list [--disco <value>]
+
+FLAGS
+  --disco=<value>
+
+DESCRIPTION
+  list projects
+
+EXAMPLES
+  $ disco projects list
+```
+
+_See code: [src/commands/projects/list.ts](https://github.com/letsdiscodev/cli/blob/v0.0.0/src/commands/projects/list.ts)_
+
+## `disco projects remove [PROJECT]`
+
+remove a project
+
+```
+USAGE
+  $ disco projects remove [PROJECT] [--disco <value>]
 
 ARGUMENTS
-  PLUGIN...  Plugin to install.
+  PROJECT  project to remove
 
 FLAGS
-  -f, --force    Run yarn install with force flag.
-  -h, --help     Show CLI help.
-  -s, --silent   Silences yarn output.
-  -v, --verbose  Show verbose yarn output.
-
-GLOBAL FLAGS
-  --json  Format output as json.
+  --disco=<value>
 
 DESCRIPTION
-  Installs a plugin into the CLI.
-  Can be installed from npm or a git url.
-
-  Installation of a user-installed plugin will override a core plugin.
-
-  e.g. If you have a core plugin that has a 'hello' command, installing a user-installed plugin with a 'hello' command
-  will override the core plugin implementation. This is useful if a user needs to update core plugin functionality in
-  the CLI without the need to patch and update the whole CLI.
-
-
-ALIASES
-  $ disco plugins add
+  remove a project
 
 EXAMPLES
-  $ disco plugins add myplugin 
-
-  $ disco plugins add https://github.com/someuser/someplugin
-
-  $ disco plugins add someuser/someplugin
+  $ disco projects remove project-name
 ```
 
-## `disco plugins:inspect PLUGIN...`
-
-Displays installation properties of a plugin.
-
-```
-USAGE
-  $ disco plugins inspect PLUGIN...
-
-ARGUMENTS
-  PLUGIN...  [default: .] Plugin to inspect.
-
-FLAGS
-  -h, --help     Show CLI help.
-  -v, --verbose
-
-GLOBAL FLAGS
-  --json  Format output as json.
-
-DESCRIPTION
-  Displays installation properties of a plugin.
-
-EXAMPLES
-  $ disco plugins inspect myplugin
-```
-
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v4.3.10/src/commands/plugins/inspect.ts)_
-
-## `disco plugins:install PLUGIN...`
-
-Installs a plugin into the CLI.
-
-```
-USAGE
-  $ disco plugins install PLUGIN...
-
-ARGUMENTS
-  PLUGIN...  Plugin to install.
-
-FLAGS
-  -f, --force    Run yarn install with force flag.
-  -h, --help     Show CLI help.
-  -s, --silent   Silences yarn output.
-  -v, --verbose  Show verbose yarn output.
-
-GLOBAL FLAGS
-  --json  Format output as json.
-
-DESCRIPTION
-  Installs a plugin into the CLI.
-  Can be installed from npm or a git url.
-
-  Installation of a user-installed plugin will override a core plugin.
-
-  e.g. If you have a core plugin that has a 'hello' command, installing a user-installed plugin with a 'hello' command
-  will override the core plugin implementation. This is useful if a user needs to update core plugin functionality in
-  the CLI without the need to patch and update the whole CLI.
-
-
-ALIASES
-  $ disco plugins add
-
-EXAMPLES
-  $ disco plugins install myplugin 
-
-  $ disco plugins install https://github.com/someuser/someplugin
-
-  $ disco plugins install someuser/someplugin
-```
-
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v4.3.10/src/commands/plugins/install.ts)_
-
-## `disco plugins:link PLUGIN`
-
-Links a plugin into the CLI for development.
-
-```
-USAGE
-  $ disco plugins link PLUGIN
-
-ARGUMENTS
-  PATH  [default: .] path to plugin
-
-FLAGS
-  -h, --help          Show CLI help.
-  -v, --verbose
-      --[no-]install  Install dependencies after linking the plugin.
-
-DESCRIPTION
-  Links a plugin into the CLI for development.
-  Installation of a linked plugin will override a user-installed or core plugin.
-
-  e.g. If you have a user-installed or core plugin that has a 'hello' command, installing a linked plugin with a 'hello'
-  command will override the user-installed or core plugin implementation. This is useful for development work.
-
-
-EXAMPLES
-  $ disco plugins link myplugin
-```
-
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v4.3.10/src/commands/plugins/link.ts)_
-
-## `disco plugins:uninstall PLUGIN...`
-
-Removes a plugin from the CLI.
-
-```
-USAGE
-  $ disco plugins remove plugins:uninstall PLUGIN...
-
-ARGUMENTS
-  PLUGIN...  plugin to uninstall
-
-FLAGS
-  -h, --help     Show CLI help.
-  -v, --verbose
-
-DESCRIPTION
-  Removes a plugin from the CLI.
-
-ALIASES
-  $ disco plugins unlink
-  $ disco plugins remove
-
-EXAMPLES
-  $ disco plugins remove myplugin
-```
-
-## `disco plugins reset`
-
-Remove all user-installed and linked plugins.
-
-```
-USAGE
-  $ disco plugins reset [--hard] [--reinstall]
-
-FLAGS
-  --hard       Delete node_modules and package manager related files in addition to uninstalling plugins.
-  --reinstall  Reinstall all plugins after uninstalling.
-```
-
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v4.3.10/src/commands/plugins/reset.ts)_
-
-## `disco plugins:uninstall PLUGIN...`
-
-Removes a plugin from the CLI.
-
-```
-USAGE
-  $ disco plugins uninstall PLUGIN...
-
-ARGUMENTS
-  PLUGIN...  plugin to uninstall
-
-FLAGS
-  -h, --help     Show CLI help.
-  -v, --verbose
-
-DESCRIPTION
-  Removes a plugin from the CLI.
-
-ALIASES
-  $ disco plugins unlink
-  $ disco plugins remove
-
-EXAMPLES
-  $ disco plugins uninstall myplugin
-```
-
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v4.3.10/src/commands/plugins/uninstall.ts)_
-
-## `disco plugins:uninstall PLUGIN...`
-
-Removes a plugin from the CLI.
-
-```
-USAGE
-  $ disco plugins unlink plugins:uninstall PLUGIN...
-
-ARGUMENTS
-  PLUGIN...  plugin to uninstall
-
-FLAGS
-  -h, --help     Show CLI help.
-  -v, --verbose
-
-DESCRIPTION
-  Removes a plugin from the CLI.
-
-ALIASES
-  $ disco plugins unlink
-  $ disco plugins remove
-
-EXAMPLES
-  $ disco plugins unlink myplugin
-```
-
-## `disco plugins update`
-
-Update installed plugins.
-
-```
-USAGE
-  $ disco plugins update [-h] [-v]
-
-FLAGS
-  -h, --help     Show CLI help.
-  -v, --verbose
-
-DESCRIPTION
-  Update installed plugins.
-```
-
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v4.3.10/src/commands/plugins/update.ts)_
+_See code: [src/commands/projects/remove.ts](https://github.com/letsdiscodev/cli/blob/v0.0.0/src/commands/projects/remove.ts)_
 <!-- commandsstop -->

@@ -38,7 +38,7 @@
     "dirname": "disco",
     "plugins": [
       "@oclif/plugin-help",
-      "@oclif/plugin-plugins"
+      "@oclif/plugin-update"
     ],
     "topicSeparator": " ",
     "topics": {
@@ -48,6 +48,11 @@
     },
     "macos": {
       "identifier": "dev.letsdisco.cli"
+    },
+    "update": {
+      "s3": {
+        "bucket": "disco-cli-assets"
+      }
     }
   },
   "dependencies": {

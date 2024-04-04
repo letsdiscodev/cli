@@ -1,6 +1,9 @@
+- add command to call oclif upload with `AWS_...` vars from .env
+- try auto update plugin? add it / try it / run promote
+- try on mac?
+- try on ubuntu / hetzner?
+- fwup antoine - did it work
 - rewrite disco-cli
-
-  - projects_remove
   - projects_move
   - env_var_set
   - env_var_get
@@ -31,12 +34,7 @@
   - meta_host DONE
   - projects_list DONE
   - projects_add DONE
-
-- FIND PERMANENT FIX for yarn --- right now, running `npm run pack` requires manual hack explained here -- https://github.com/oclif/oclif/issues/759#issuecomment-1516581856 -- i.e. need to manually change lib/tarballs/build.js to have different `yarn workspaces ......` line
-- add init command - finish
-- read/write auth in .disco/config
-- should read auth from config call be a oclif hook..? or just utility func called every time? or a parent class to all commands that require auth?
-- how to deal with server side events?
+  - projects_remove DONE
 - build for macos, ubuntu
 - connect with homebrew?
 - ubuntu installation instructions?
@@ -46,19 +44,25 @@
 - look into autocomplete
 - once cutover, archive disco-cli, point to /cli
 - update docs re: installing/upgrading
-  <<<<<<< HEAD
-- disable 'plugins'..?
-- workflows:
-  - create release on tag (test + build)
-  - test on every push
-- use `npm run readme` - but copy/paste into docs // generate CLI.md or something instead of readme? and don't git add readme
+- use `npm run version` - but copy/paste into docs // generate CLI.md or something instead of readme? and don't git add readme
 - set the version (something that's +0.1 more than current homebrew? in line with the python cli version?)
-
-(below is maybe duplicate)
-
 - disable 'plugins'..? i.e. ability to have/add plugins? (and see them in binary's help)
-- disable most/all github workflows
 - look into what s3 tarballs upload does (only uploads?) - would prefer to push to releases on github
-- github workflow to actually build tarballs + make those part of releases? when adding tag (i.e. tag -> build tarball -> release with files)
+- enable workflows:
+  - when adding tag - build tarballs + make those part of releases? (i.e. tag -> build tarball -> release with files)
+  - test on every push
 - add some tests to commands
 - run tests as part of release process
+- command that expect a server (env list, many others) should check first if there's a .disco config at all -- use a parent class for all commands that take / expect a --disco param?
+  - should read auth from config call be a oclif hook..? or just utility func called every time? or a parent class to all commands that require auth?
+
+---
+
+ask Rodrigo:
+
+- this.error which doesn't work within request catch fail... because of catch..? or something else..?
+
+- probably not needed anymore....!!!
+  - how to patch oclif re: tarball bundling which requires the yarn patch?
+  - FIND PERMANENT FIX for yarn --- right now, running `npm run pack` requires manual hack explained here -- https://github.com/oclif/oclif/issues/759#issuecomment-1516581856 -- i.e. need to manually change lib/tarballs/build.js to have different `yarn workspaces ......` line
+    - it seems to work now.......!!!
