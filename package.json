@@ -65,7 +65,7 @@
     "@oclif/test": "^3",
     "@types/chai": "^4",
     "@types/eventsource": "^1.1.15",
-    "@types/mocha": "^10.0.0",
+    "@types/mocha": "^10.0.6",
     "@types/node": "^18",
     "@types/node-fetch": "^2.6.11",
     "chai": "^4",
