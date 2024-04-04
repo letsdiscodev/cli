@@ -1,7 +1,7 @@
 import {Command, Flags} from '@oclif/core'
 
 import {getDisco} from '../config'
-import {initAuthEventSource, EventWithMessage} from '../auth-event-source'
+import {readEventSource, EventWithMessage} from '../auth-request'
 
 export default class Logs extends Command {
   static description = 'fetch logs'
@@ -33,7 +33,7 @@ export default class Logs extends Command {
       url = `${url}/${flags.service}`
     }
 
-    initAuthEventSource(url, discoConfig, 'text/event-stream', {
+    readEventSource(url, discoConfig, {
       onMessage: (event: MessageEvent) => {
         const logItem = JSON.parse(event.data)
 

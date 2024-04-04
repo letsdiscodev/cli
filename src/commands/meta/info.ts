@@ -1,6 +1,6 @@
 import {Command, Flags} from '@oclif/core'
 import {getDisco} from '../../config'
-import {initAuthEventSource, EventWithMessage} from '../../auth-event-source'
+import {getJsonRequest} from '../../auth-request'
 
 export default class MetaInfo extends Command {
   static description = 'fetch info about the server'
@@ -14,19 +14,17 @@ export default class MetaInfo extends Command {
   public async run(): Promise<void> {
     const {flags} = await this.parse(MetaInfo)
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/.disco/disco/met`
+    const url = `https://${discoConfig.host}/.disco/disco/meta`
 
-    console.log('url', url)
-
-    initAuthEventSource(url, discoConfig, 'application/json', {
-      onMessage: (event: MessageEvent) => {
-        // const logItem = JSON.parse(event.data)
-        // this.log(logItem)
-      },
-      onError: (event: EventWithMessage) => {
-        console.log(event)
-        this.warn(event.message ?? 'An error occurred')
-      },
-    })
+    getJsonRequest(url, discoConfig)
+      .then((res) => {
+        this.log(`Version:         ${res.version}`)
+        this.log(`IP address:      ${res.ip}`)
+        this.log(`Disco Host:      ${res.discoHost}`)
+        this.log(`Registry Host:   ${res.registryHost}`)
+      })
+      .catch((error) => {
+        this.warn(error?.message ?? 'An error occurred')
+      })
   }
 }
