@@ -1,6 +1,5 @@
 - rewrite disco-cli
 
-  - meta_info
   - meta_upgrade
   - meta_host
   - projects_add
@@ -28,12 +27,10 @@
   - invite_accept
   - apikeys_list
   - apikeys_remove
-  - config.py
-    - DONE
-  - logs
-    - DONE
-  - init
-    - DONE
+  - config.py DONE
+  - logs DONE
+  - init DONE
+  - meta_info DONE
 
 - FIND PERMANENT FIX for yarn --- right now, running `npm run pack` requires manual hack explained here -- https://github.com/oclif/oclif/issues/759#issuecomment-1516581856 -- i.e. need to manually change lib/tarballs/build.js to have different `yarn workspaces ......` line
 - add init command - finish

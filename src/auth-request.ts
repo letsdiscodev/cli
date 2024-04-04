@@ -34,19 +34,40 @@ export function readEventSource(url: string, discoConfig: DiscoConfig, handlers:
   es.addEventListener('error', handlers.onError)
 }
 
-export function getJsonRequest(url: string, discoConfig: DiscoConfig) {
+export function request({
+  method,
+  url,
+  discoConfig,
+  body,
+}: {
+  method: string
+  url: string
+  discoConfig: DiscoConfig
+  body?: unknown
+}) {
   const sslConfiguredAgent = new https.Agent({
     ca: fs.readFileSync(certPath(discoConfig.ip)),
     rejectUnauthorized: true,
   })
 
-  return fetch(url, {
+  const params: fetch.RequestInit = {
+    method,
     agent: sslConfiguredAgent,
     headers: {
       Accept: 'application/json',
       Authorization: 'Basic ' + Buffer.from(`${discoConfig.apiKey}:`).toString('base64'),
     },
-  }).then((res) => {
+  }
+
+  if (method === 'POST') {
+    params.headers = {
+      ...params.headers,
+      'Content-Type': 'application/json',
+    }
+    params.body = JSON.stringify(body)
+  }
+
+  return fetch(url, params).then((res) => {
     if (!res.ok) {
       throw new Error(`HTTP error: ${res.status}`)
     }

@@ -5,7 +5,9 @@
     "max-params": "off",
     "perfectionist/sort-objects": "off",
     "perfectionist/sort-imports": "off",
-    "perfectionist/sort-named-imports": "off"
+    "perfectionist/sort-named-imports": "off",
+    "perfectionist/sort-interfaces": "off",
+    "perfectionist/sort-object-types": "off"
   },
   "ignorePatterns": ["**/*.d.ts"]
 }

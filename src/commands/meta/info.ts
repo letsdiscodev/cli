@@ -1,6 +1,6 @@
 import {Command, Flags} from '@oclif/core'
 import {getDisco} from '../../config'
-import {getJsonRequest} from '../../auth-request'
+import {request} from '../../auth-request'
 
 export default class MetaInfo extends Command {
   static description = 'fetch info about the server'
@@ -16,7 +16,7 @@ export default class MetaInfo extends Command {
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/.disco/disco/meta`
 
-    getJsonRequest(url, discoConfig)
+    request({method: 'GET', url, discoConfig})
       .then((res) => {
         this.log(`Version:         ${res.version}`)
         this.log(`IP address:      ${res.ip}`)
