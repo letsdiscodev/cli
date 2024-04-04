@@ -46,11 +46,10 @@ export default class Logs extends Command {
         this.log(`${container} ${timestamp} ${message}`)
       },
       onError: (event: EventWithMessage) => {
-        // we're calling .warn as this.error can't be called here,
-        // since it tries to throw an error -- but that, for some reason, doesn't
-        // work ((because we're in an event listener? and/or maybe this
-        // event listener is itself within a catch in the eventstream code..?))
-        this.warn(event.message ?? 'An error occurred')
+        // this.error throws a big ugly error in the cli
+        // output which is bad. however, calling
+        // this.warn will keep showing the error in a loop...
+        this.error(event.message ?? 'An error occurred')
       },
     })
   }
