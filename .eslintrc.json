@@ -2,7 +2,10 @@
   "extends": ["oclif", "oclif-typescript", "prettier"],
   "rules": {
     "unicorn/better-regex": "off",
-    "max-params": "off"
+    "max-params": "off",
+    "perfectionist/sort-objects": "off",
+    "perfectionist/sort-imports": "off",
+    "perfectionist/sort-named-imports": "off"
   },
   "ignorePatterns": ["**/*.d.ts"]
 }

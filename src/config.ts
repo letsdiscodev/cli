@@ -7,7 +7,7 @@ const CONFIG_PATH = `${HOME_DIR}/.disco/config.json`
 const CONFIG_FOLDER = `${HOME_DIR}/.disco`
 const CERTS_FOLDER = `${HOME_DIR}/.disco/certs`
 
-interface DiscoConfig {
+export interface DiscoConfig {
   apiKey: string
   host: string
   ip: string
@@ -119,22 +119,4 @@ export function writeCert(ip: string, publicKey: string): void {
   }
 
   fs.writeFileSync(certPath(ip), publicKey, 'utf8')
-}
-
-// FIXME this isn't actually used and should also be renamed
-export function requestsVerify(discoConfig: DiscoConfig): string | true {
-  /**
-   * Returns the value for the param 'verify' in requests.
-   * True means "verify the TLS certificate provided by the server.
-   * The path to the certificate means "verify the certificate
-   * provided by the server using the public key.
-   * We're using a self-signed certificate when accessing the
-   * disco using the IP address instead of a domain name.
-   */
-  if (discoConfig.host !== discoConfig.ip) {
-    // sending request to domain name
-    return true
-  }
-
-  return certPath(discoConfig.ip)
 }
