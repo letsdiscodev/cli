@@ -39,13 +39,13 @@ export function request({
   url,
   discoConfig,
   body,
-  expectedStatus = 200,
+  expectedStatuses = [200],
 }: {
   method: string
   url: string
   discoConfig: DiscoConfig
   body?: unknown
-  expectedStatus?: number
+  expectedStatuses?: number[]
 }) {
   // will only be used if host === ip
   const sslConfiguredAgent = new https.Agent({
@@ -74,7 +74,7 @@ export function request({
   }
 
   return fetch(url, params).then(async (res) => {
-    if (!res.ok || res.status !== expectedStatus) {
+    if (!res.ok || !expectedStatuses.includes(res.status)) {
       throw new Error(`HTTP error: ${res.status} ${await res.text()}`)
     }
 

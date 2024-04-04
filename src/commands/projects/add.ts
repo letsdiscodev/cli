@@ -36,7 +36,7 @@ export default class ProjectsAdd extends Command {
 
     let res
     try {
-      res = await request({method: 'POST', url, discoConfig, body, expectedStatus: 201})
+      res = await request({method: 'POST', url, discoConfig, body, expectedStatuses: [201]})
     } catch (error: unknown) {
       this.warn((error as {message: string}).message ?? 'An error occurred')
       return
