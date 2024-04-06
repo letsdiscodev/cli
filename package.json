@@ -62,7 +62,7 @@
     "@types/ssh2-streams": "^0.1.12",
     "chalk": "^4",
     "eventsource": "^2.0.2",
-    "node-fetch": "^2.7.0",
+    "node-fetch": "^3.3.2",
     "node-ssh": "^13.1.0"
   },
   "devDependencies": {
