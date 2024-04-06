@@ -1,4 +1,4 @@
-- better handling for server events that close -- for example, after deployment. eventsource only sends ... error? check readyState state? will it be different between error and actually closed?
+- cleanup readEventSource -> don't call with onerror handler, since we now ust close the connection instead of handling the ... non real errors? check code -- have we ever handled errors coming from the sse...? can we generate sse error and see if it gets handled...??
 - rewrite disco-cli
   - env_var_set
   - env_var_get
