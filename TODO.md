@@ -1,10 +1,5 @@
-- add command to call oclif upload with `AWS_...` vars from .env
-- try auto update plugin? add it / try it / run promote
-- try on mac?
-- try on ubuntu / hetzner?
-- fwup antoine - did it work
+- better handling for server events that close -- for example, after deployment. eventsource only sends ... error? check readyState state? will it be different between error and actually closed?
 - rewrite disco-cli
-  - projects_move
   - env_var_set
   - env_var_get
   - env_var_remove
@@ -35,6 +30,12 @@
   - projects_list DONE
   - projects_add DONE
   - projects_remove DONE
+  - projects_move DONE
+- add command to call oclif upload with `AWS_...` vars from .env
+- try auto update plugin? add it / try it / run promote
+- try on mac?
+- try on ubuntu / hetzner?
+- fwup antoine - did it work
 - build for macos, ubuntu
 - connect with homebrew?
 - ubuntu installation instructions?

@@ -31,7 +31,9 @@ export function readEventSource(url: string, discoConfig: DiscoConfig, handlers:
 
   const es = new EventSource(url, params)
   es.addEventListener('message', handlers.onMessage)
-  es.addEventListener('error', handlers.onError)
+  es.addEventListener('error', () => {
+    es.close()
+  })
 }
 
 export function request({
