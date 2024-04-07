@@ -34,7 +34,10 @@ export default class Init extends Command {
 
   static description = 'initializes a new server'
 
-  static examples = ['<%= config.bin %> <%= command.id %> root@12.34.56.78']
+  static examples = [
+    '<%= config.bin %> <%= command.id %> root@12.34.56.78',
+    '<%= config.bin %> <%= command.id %> root@12.34.56.78 --version 0.4.0.dev2',
+  ]
 
   static flags = {
     version: Flags.string({default: 'latest', description: 'version of disco daemon to install'}),

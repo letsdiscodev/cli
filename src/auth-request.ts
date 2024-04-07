@@ -30,8 +30,13 @@ export function readEventSource(url: string, discoConfig: DiscoConfig, handlers:
   }
 
   const es = new EventSource(url, params)
-  es.addEventListener('message', handlers.onMessage)
-  es.addEventListener('error', () => {
+  // don't catch errors -- let eventsource 'handle'
+  // them by trying to reconnect..?
+  // ... or throw error and close connection?
+  // 'output' is our way of saying that we're sending a message
+  es.addEventListener('output', handlers.onMessage)
+  // sending 'end' is our way of signaling that we want to close the connection
+  es.addEventListener('end', () => {
     es.close()
   })
 }

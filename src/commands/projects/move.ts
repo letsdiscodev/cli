@@ -43,6 +43,10 @@ export default class ProjectsMove extends Command {
     // create project
     const createUrl = `https://${toDiscoConfig.host}/.disco/projects`
 
+    // TODO check that exportResult.deployment.commit exists
+    // otherwise, it could mean that the project that's being
+    // moved has never been deployed before
+
     const createBody = {
       name: exportResult.name,
       githubRepo: exportResult.githubRepo,
