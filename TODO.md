@@ -1,9 +1,6 @@
-- cleanup readEventSource -> don't call with onerror handler, since we now ust close the connection instead of handling the ... non real errors? check code -- have we ever handled errors coming from the sse...? can we generate sse error and see if it gets handled...??
 - rewrite disco-cli
   - env_var_set
-  - env_var_get
   - env_var_remove
-  - env_var_list
   - volumes_list
   - volumes_export
   - volumes_import
@@ -31,6 +28,9 @@
   - projects_add DONE
   - projects_remove DONE
   - projects_move DONE
+  - env_var_get DONE
+  - env_var_list DONE
+- add tests -- mock network requests
 - add command to call oclif upload with `AWS_...` vars from .env
 - try auto update plugin? add it / try it / run promote
 - try on mac?
