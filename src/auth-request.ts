@@ -10,7 +10,6 @@ export interface EventWithMessage extends Event {
 }
 
 interface Handlers {
-  onError: (event: EventWithMessage) => void
   onMessage: (event: MessageEvent) => void
 }
 
@@ -81,10 +80,12 @@ export function request({
   }
 
   return fetch(url, params).then(async (res) => {
-    if (!res.ok || !expectedStatuses.includes(res.status)) {
+    if (!expectedStatuses.includes(res.status)) {
       throw new Error(`HTTP error: ${res.status} ${await res.text()}`)
     }
 
-    return res.json()
+    // send back the server response so that caller
+    // can access .status and .json
+    return res
   })
 }

@@ -34,30 +34,25 @@ export default class ProjectsAdd extends Command {
       deploy: flags.deploy,
     }
 
-    let res
-    try {
-      res = await request({method: 'POST', url, discoConfig, body, expectedStatuses: [201]})
-    } catch (error: unknown) {
-      this.warn((error as {message: string}).message ?? 'An error occurred')
-      return
-    }
+    const res = await request({method: 'POST', url, discoConfig, body, expectedStatuses: [201]})
+    const data = await res.json()
 
     this.log(`Project added`)
 
-    if (res.project.githubRepo) {
+    if (data.project.githubRepo) {
       this.log('')
 
-      const m = /^((git@)|(https:\/\/))github\.com(:|\/)?(?<repo>\S+)\.git$/.exec(res.project.githubRepo)
+      const m = /^((git@)|(https:\/\/))github\.com(:|\/)?(?<repo>\S+)\.git$/.exec(data.project.githubRepo)
 
       let repo
       if (m) {
         repo = m.groups!.repo
       } else {
-        this.log(`Couldn't parse Github repo: ${res.project.githubRepo}`)
+        this.log(`Couldn't parse Github repo: ${data.project.githubRepo}`)
         repo = 'your-repo-here'
       }
 
-      if (res.sshKeyPub) {
+      if (data.sshKeyPub) {
         this.log('')
         this.log('Github Deploy Key')
         this.log('=================')
@@ -68,13 +63,13 @@ export default class ProjectsAdd extends Command {
         this.log('Title: Give it the title you want, for example: "Disco".')
         this.log('')
         this.log('Key:')
-        this.log(res.sshKeyPub)
+        this.log(data.sshKeyPub)
         this.log('No need for write access.')
       }
 
-      if (res.project.githubWebhookToken) {
+      if (data.project.githubWebhookToken) {
         this.log('')
-        let webhookHost = res.project.domain
+        let webhookHost = data.project.domain
         if (!webhookHost) {
           webhookHost = discoConfig.host
         }
@@ -87,7 +82,7 @@ export default class ProjectsAdd extends Command {
         this.log(`Open https://github.com/${repo}/settings/hooks/new`)
         this.log('')
         this.log('Payload URL')
-        this.log(`https://${webhookHost}/.disco/webhooks/github/${res.project.githubWebhookToken}`)
+        this.log(`https://${webhookHost}/.disco/webhooks/github/${data.project.githubWebhookToken}`)
         this.log('')
         this.log('SSL verification: Enable SSL verification')
         this.log('Content type: application/json')
@@ -97,17 +92,14 @@ export default class ProjectsAdd extends Command {
       }
     }
 
-    if (res.deployment) {
+    if (data.deployment) {
       const project = flags.name
-      this.log(`Deploying ${project}, version ${res.deployment.number}`)
-      const url = `https://${discoConfig.host}/.disco/projects/${project}/deployments/${res.deployment.number}/output`
+      this.log(`Deploying ${project}, version ${data.deployment.number}`)
+      const url = `https://${discoConfig.host}/.disco/projects/${project}/deployments/${data.deployment.number}/output`
 
       readEventSource(url, discoConfig, {
         onMessage(event: MessageEvent) {
           process.stdout.write(JSON.parse(event.data).text)
-        },
-        onError: (event: EventWithMessage) => {
-          this.error(event.message ?? 'An error occurred')
         },
       })
     }

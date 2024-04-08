@@ -20,12 +20,8 @@ export default class ProjectsList extends Command {
 
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/.disco/projects`
-    request({method: 'GET', url, discoConfig})
-      .then((res) => {
-        this.log(res.projects.map((project: Project) => project.name).join('\n'))
-      })
-      .catch((error) => {
-        this.warn(error?.message ?? 'An error occurred')
-      })
+    const res = await request({method: 'GET', url, discoConfig})
+    const data = await res.json()
+    this.log(data.projects.map((project: Project) => project.name).join('\n'))
   }
 }

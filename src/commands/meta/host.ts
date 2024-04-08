@@ -22,9 +22,10 @@ export default class MetaHost extends Command {
     const url = `https://${discoConfig.host}/.disco/disco/host`
 
     request({method: 'POST', url, discoConfig, body: {host: args.domain}})
-      .then((res) => {
+      .then(async (res) => {
+        const data = await res.json()
         this.log(`Host set to ${args.domain}`)
-        setHost(discoConfig.name, res.discoHost)
+        setHost(discoConfig.name, data.discoHost)
       })
       .catch((error) => {
         this.warn(error?.message ?? 'An error occurred')

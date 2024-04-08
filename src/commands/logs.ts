@@ -45,12 +45,6 @@ export default class Logs extends Command {
         const {message, timestamp} = logItem
         this.log(`${container} ${timestamp} ${message}`)
       },
-      onError: (event: EventWithMessage) => {
-        // this.error throws a big ugly error in the cli
-        // output which is bad. however, calling
-        // this.warn will keep showing the error in a loop...
-        this.error(event.message ?? 'An error occurred')
-      },
     })
   }
 }

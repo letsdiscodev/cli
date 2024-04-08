@@ -38,7 +38,8 @@ export default class ProjectsMove extends Command {
 
     const exportUrl = `https://${fromDiscoConfig.host}/.disco/projects/${flags.project}/export`
 
-    const exportResult: ProjectExport = await request({method: 'GET', url: exportUrl, discoConfig: fromDiscoConfig})
+    const exportResponse = await request({method: 'GET', url: exportUrl, discoConfig: fromDiscoConfig})
+    const exportResult: ProjectExport = await exportResponse.json()
 
     // create project
     const createUrl = `https://${toDiscoConfig.host}/.disco/projects`
@@ -60,13 +61,14 @@ export default class ProjectsMove extends Command {
       deploy: true,
     }
 
-    const createResult = await request({
+    const createResponse = await request({
       method: 'POST',
       url: createUrl,
       discoConfig: toDiscoConfig,
       body: createBody,
       expectedStatuses: [201],
     })
+    const createResult = await createResponse.json()
 
     if (createResult.deployment) {
       this.log(`Deploying ${flags.project}, version ${createResult.deployment.number}`)
@@ -76,11 +78,6 @@ export default class ProjectsMove extends Command {
       readEventSource(outputStream, toDiscoConfig, {
         onMessage(event) {
           process.stdout.write(JSON.parse(event.data).text)
-        },
-        onError() {
-          // eslint-disable-next-line prefer-rest-params
-          console.log('SSE', arguments)
-          // this.error(event.message ?? 'An error occurred')
         },
       })
     }
