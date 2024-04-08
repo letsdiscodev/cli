@@ -1,5 +1,4 @@
 - rewrite disco-cli
-  - env_var_set
   - env_var_remove
   - volumes_list
   - volumes_export
@@ -30,6 +29,7 @@
   - projects_move DONE
   - env_var_get DONE
   - env_var_list DONE
+  - env_var_set DONE
 - add tests -- mock network requests
 - add command to call oclif upload with `AWS_...` vars from .env
 - try auto update plugin? add it / try it / run promote
