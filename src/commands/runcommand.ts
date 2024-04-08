@@ -10,11 +10,10 @@ export default class Runcommand extends Command {
     args: Args.string({description: 'args to pass to command'}),
   }
 
-  static override aliases = ['command']
   // set to be able to receive variable number of arguments
   static strict = false
 
-  static override description = 'run a command'
+  static override description = 'run a service-level (e.g. postgres) command'
 
   static override examples = ['<%= config.bin %> <%= command.id %> postgres db:add -- "--project flask"']
 
@@ -26,9 +25,6 @@ export default class Runcommand extends Command {
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(Runcommand)
     const discoConfig = getDisco(flags.disco || null)
-
-    console.log('args', args)
-    console.log('flags', flags)
 
     const url = `https://${discoConfig.host}/.disco/projects/${args.project}/runs`
     const body = {
