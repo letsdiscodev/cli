@@ -1,22 +1,21 @@
 - rewrite disco-cli
-  - env_var_remove
+  - apikeys_list
+  - apikeys_remove
+  - run
+  - command
   - volumes_list
   - volumes_export
   - volumes_import
   - deploy
   - deploy_list
   - deploy_output
-  - run
   - syslog_add
   - syslog_remove
   - syslog_list
-  - command
   - nodes_add
   - scale
   - invite_create
   - invite_accept
-  - apikeys_list
-  - apikeys_remove
   - config.py DONE
   - logs DONE
   - init DONE
@@ -30,6 +29,7 @@
   - env_var_get DONE
   - env_var_list DONE
   - env_var_set DONE
+  - env_var_remove DONE
 - add tests -- mock network requests
 - add command to call oclif upload with `AWS_...` vars from .env
 - try auto update plugin? add it / try it / run promote
@@ -56,6 +56,7 @@
 - run tests as part of release process
 - command that expect a server (env list, many others) should check first if there's a .disco config at all -- use a parent class for all commands that take / expect a --disco param?
   - should read auth from config call be a oclif hook..? or just utility func called every time? or a parent class to all commands that require auth?
+  - https://oclif.io/docs/base_class/ for --disco ? and different one for cli commands expecting disco and project? and call getDisco automatically to set this.discoConfig? or overkill?
 
 ---
 
