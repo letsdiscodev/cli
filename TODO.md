@@ -1,5 +1,4 @@
 - rewrite disco-cli
-  - apikeys_list
   - apikeys_remove
   - run
   - command
@@ -30,6 +29,7 @@
   - env_var_list DONE
   - env_var_set DONE
   - env_var_remove DONE
+  - apikeys_list DONE
 - add tests -- mock network requests
 - add command to call oclif upload with `AWS_...` vars from .env
 - try auto update plugin? add it / try it / run promote
