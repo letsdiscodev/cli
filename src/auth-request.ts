@@ -4,6 +4,7 @@ import * as https from 'node:https'
 import fetch from 'node-fetch'
 
 import {DiscoConfig, certPath} from './config'
+import {Readable} from 'node:stream'
 
 export interface EventWithMessage extends Event {
   message?: string
@@ -46,12 +47,14 @@ export function request({
   discoConfig,
   body,
   expectedStatuses = [200],
+  bodyStream,
 }: {
   method: string
   url: string
   discoConfig: DiscoConfig
   body?: unknown
   expectedStatuses?: number[]
+  bodyStream?: Readable
 }) {
   // will only be used if host === ip
   const sslConfiguredAgent = new https.Agent({
@@ -77,6 +80,10 @@ export function request({
       'Content-Type': 'application/json',
     }
     params.body = JSON.stringify(body)
+  }
+
+  if (bodyStream) {
+    params.body = bodyStream
   }
 
   return fetch(url, params).then(async (res) => {

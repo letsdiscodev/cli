@@ -1,5 +1,4 @@
 - rewrite disco-cli
-  - volumes_import
   - deploy
   - deploy_list
   - deploy_output
@@ -30,6 +29,7 @@
   - invite_accept DONE
   - volumes_list DONE
   - volumes_export DONE
+  - volumes_import DONE
 - add tests -- mock network requests
 - add command to call oclif upload with `AWS_...` vars from .env
 - try auto update plugin? add it / try it / run promote
