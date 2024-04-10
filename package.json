@@ -89,7 +89,7 @@
     "eslint-config-oclif-typescript": "^3",
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^10",
-    "shx": "^0.3.3",
+    "shx": "^0.3.4",
     "ts-node": "^10.9.2",
     "typescript": "^5"
   },
