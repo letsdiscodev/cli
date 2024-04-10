@@ -42,8 +42,17 @@
     ],
     "topicSeparator": ":",
     "topics": {
-      "hello": {
-        "description": "Say hello to the world and others"
+      "apikeys": {
+        "description": "list and remove api keys"
+      },
+      "env": {
+        "description": "read, set and remove environment variables"
+      },
+      "meta": {
+        "description": "get and set meta information"
+      },
+      "projects": {
+        "description": "add, list, move and remove projects"
       }
     },
     "macos": {
@@ -53,12 +62,6 @@
       "s3": {
         "bucket": "disco-cli-assets"
       }
-    },
-    "topics": {
-      "apikeys": {"description": "list and remove api keys"},
-      "env": {"description": "read, set and remove environment variables"},
-      "meta": {"description": "get and set meta information"},
-      "projects": {"description": "add, list, move and remove projects"}
     }
   },
   "dependencies": {
@@ -69,7 +72,8 @@
     "chalk": "^4",
     "eventsource": "^2.0.2",
     "node-fetch": "^2.7.0",
-    "node-ssh": "^13.1.0"
+    "node-ssh": "^13.1.0",
+    "oclif": "^4.7.8"
   },
   "devDependencies": {
     "@oclif/prettier-config": "^0.2.1",
@@ -85,7 +89,6 @@
     "eslint-config-oclif-typescript": "^3",
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^10",
-    "oclif": "^4",
     "shx": "^0.3.3",
     "ts-node": "^10.9.2",
     "typescript": "^5"
