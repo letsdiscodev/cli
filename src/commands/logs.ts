@@ -36,11 +36,6 @@ export default class Logs extends Command {
     readEventSource(url, discoConfig, {
       onMessage: (event: MessageEvent) => {
         const logItem = JSON.parse(event.data)
-
-        if (!Object.keys(logItem.labels).includes('com.docker.swarm.service.name')) {
-          return
-        }
-
         const container = logItem.container.slice(1)
         const {message, timestamp} = logItem
         this.log(`${container} ${timestamp} ${message}`)
