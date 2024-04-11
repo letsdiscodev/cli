@@ -1,6 +1,6 @@
 import {Command, Flags} from '@oclif/core'
 import {getDisco} from '../../config'
-import {request, readEventSource, EventWithMessage} from '../../auth-request'
+import {request, readEventSource} from '../../auth-request'
 
 interface ProjectExport {
   name: string

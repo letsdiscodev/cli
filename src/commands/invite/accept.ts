@@ -2,7 +2,6 @@ import {Args, Command, Flags} from '@oclif/core'
 import fetch from 'node-fetch'
 
 import {addDisco, isDiscoAlreadyInConfig} from '../../config'
-import {request} from '../../auth-request'
 
 export default class InvitesAccept extends Command {
   static override args = {
@@ -22,6 +21,7 @@ export default class InvitesAccept extends Command {
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(InvitesAccept)
 
+    // not using request as this is a not an auth-signed request
     const res = await fetch(args.url, {
       method: 'POST',
       headers: {
