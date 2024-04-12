@@ -67,13 +67,13 @@
   "dependencies": {
     "@oclif/core": "^3",
     "@oclif/plugin-help": "^6",
-    "@oclif/plugin-plugins": "^4",
+    "@oclif/plugin-plugins": "^5",
     "@types/ssh2-streams": "^0.1.12",
     "chalk": "^4",
     "eventsource": "^2.0.2",
     "node-fetch": "^2.7.0",
     "node-ssh": "^13.1.0",
-    "oclif": "^4.7.8"
+    "oclif": "^4.8.0"
   },
   "devDependencies": {
     "@oclif/prettier-config": "^0.2.1",
@@ -81,10 +81,10 @@
     "@types/chai": "^4",
     "@types/eventsource": "^1.1.15",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^18",
+    "@types/node": "^20",
     "@types/node-fetch": "^2.6.11",
-    "chai": "^4",
-    "eslint": "^8.57.0",
+    "chai": "^5",
+    "eslint": "^9.0.0",
     "eslint-config-oclif": "^5",
     "eslint-config-oclif-typescript": "^3",
     "eslint-config-prettier": "^9.1.0",
