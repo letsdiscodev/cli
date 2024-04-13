@@ -3,12 +3,12 @@ import {Args, Command, Flags} from '@oclif/core'
 import {getDisco} from '../../config'
 import {request} from '../../auth-request'
 
-export default class SyslogAdd extends Command {
+export default class SyslogRemove extends Command {
   static override args = {
     syslogDestination: Args.string({description: 'syslog destination, should be syslog:// or syslog+tls:// protocol'}),
   }
 
-  static override description = 'add a log destination'
+  static override description = 'remove a log destination'
 
   static override examples = [
     '<%= config.bin %> <%= command.id %> syslog://logs.example.com:4415',
@@ -20,7 +20,7 @@ export default class SyslogAdd extends Command {
   }
 
   public async run(): Promise<void> {
-    const {args, flags} = await this.parse(SyslogAdd)
+    const {args, flags} = await this.parse(SyslogRemove)
 
     const discoConfig = getDisco(flags.disco || null)
     const requestUrl = `https://${discoConfig.host}/.disco/syslog`
@@ -29,7 +29,7 @@ export default class SyslogAdd extends Command {
       url: requestUrl,
       discoConfig,
       body: {
-        action: 'add',
+        action: 'remove',
         url: args.syslogDestination,
       },
     })

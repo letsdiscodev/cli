@@ -6,8 +6,6 @@ updates:
       interval: 'weekly'
       day: 'saturday'
     versioning-strategy: 'increase'
-    labels:
-      - 'dependencies'
     pull-request-branch-name:
       separator: '-'
     ignore:
@@ -15,6 +13,6 @@ updates:
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
     groups:
-      npm-packages:
+      dependencies:
         patterns:
           - '*'

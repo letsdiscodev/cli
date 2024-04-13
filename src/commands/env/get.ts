@@ -27,7 +27,6 @@ export default class EnvGet extends Command {
     const {args, flags} = await this.parse(EnvGet)
 
     const discoConfig = getDisco(flags.disco || null)
-    this.log(`Fetching env variable for ${flags.project}: ${args.envVar}`)
     const url = `https://${discoConfig.host}/.disco/projects/${flags.project}/env/${args.envVar}`
     const res = await request({method: 'GET', url, discoConfig, expectedStatuses: [200, 404]})
 
