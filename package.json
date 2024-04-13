@@ -1,6 +1,6 @@
 {
   "name": "disco",
-  "version": "0.0.0",
+  "version": "0.4.0",
   "description": "deploy and manage your web projects",
   "keywords": [
     "oclif"
@@ -45,14 +45,26 @@
       "apikeys": {
         "description": "list and remove api keys"
       },
+      "deploy": {
+        "description": "manage deployments and see deployment output"
+      },
       "env": {
         "description": "read, set and remove environment variables"
+      },
+      "invite": {
+        "description": "create and accept invites to manage a server"
       },
       "meta": {
         "description": "get and set meta information"
       },
       "projects": {
         "description": "add, list, move and remove projects"
+      },
+      "syslog": {
+        "description": "add, list and remove log destinations"
+      },
+      "volumes": {
+        "description": "list, import and export volume data"
       }
     },
     "macos": {

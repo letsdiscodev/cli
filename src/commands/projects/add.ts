@@ -1,4 +1,4 @@
-import {Command, Flags} from '@oclif/core'
+import {Command, Flags, ux} from '@oclif/core'
 import {getDisco} from '../../config'
 import {request, readEventSource} from '../../auth-request'
 
@@ -54,7 +54,7 @@ export default class ProjectsAdd extends Command {
 
       if (data.sshKeyPub) {
         this.log('')
-        this.log('Github Deploy Key')
+        this.log(ux.colorize('green', 'Github Deploy Key'))
         this.log('=================')
         this.log('')
         this.log('You need to give read access to your repo to Disco.')
@@ -75,7 +75,7 @@ export default class ProjectsAdd extends Command {
         }
 
         this.log('')
-        this.log('Github Webhook')
+        this.log(ux.colorize('green', 'Github Webhook'))
         this.log('==============')
         this.log('')
         this.log('To deploy automatically when commits are pushed.')
