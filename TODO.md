@@ -1,3 +1,13 @@
+- pack tarballs
+- test tarball on mac, ubuntu, fedora?
+- upload, promote
+- try releasing .exe? try it?
+- update documentation re: tarballs & supported OS
+- work on homepage!
+- update docs / examples to make sure they're compatible with new cli
+
+---
+
 - salesforces does pkg, .exe and linux tarball directly
   - no curl, no brew
 - change oclif-hello-world in the readme, point to docs
@@ -52,6 +62,8 @@
 - centralize running ssh command code from init.ts and nodes:add
 - for the future: see list of nodes and see list of scaled servers
 - maybe on webhook ping, try to do a deployment..? but deploy key might not have been set ... but also CLI could walk you through steps and ask you to add deploy key first AND THEN webhook... AND THEN deploy...!
+- migrate to esm version -- at some point?
+- release 0.4.1 with latest updates to CLI
 
 ---
 

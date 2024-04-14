@@ -5,7 +5,7 @@ import {request} from '../../auth-request'
 
 export default class InvitesCreate extends Command {
   static override args = {
-    name: Args.string({description: 'api key invitee name'}),
+    name: Args.string({description: 'api key invitee name', required: true}),
   }
 
   static override description =

@@ -1,6 +1,6 @@
 {
   "name": "disco",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "deploy and manage your web projects",
   "keywords": [
     "oclif"
@@ -28,7 +28,6 @@
     "prepare": "npm run build",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
     "posttest": "npm run lint",
-    "version": "oclif readme",
     "pack-tarballs": "oclif pack tarballs",
     "pack-macos": "oclif pack macos"
   },

@@ -56,12 +56,6 @@ export function request({
   expectedStatuses?: number[]
   bodyStream?: Readable
 }) {
-  // will only be used if host === ip
-  const sslConfiguredAgent = new https.Agent({
-    ca: fs.readFileSync(certPath(discoConfig.ip)),
-    rejectUnauthorized: true,
-  })
-
   const params: fetch.RequestInit = {
     method,
     headers: {
@@ -71,7 +65,10 @@ export function request({
   }
 
   if (discoConfig.host === discoConfig.ip) {
-    params.agent = sslConfiguredAgent
+    params.agent = new https.Agent({
+      ca: fs.readFileSync(certPath(discoConfig.ip)),
+      rejectUnauthorized: true,
+    })
   }
 
   if (method === 'POST') {

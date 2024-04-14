@@ -93,7 +93,11 @@ export function getConfig(): {discos: HostDiscoConfig} {
   }
 
   const configData = fs.readFileSync(CONFIG_PATH, 'utf8')
-  return JSON.parse(configData)
+  try {
+    return JSON.parse(configData)
+  } catch (error) {
+    throw new Error(`An error happened when trying to read the ~/.disco/config.json file -- ${error}`)
+  }
 }
 
 export function saveConfig(config: {discos: HostDiscoConfig}): void {
