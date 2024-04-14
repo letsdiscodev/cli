@@ -38,7 +38,7 @@ USAGE
 * [`disco help [COMMAND]`](#disco-help-command)
 * [`disco init SSHSTRING`](#disco-init-sshstring)
 * [`disco invite:accept URL`](#disco-inviteaccept-url)
-* [`disco invite:create [NAME]`](#disco-invitecreate-name)
+* [`disco invite:create NAME`](#disco-invitecreate-name)
 * [`disco logs`](#disco-logs)
 * [`disco meta:host DOMAIN`](#disco-metahost-domain)
 * [`disco meta:info`](#disco-metainfo)
@@ -332,13 +332,13 @@ EXAMPLES
 
 _See code: [src/commands/invite/accept.ts](https://github.com/letsdiscodev/cli/blob/v0.4.1/src/commands/invite/accept.ts)_
 
-## `disco invite:create [NAME]`
+## `disco invite:create NAME`
 
 invite someone to deploy to this server. server must have a dedicated domain name, see the meta:host command
 
 ```
 USAGE
-  $ disco invite:create [NAME] [--disco <value>]
+  $ disco invite:create NAME [--disco <value>]
 
 ARGUMENTS
   NAME  api key invitee name

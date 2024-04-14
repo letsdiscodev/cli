@@ -1,6 +1,7 @@
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
+import {ux} from '@oclif/core'
 
 const HOME_DIR = os.homedir()
 const CONFIG_PATH = `${HOME_DIR}/.disco/config.json`
@@ -56,6 +57,7 @@ export function discoAlreadyInConfig(name: string): boolean {
 
 export function getDisco(name: null | string): DiscoConfig {
   const config = getConfig()
+
   if (name === null) {
     const discos = Object.keys(config.discos)
     if (discos.length !== 1) {
@@ -63,6 +65,12 @@ export function getDisco(name: null | string): DiscoConfig {
     }
 
     name = discos[0]
+  } else if (!(name in config.discos)) {
+    throw new Error(
+      `disco ${name} not in config. available discos:\n${Object.keys(config.discos)
+        .map((d) => ux.colorize('green', `- ${d}`))
+        .join('\n')}`,
+    )
   }
 
   return config.discos[name]

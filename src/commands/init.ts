@@ -73,30 +73,36 @@ export default class Init extends Command {
       progressBar = new cliProgress.SingleBar({format: '[{bar}] {percentage}%', clearOnComplete: true})
       progressBar.start(count, 0)
     }
+
     if (!dockerAlreadyInstalled) {
       if (verbose) {
         this.log('Installing Docker')
       }
+
       try {
         await installDocker({ssh, verbose, progressBar})
-      } catch (err) {
-        this.error(`Failed to install Docker\n${err}`)
+      } catch (error) {
+        this.error(`Failed to install Docker\n${error}`)
       }
     } else if (verbose) {
       this.log('Docker already installed')
     }
+
     if (verbose) {
       this.log('Initializing Disco')
     }
+
     const {apiKey, certificate} = await initDisco({ssh, ip, version, verbose, progressBar})
     if (verbose) {
       this.log('Adding Disco to local config')
     }
+
     addDisco(host, host, ip, apiKey, certificate)
     ssh.dispose()
     if (progressBar !== undefined) {
       progressBar.stop()
     }
+
     this.log('Done')
   }
 }
@@ -140,6 +146,7 @@ async function connectSsh({host, username}: {host: string; username: string}): P
       return ssh
     } catch {}
   }
+
   const password = await inquirerPassword({message: `${username}@${host}'s password:`})
   await ssh.connect({
     host,
@@ -151,7 +158,7 @@ async function connectSsh({host, username}: {host: string; username: string}): P
 
 async function checkDockerInstalled(ssh: NodeSSH): Promise<boolean> {
   const {code} = await ssh.execCommand('command -v docker >/dev/null 2>&1')
-  return code == 0
+  return code === 0
 }
 
 async function installDocker({
@@ -177,7 +184,7 @@ async function installDocker({
     'DEBIAN_FRONTEND=noninteractive sudo apt-get install -y docker-ce docker-ce-cli ' +
       'containerd.io docker-buildx-plugin docker-compose-plugin',
   ]
-  for (const command of commands) {
+  for await (const command of commands) {
     await runSshCommand({ssh, command, verbose, progressBar})
   }
 }
@@ -253,6 +260,7 @@ async function runSshCommand({
       if (verbose) {
         process.stdout.write(str)
       }
+
       if (progressBar !== undefined) {
         progressBar.increment()
       }
@@ -263,6 +271,7 @@ async function runSshCommand({
       if (verbose) {
         process.stderr.write(str)
       }
+
       if (progressBar !== undefined) {
         progressBar.increment()
       }
@@ -271,5 +280,6 @@ async function runSshCommand({
   if (code !== 0) {
     throw new Error(`Failed to run command over SSH\n${command}\n${stderr}`)
   }
+
   return stdout
 }
