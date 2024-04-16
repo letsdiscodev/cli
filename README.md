@@ -1,11 +1,9 @@
-oclif-hello-world
-=================
+# disco cli
 
-oclif example Hello World CLI
+Please refer to [the disco documentation site](https://docs.letsdisco.dev/).
 
-[![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
-[![GitHub license](https://img.shields.io/github/license/oclif/hello-world)](https://github.com/oclif/hello-world/blob/main/LICENSE)
-
+---
+ 
 <!-- toc -->
 * [Usage](#usage)
 * [Commands](#commands)
