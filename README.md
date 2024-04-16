@@ -1,6 +1,6 @@
-# disco cli
+# disco command line tool
 
-Please refer to [the disco documentation site](https://docs.letsdisco.dev/).
+## Please refer to [the disco documentation site](https://docs.letsdisco.dev/)
 
 ---
  
