@@ -10,6 +10,7 @@ import select from '@inquirer/select'
 import input from '@inquirer/input'
 import {addDisco, isDiscoAlreadyInConfig} from '../config'
 import {SingleBar} from 'cli-progress'
+import {Readable} from 'node:stream'
 
 export default class Init extends Command {
   static args = {
@@ -26,11 +27,13 @@ export default class Init extends Command {
   static flags = {
     version: Flags.string({default: 'latest', description: 'version of disco daemon to install'}),
     verbose: Flags.boolean({default: false, description: 'show extra output'}),
+    image: Flags.string({description: 'local Docker image to upload and use (mostly for Disco development)'}),
   }
 
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(Init)
-    const {version, verbose} = flags
+    const {version, verbose, image: imageFlag} = flags
+    const image = imageFlag === undefined ? `letsdiscodev/daemon:${version}` : imageFlag
     const [argUsername, host] = args.sshString.split('@')
     let username = argUsername
     if (isDiscoAlreadyInConfig(host)) {
@@ -109,25 +112,21 @@ export default class Init extends Command {
     await installSpecificEnvRequirements({ssh, verbose, progressBar})
     ssh = await reconnectSshAfterRebootIfNeeded({ssh, verbose, host, username, password})
 
-    if (!dockerAlreadyInstalled) {
-      if (verbose) {
-        this.log('Installing Docker')
-      }
+    await installDockerIfNeeded({dockerAlreadyInstalled, verbose, ssh, progressBar})
 
-      try {
-        await installDocker({ssh, verbose, progressBar})
-      } catch (error) {
-        this.error(`Failed to install Docker\n${error}`)
-      }
-    } else if (verbose) {
-      this.log('Docker already installed')
+    if (imageFlag !== undefined) {
+      await uploadLocalImage({
+        image: imageFlag,
+        ssh,
+        verbose,
+      })
     }
 
     if (verbose) {
       this.log('Initializing Disco')
     }
 
-    const {apiKey, certificate} = await initDisco({ssh, ip, version, verbose, progressBar})
+    const {apiKey, certificate} = await initDisco({ssh, ip, image, verbose, progressBar})
     if (verbose) {
       this.log('Adding Disco to local config')
     }
@@ -139,6 +138,61 @@ export default class Init extends Command {
     }
 
     this.log('Done')
+  }
+}
+
+async function uploadLocalImage({image, ssh, verbose}: {image: string; ssh: NodeSSH; verbose: boolean}): Promise<void> {
+  if (verbose) {
+    process.stdout.write(`Uploading image ${image}\n`)
+  }
+
+  const dockerSaveProcess = child.spawn('docker', ['save', image])
+  const processCompleted = new Promise<void>((resolve, reject) => {
+    dockerSaveProcess.on('close', (code) => {
+      if (code === 0) {
+        resolve()
+      } else {
+        reject(new Error(`docker save ${image} returned code ${code}`))
+      }
+    })
+  })
+  await runSshCommand({
+    ssh,
+    command: 'docker load',
+    stdin: dockerSaveProcess.stdout,
+    progressBar: undefined,
+    verbose,
+  })
+
+  await processCompleted
+  if (verbose) {
+    process.stdout.write('Upload complete\n')
+  }
+}
+
+async function installDockerIfNeeded({
+  dockerAlreadyInstalled,
+  verbose,
+  ssh,
+  progressBar,
+}: {
+  dockerAlreadyInstalled: boolean
+  verbose: boolean
+  ssh: NodeSSH
+  progressBar: SingleBar | undefined
+}): Promise<void> {
+  if (!dockerAlreadyInstalled) {
+    if (verbose) {
+      process.stdout.write('Installing Docker\n')
+    }
+
+    try {
+      await installDocker({ssh, verbose, progressBar})
+    } catch (error) {
+      throw new Error(`Failed to install Docker\n${error}`)
+    }
+  } else if (verbose) {
+    process.stdout.write('Docker already installed\n')
   }
 }
 
@@ -244,13 +298,13 @@ async function installDocker({
 async function initDisco({
   ssh,
   ip,
-  version,
+  image,
   verbose,
   progressBar,
 }: {
   ssh: NodeSSH
   ip: string
-  version: string
+  image: string
   verbose: boolean
   progressBar: SingleBar | undefined
 }): Promise<{apiKey: string; certificate: string}> {
@@ -266,7 +320,8 @@ async function initDisco({
     `--env DISCO_IP="${ip}" ` +
     '--env HOST_HOME=$HOME ' +
     '--env DISCO_VERBOSE=true ' +
-    `letsdiscodev/daemon:${version} ` +
+    `--env DISCO_IMAGE=${image} ` +
+    `${image} ` +
     'disco_init'
   const output = await runSshCommand({ssh, command, verbose, progressBar})
   const apiKey = extractApiKey(output)
@@ -301,7 +356,7 @@ async function runSshCommand({
 }: {
   ssh: NodeSSH
   command: string
-  stdin?: string
+  stdin?: Readable | string
   verbose: boolean
   progressBar: SingleBar | undefined
 }): Promise<string> {
