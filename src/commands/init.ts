@@ -220,7 +220,7 @@ async function installDocker({
 }: {
   ssh: NodeSSH
   verbose: boolean
-  progressBar: cliProgress.SingleBar | undefined
+  progressBar: SingleBar | undefined
 }): Promise<void> {
   const commands = [
     'sudo apt-get update',
@@ -252,7 +252,7 @@ async function initDisco({
   ip: string
   version: string
   verbose: boolean
-  progressBar: cliProgress.SingleBar | undefined
+  progressBar: SingleBar | undefined
 }): Promise<{apiKey: string; certificate: string}> {
   const command =
     'docker run ' +
@@ -303,7 +303,7 @@ async function runSshCommand({
   command: string
   stdin?: string
   verbose: boolean
-  progressBar: cliProgress.SingleBar | undefined
+  progressBar: SingleBar | undefined
 }): Promise<string> {
   let stdout = ''
   let stderr = ''
@@ -367,7 +367,7 @@ async function installSpecificEnvRequirements({
 }: {
   ssh: NodeSSH
   verbose: boolean
-  progressBar: cliProgress.SingleBar | undefined
+  progressBar: SingleBar | undefined
 }): Promise<void> {
   const unameR = await runSshCommand({ssh, command: 'uname -r', verbose, progressBar: undefined})
   if (verbose) {
