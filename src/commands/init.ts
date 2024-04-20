@@ -20,19 +20,19 @@ export default class Init extends Command {
   static description = 'initializes a new server'
 
   static examples = [
-    '<%= config.bin %> <%= command.id %> root@12.34.56.78',
-    '<%= config.bin %> <%= command.id %> root@12.34.56.78 --version 0.4.0',
+    '<%= config.bin %> <%= command.id %> root@disco.example.com',
+    '<%= config.bin %> <%= command.id %> root@disco.example.com --version 0.4.0',
   ]
 
   static flags = {
     version: Flags.string({default: 'latest', description: 'version of disco daemon to install'}),
     verbose: Flags.boolean({default: false, description: 'show extra output'}),
-    image: Flags.string({description: 'local Docker image to upload and use (mostly for Disco development)'}),
+    'local-image': Flags.string({description: 'local Docker image to upload and use (mostly for Disco development)'}),
   }
 
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(Init)
-    const {version, verbose, image: imageFlag} = flags
+    const {version, verbose, 'local-image': imageFlag} = flags
     const image = imageFlag === undefined ? `letsdiscodev/daemon:${version}` : imageFlag
     const [argUsername, host] = args.sshString.split('@')
     let username = argUsername
