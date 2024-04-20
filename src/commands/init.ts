@@ -3,10 +3,13 @@ import * as dns from 'node:dns'
 import fs from 'node:fs/promises'
 import * as os from 'node:os'
 import * as path from 'node:path'
+import * as child from 'node:child_process'
 import {NodeSSH} from 'node-ssh'
 import inquirerPassword from '@inquirer/password'
+import select from '@inquirer/select'
+import input from '@inquirer/input'
 import {addDisco, isDiscoAlreadyInConfig} from '../config'
-import cliProgress from 'cli-progress'
+import {SingleBar} from 'cli-progress'
 
 export default class Init extends Command {
   static args = {
@@ -28,7 +31,8 @@ export default class Init extends Command {
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(Init)
     const {version, verbose} = flags
-    const [username, host] = args.sshString.split('@')
+    const [argUsername, host] = args.sshString.split('@')
+    let username = argUsername
     if (isDiscoAlreadyInConfig(host)) {
       this.error('host already present in .disco config')
     }
@@ -57,11 +61,39 @@ export default class Init extends Command {
     if (!ip) {
       this.error('could not resolve IP address for host')
     }
+
     let ssh
+    let password
     try {
-      ssh = await connectSsh({host, username})
+      ;({ssh, password} = await connectSsh({host, username}))
     } catch {
       this.error('could not connect to SSH')
+    }
+
+    if (username !== 'root') {
+      const canSudoWithoutPassword = await userCanSudoWitoutPassword({ssh, verbose})
+      // use password if provided, or ask for one if needed
+      const passwordToUse =
+        password === undefined
+          ? canSudoWithoutPassword
+            ? undefined
+            : await inquirerPassword({message: `${username}@${host}'s password:`})
+          : password
+      if (verbose) {
+        if (passwordToUse === undefined) {
+          process.stdout.write('Will not use password\n')
+        } else {
+          process.stdout.write('Will use password\n')
+        }
+      }
+
+      await setupRootSshAccess({ssh, password: passwordToUse, verbose})
+      username = 'root'
+      try {
+        ;({ssh, password} = await connectSsh({host, username}))
+      } catch {
+        this.error('could not connect to SSH as root')
+      }
     }
 
     const dockerAlreadyInstalled = await checkDockerInstalled(ssh)
@@ -70,9 +102,12 @@ export default class Init extends Command {
       const dockerInstallOutputCount = 309
       const discoInitOutputCount = 261
       const count = dockerAlreadyInstalled ? discoInitOutputCount : dockerInstallOutputCount + discoInitOutputCount
-      progressBar = new cliProgress.SingleBar({format: '[{bar}] {percentage}%', clearOnComplete: true})
+      progressBar = new SingleBar({format: '[{bar}] {percentage}%', clearOnComplete: true})
       progressBar.start(count, 0)
     }
+
+    await installSpecificEnvRequirements({ssh, verbose, progressBar})
+    ssh = await reconnectSshAfterRebootIfNeeded({ssh, verbose, host, username, password})
 
     if (!dockerAlreadyInstalled) {
       if (verbose) {
@@ -110,7 +145,7 @@ export default class Init extends Command {
 async function getSshPrivateKeyPaths(): Promise<string[]> {
   const sshDir = path.join(os.homedir(), '.ssh')
   const filenames = await fs.readdir(sshDir)
-  const publicKeys = filenames.filter((filename) => /^.+\.pub$/.test(filename))
+  const publicKeys = filenames.filter((filename) => filename.endsWith('.pub'))
   const possiblePrivKeyPaths = publicKeys
     .map((pubKeyFilename) => pubKeyFilename.slice(0, -4))
     .map((privKeyFilename) => path.join(sshDir, privKeyFilename))
@@ -133,7 +168,15 @@ async function getSshPrivateKeyPaths(): Promise<string[]> {
   return privKeyPaths
 }
 
-async function connectSsh({host, username}: {host: string; username: string}): Promise<NodeSSH> {
+async function connectSsh({
+  host,
+  username,
+  password,
+}: {
+  host: string
+  username: string
+  password?: boolean | string | undefined // false means don't try password
+}): Promise<{ssh: NodeSSH; password: string | undefined}> {
   const privKeyPaths = await getSshPrivateKeyPaths()
   const ssh = new NodeSSH()
   for await (const sshKeyPath of privKeyPaths) {
@@ -142,18 +185,27 @@ async function connectSsh({host, username}: {host: string; username: string}): P
         host,
         privateKeyPath: sshKeyPath,
         username,
+        timeout: 5,
       })
-      return ssh
+      return {ssh, password: undefined}
     } catch {}
   }
 
-  const password = await inquirerPassword({message: `${username}@${host}'s password:`})
-  await ssh.connect({
-    host,
-    username,
-    password,
-  })
-  return ssh
+  if (password === undefined) {
+    password = await inquirerPassword({message: `${username}@${host}'s password:`})
+  }
+
+  if (typeof password === 'string') {
+    await ssh.connect({
+      host,
+      username,
+      password,
+      timeout: 5,
+    })
+    return {ssh, password}
+  }
+
+  throw new Error('Failed to connect with SSH')
 }
 
 async function checkDockerInstalled(ssh: NodeSSH): Promise<boolean> {
@@ -243,17 +295,24 @@ function extractPublicKeyCertificate(output: string): string {
 async function runSshCommand({
   ssh,
   command,
+  stdin,
   verbose,
   progressBar,
 }: {
   ssh: NodeSSH
   command: string
+  stdin?: string
   verbose: boolean
   progressBar: cliProgress.SingleBar | undefined
 }): Promise<string> {
   let stdout = ''
   let stderr = ''
+  if (verbose) {
+    process.stdout.write(`$ ${command}\n`)
+  }
+
   const {code} = await ssh.execCommand(command, {
+    stdin,
     onStdout(chunk) {
       const str = chunk.toString('utf8')
       stdout += str
@@ -282,4 +341,300 @@ async function runSshCommand({
   }
 
   return stdout
+}
+
+async function userCanSudoWitoutPassword({ssh, verbose}: {ssh: NodeSSH; verbose: boolean}): Promise<boolean> {
+  try {
+    await runSshCommand({ssh, command: 'sudo -n true', verbose, progressBar: undefined})
+    if (verbose) {
+      process.stdout.write('Can run sudo commands without password\n')
+    }
+
+    return true
+  } catch {
+    if (verbose) {
+      process.stdout.write('Sudo commands require password\n')
+    }
+
+    return false
+  }
+}
+
+async function installSpecificEnvRequirements({
+  ssh,
+  verbose,
+  progressBar,
+}: {
+  ssh: NodeSSH
+  verbose: boolean
+  progressBar: cliProgress.SingleBar | undefined
+}): Promise<void> {
+  const unameR = await runSshCommand({ssh, command: 'uname -r', verbose, progressBar: undefined})
+  if (verbose) {
+    process.stdout.write('uname -r\n')
+    process.stdout.write(unameR)
+  }
+
+  const isPi = /raspi/.test(unameR)
+  if (isPi) {
+    if (verbose) {
+      process.stdout.write('Detected Raspberry Pi\n')
+    }
+
+    try {
+      // check if linux-modules-extra-raspi is already installed
+      await runSshCommand({ssh, command: 'apt list --installed | grep linux-modules-extra-raspi', verbose, progressBar})
+    } catch {
+      // linux-modules-extra-raspi is not already installed
+      if (progressBar !== undefined) {
+        progressBar.setTotal(progressBar.getTotal() + 600)
+      }
+
+      await runSshCommand({ssh, command: 'apt install -y linux-modules-extra-raspi', verbose, progressBar})
+      await runSshCommand({ssh, command: 'shutdown --reboot 0', verbose, progressBar})
+      ssh.dispose()
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 3000)
+      })
+    }
+  }
+}
+
+async function setupRootSshAccess({
+  ssh,
+  verbose,
+  password,
+}: {
+  ssh: NodeSSH
+  verbose: boolean
+  password: string | undefined
+}) {
+  const permitRootLogin = await readPermitRootLogin({ssh, verbose})
+  if (permitRootLogin === null) {
+    // no statement set, add one
+    await addPermitRootLoginProhibitPassword({ssh, password, verbose})
+  } else if (!['nopwd', 'prohibit-password', 'without-password', 'yes'].includes(permitRootLogin)) {
+    // currently explicitly not permissive enough
+    // allow SSH root login with private key
+    await updatePermitRootLoginToProhibitPassword({ssh, password, verbose})
+  }
+
+  await uploadRootSshPublicKey({ssh, verbose, password})
+  await restartSshD({ssh, verbose, password})
+}
+
+async function readPermitRootLogin({ssh, verbose}: {ssh: NodeSSH; verbose: boolean}): Promise<null | string> {
+  const statement = await runSshCommand({
+    ssh,
+    command: 'cat /etc/ssh/sshd_config | grep PermitRootLogin',
+    verbose,
+    progressBar: undefined,
+  })
+  if (statement.startsWith('PermitRootLogin')) {
+    return statement.split(' ')[1]
+  }
+
+  return null
+}
+
+async function updatePermitRootLoginToProhibitPassword({
+  ssh,
+  password,
+  verbose,
+}: {
+  ssh: NodeSSH
+  password: string | undefined
+  verbose: boolean
+}): Promise<void> {
+  await runSshCommand({
+    ssh,
+    command: `sudo ${
+      password === undefined ? ' ' : '-S '
+    }sed -i '0,/^PermitRootLogin/c\\PermitRootLogin prohibit-password' /etc/ssh/sshd_config`,
+    verbose,
+    stdin: password,
+    progressBar: undefined,
+  })
+}
+
+async function addPermitRootLoginProhibitPassword({
+  ssh,
+  password,
+  verbose,
+}: {
+  ssh: NodeSSH
+  password: string | undefined
+  verbose: boolean
+}): Promise<void> {
+  await runSshCommand({
+    ssh,
+    command: `sudo ${
+      password === undefined ? ' ' : '-S '
+    } sh -c "echo 'PermitRootLogin prohibit-password' >> /etc/ssh/sshd_config"`,
+    verbose,
+    stdin: password,
+    progressBar: undefined,
+  })
+}
+
+async function uploadRootSshPublicKey({
+  ssh,
+  verbose,
+  password,
+}: {
+  ssh: NodeSSH
+  verbose: boolean
+  password: string | undefined
+}): Promise<void> {
+  const privKeyPaths = await getSshPrivateKeyPaths()
+  const selectedPrivKeyName = await select({
+    message: 'Select SSH key to setup for root access',
+    choices: [
+      ...privKeyPaths.map((keyPath) => ({
+        name: keyPath,
+        value: keyPath,
+      })),
+      {
+        name: 'Create a new one',
+        value: '__NEW__',
+      },
+    ],
+  })
+  let localPublicKeyPath: string
+  if (selectedPrivKeyName === '__NEW__') {
+    const idRsaExists = privKeyPaths.filter((keyPath) => keyPath.endsWith(`${path.sep}id_rsa`))
+    const defaultKeyName = idRsaExists ? `id_rsa_disco_${Math.floor(Math.random() * 9_999_999)}` : 'id_rsa'
+    const privKeyName = await input({message: 'Enter the name of the new key to create', default: defaultKeyName})
+    const localPrivKeyPath = path.join(os.homedir(), '.ssh', privKeyName)
+    localPublicKeyPath = `${localPrivKeyPath}.pub`
+    await new Promise<void>((resolve, reject) => {
+      child.exec(`ssh-keygen -f ${localPrivKeyPath} -N ""`, (error, stdout, stderr) => {
+        if (error) {
+          reject(new Error('Error running ssh-keygen'))
+        }
+
+        if (verbose) {
+          process.stdout.write(stdout)
+          process.stderr.write(stderr)
+        }
+
+        resolve()
+      })
+    })
+  } else {
+    localPublicKeyPath = `${selectedPrivKeyName}.pub`
+  }
+
+  const publicKeyContent = await fs.readFile(localPublicKeyPath)
+  await runSshCommand({
+    ssh,
+    command: `sudo ${password === undefined ? ' ' : '-S '}mkdir -p /root/.ssh`,
+    verbose,
+    stdin: password,
+    progressBar: undefined,
+  })
+  await runSshCommand({
+    ssh,
+    command: `sudo ${password === undefined ? ' ' : '-S '}touch /root/.ssh/authorized_keys`,
+    verbose,
+    stdin: password,
+    progressBar: undefined,
+  })
+  let keyAlreadyAuthorized
+  try {
+    await runSshCommand({
+      ssh,
+      command: `sudo ${
+        password === undefined ? ' ' : '-S '
+      }sh -c "cat /root/.ssh/authorized_keys | grep '${publicKeyContent}'"`,
+      verbose,
+      stdin: password,
+      progressBar: undefined,
+    })
+    keyAlreadyAuthorized = true
+  } catch {
+    keyAlreadyAuthorized = false
+  }
+
+  if (!keyAlreadyAuthorized) {
+    await runSshCommand({
+      ssh,
+      command: `sudo ${
+        password === undefined ? ' ' : '-S '
+      }sh -c "echo '${publicKeyContent}' >> /root/.ssh/authorized_keys"`,
+      verbose,
+      stdin: password,
+      progressBar: undefined,
+    })
+  }
+}
+
+async function restartSshD({
+  ssh,
+  verbose,
+  password,
+}: {
+  ssh: NodeSSH
+  verbose: boolean
+  password: string | undefined
+}): Promise<void> {
+  await runSshCommand({
+    ssh,
+    command: `sudo ${password === undefined ? ' ' : '-S '}/etc/init.d/ssh restart`,
+    stdin: password,
+    verbose,
+    progressBar: undefined,
+  })
+}
+
+async function reconnectSshAfterRebootIfNeeded({
+  ssh,
+  verbose,
+  host,
+  username,
+  password,
+}: {
+  ssh: NodeSSH
+  verbose: boolean
+  host: string
+  username: string
+  password: boolean | string | undefined
+}): Promise<NodeSSH> {
+  if (ssh.isConnected()) {
+    if (verbose) {
+      process.stdout.write('Still connected with SSH, not trying to reconnect\n')
+    }
+
+    return ssh
+  }
+
+  let retries = 50
+  while (retries > 0) {
+    try {
+      if (verbose) {
+        process.stdout.write(`Reconnecting SSH session after rebooting, ${retries} attempts left.\n`)
+      }
+
+      // eslint-disable-next-line no-await-in-loop
+      ;({ssh, password} = await connectSsh({
+        host,
+        username,
+        // do not ask for password if there's no password at this point
+        password: password === undefined ? false : password,
+      }))
+      return ssh
+    } catch {
+      retries--
+      if (verbose) {
+        process.stdout.write(`Failed to connect. Waiting 3 seconds.\n`)
+      }
+
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((resolve) => {
+        setTimeout(resolve, 3000)
+      })
+    }
+  }
+
+  throw new Error('Failed to connect to SSH after rebooting')
 }
