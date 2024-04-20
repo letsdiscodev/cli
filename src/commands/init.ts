@@ -319,7 +319,6 @@ async function initDisco({
     '--mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock ' +
     `--env DISCO_IP="${ip}" ` +
     '--env HOST_HOME=$HOME ' +
-    '--env DISCO_VERBOSE=true ' +
     `--env DISCO_IMAGE=${image} ` +
     `${image} ` +
     'disco_init'
