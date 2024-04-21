@@ -1,17 +1,14 @@
 import * as fs from 'node:fs'
 import * as os from 'node:os'
-import * as path from 'node:path'
 import {ux} from '@oclif/core'
 
 const HOME_DIR = os.homedir()
 const CONFIG_PATH = `${HOME_DIR}/.disco/config.json`
 const CONFIG_FOLDER = `${HOME_DIR}/.disco`
-const CERTS_FOLDER = `${HOME_DIR}/.disco/certs`
 
 export interface DiscoConfig {
   apiKey: string
   host: string
-  ip: string
   name: string
 }
 
@@ -24,13 +21,7 @@ export function isDiscoAlreadyInConfig(name: string): boolean {
   return Object.keys(config.discos).includes(name)
 }
 
-export function addDisco(
-  name: string,
-  host: string,
-  ip: string,
-  apiKey: string,
-  publicKey: null | string = null,
-): void {
+export function addDisco({name, host, apiKey}: {name: string; host: string; apiKey: string}): void {
   const config = getConfig()
   if (name in config.discos) {
     throw new Error(`Disco ${name} already in config`)
@@ -39,15 +30,10 @@ export function addDisco(
   config.discos[name] = {
     apiKey,
     host,
-    ip,
     name,
   }
 
   saveConfig(config)
-
-  if (publicKey !== null) {
-    writeCert(ip, publicKey)
-  }
 }
 
 export function discoAlreadyInConfig(name: string): boolean {
@@ -115,20 +101,4 @@ export function saveConfig(config: {discos: HostDiscoConfig}): void {
 
   const configData = JSON.stringify(config, null, 4)
   fs.writeFileSync(CONFIG_PATH, configData, 'utf8')
-}
-
-export function certPath(ip: string): string {
-  return path.join(CERTS_FOLDER, `${ip}.crt`)
-}
-
-export function writeCert(ip: string, publicKey: string): void {
-  if (!fs.existsSync(CONFIG_FOLDER)) {
-    fs.mkdirSync(CONFIG_FOLDER, {recursive: true})
-  }
-
-  if (!fs.existsSync(CERTS_FOLDER)) {
-    fs.mkdirSync(CERTS_FOLDER, {recursive: true})
-  }
-
-  fs.writeFileSync(certPath(ip), publicKey, 'utf8')
 }

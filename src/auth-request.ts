@@ -1,9 +1,7 @@
 import EventSource, {EventSourceInitDict} from 'eventsource'
-import * as fs from 'node:fs'
-import * as https from 'node:https'
 import fetch from 'node-fetch'
 
-import {DiscoConfig, certPath} from './config'
+import {DiscoConfig} from './config'
 import {Readable} from 'node:stream'
 
 export interface EventWithMessage extends Event {
@@ -20,13 +18,6 @@ export function readEventSource(url: string, discoConfig: DiscoConfig, handlers:
       Accept: 'text/event-stream',
       Authorization: 'Basic ' + Buffer.from(`${discoConfig.apiKey}:`).toString('base64'),
     },
-  }
-
-  if (discoConfig.host === discoConfig.ip) {
-    params.https = {
-      ca: fs.readFileSync(certPath(discoConfig.ip)),
-      rejectUnauthorized: true,
-    }
   }
 
   const es = new EventSource(url, params)
@@ -62,13 +53,6 @@ export function request({
       Accept: 'application/json',
       Authorization: 'Basic ' + Buffer.from(`${discoConfig.apiKey}:`).toString('base64'),
     },
-  }
-
-  if (discoConfig.host === discoConfig.ip) {
-    params.agent = new https.Agent({
-      ca: fs.readFileSync(certPath(discoConfig.ip)),
-      rejectUnauthorized: true,
-    })
   }
 
   if (method === 'POST') {

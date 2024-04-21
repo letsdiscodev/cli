@@ -28,11 +28,14 @@ export default class Init extends Command {
     version: Flags.string({default: 'latest', description: 'version of disco daemon to install'}),
     verbose: Flags.boolean({default: false, description: 'show extra output'}),
     'local-image': Flags.string({description: 'local Docker image to upload and use (mostly for Disco development)'}),
+    'advertise-addr': Flags.string({
+      description: 'fixed IP address used to add nodes. defaults to resolving domain name of ssh connection',
+    }),
   }
 
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(Init)
-    const {version, verbose, 'local-image': imageFlag} = flags
+    const {version, verbose, 'local-image': imageFlag, 'advertise-addr': advertiseAddrFlag} = flags
     const image = imageFlag === undefined ? `letsdiscodev/daemon:${version}` : imageFlag
     const [argUsername, host] = args.sshString.split('@')
     let username = argUsername
@@ -40,29 +43,17 @@ export default class Init extends Command {
       this.error('host already present in .disco config')
     }
 
-    // make sure that host is an IP address, otherwise fail.
-    // validate ipv4 addresses only for now
-    if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(host)) {
-      this.error('ssh host must be an IP address, not a domain name')
-    }
-
-    // get ip via dns lookup
-    // (we only accept IPs for now, but that's because there seems to be a bug
-    // when running init with a domain name for a host. if/when that bug is fixed,
-    // we'll probably want to do the dns lookup below. so keep it for now.)
-    // https://github.com/letsdiscodev/disco-daemon/issues/3
-    const ip: string = await new Promise((resolve, reject) => {
-      dns.lookup(host, (err, address, _) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(address)
-        }
+    let advertiseAddr = advertiseAddrFlag
+    if (advertiseAddr === undefined) {
+      advertiseAddr = await new Promise<string>((resolve, reject) => {
+        dns.lookup(host, (err, address, _) => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve(address)
+          }
+        })
       })
-    })
-
-    if (!ip) {
-      this.error('could not resolve IP address for host')
     }
 
     let ssh
@@ -126,12 +117,12 @@ export default class Init extends Command {
       this.log('Initializing Disco')
     }
 
-    const {apiKey, certificate} = await initDisco({ssh, ip, image, verbose, progressBar})
+    const apiKey = await initDisco({ssh, host, advertiseAddr, image, verbose, progressBar})
     if (verbose) {
       this.log('Adding Disco to local config')
     }
 
-    addDisco(host, host, ip, apiKey, certificate)
+    addDisco({name: host, host, apiKey})
     ssh.dispose()
     if (progressBar !== undefined) {
       progressBar.stop()
@@ -297,17 +288,19 @@ async function installDocker({
 
 async function initDisco({
   ssh,
-  ip,
+  host,
+  advertiseAddr,
   image,
   verbose,
   progressBar,
 }: {
   ssh: NodeSSH
-  ip: string
+  host: string
+  advertiseAddr: string
   image: string
   verbose: boolean
   progressBar: SingleBar | undefined
-}): Promise<{apiKey: string; certificate: string}> {
+}): Promise<string> {
   const command =
     'docker run ' +
     '--rm ' +
@@ -317,15 +310,15 @@ async function initDisco({
     '--mount type=bind,source=$HOME,target=/host/$HOME ' +
     '--mount source=disco-caddy-init-config,target=/initconfig ' +
     '--mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock ' +
-    `--env DISCO_IP="${ip}" ` +
+    `--env DISCO_HOST="${host}" ` +
+    `--env DISCO_ADVERTISE_ADDR="${advertiseAddr}" ` +
     '--env HOST_HOME=$HOME ' +
     `--env DISCO_IMAGE=${image} ` +
     `${image} ` +
     'disco_init'
   const output = await runSshCommand({ssh, command, verbose, progressBar})
   const apiKey = extractApiKey(output)
-  const certificate = extractPublicKeyCertificate(output)
-  return {apiKey, certificate}
+  return apiKey
 }
 
 function extractApiKey(output: string): string {
@@ -335,15 +328,6 @@ function extractApiKey(output: string): string {
   }
 
   return match[1]
-}
-
-function extractPublicKeyCertificate(output: string): string {
-  const match = output.match(/-----BEGIN CERTIFICATE-----\n.*\n-----END CERTIFICATE-----/s)
-  if (!match) {
-    throw new Error('could not extract certificate public key')
-  }
-
-  return match[0]
 }
 
 async function runSshCommand({

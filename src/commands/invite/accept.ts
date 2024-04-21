@@ -45,9 +45,8 @@ export default class InvitesAccept extends Command {
       this.log(`Private Key: ${data.apiKey.privateKey}`)
       this.log(`Public Key:  ${data.apiKey.publicKey}`)
       this.log(`Host:        ${data.meta.discoHost}`)
-      this.log(`IP:          ${data.meta.ip}`)
     } else {
-      addDisco(data.meta.discoHost, data.meta.discoHost, data.meta.ip, data.apiKey.privateKey)
+      addDisco({name: data.meta.discoHost, host: data.meta.discoHost, apiKey: data.apiKey.privateKey})
     }
   }
 }

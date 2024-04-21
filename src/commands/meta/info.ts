@@ -19,7 +19,6 @@ export default class MetaInfo extends Command {
     const res = await request({method: 'GET', url, discoConfig})
     const data = await res.json()
     this.log(`Version:         ${data.version}`)
-    this.log(`IP address:      ${data.ip}`)
     this.log(`Disco Host:      ${data.discoHost}`)
     this.log(`Registry Host:   ${data.registryHost}`)
   }
