@@ -86,7 +86,7 @@ export default class ProjectsAdd extends Command {
         this.log('')
         this.log('SSL verification: Enable SSL verification')
         this.log('Content type: application/json')
-        this.log('Secret: leave empty.')
+        this.log(`Secret: ${data.project.githubWebhookSecret}`)
         this.log('Just the push event.')
         this.log('Check "Active".')
       }
