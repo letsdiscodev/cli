@@ -2,7 +2,7 @@
 
 ```bash
 # in repo
-oclif pack tarballs --no-xz
+oclif pack tarballs --no-xz --parallel
 
 AWS_ACCESS_KEY_ID="..." AWS_SECRET_ACCESS_KEY="..." oclif upload tarballs --no-xz
 

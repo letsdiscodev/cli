@@ -1,6 +1,6 @@
 {
   "name": "disco",
-  "version": "0.4.1",
+  "version": "0.4.9",
   "description": "deploy and manage your web projects",
   "keywords": [
     "oclif"
@@ -36,8 +36,7 @@
     "commands": "./dist/commands",
     "dirname": "disco",
     "plugins": [
-      "@oclif/plugin-help",
-      "@oclif/plugin-update"
+      "@oclif/plugin-help"
     ],
     "topicSeparator": ":",
     "topics": {

@@ -8,5 +8,9 @@
     "target": "es2022",
     "esModuleInterop": true
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "skipLibCheck": true
+  }
 }
