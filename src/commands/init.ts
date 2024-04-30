@@ -462,14 +462,20 @@ async function setupRootSshAccess({
 }
 
 async function readPermitRootLogin({ssh, verbose}: {ssh: NodeSSH; verbose: boolean}): Promise<null | string> {
-  const statement = await runSshCommand({
-    ssh,
-    command: 'cat /etc/ssh/sshd_config | grep PermitRootLogin',
-    verbose,
-    progressBar: undefined,
-  })
-  if (statement.startsWith('PermitRootLogin')) {
-    return statement.split(' ')[1]
+  try {
+    const statement = await runSshCommand({
+      ssh,
+      command: 'cat /etc/ssh/sshd_config | grep PermitRootLogin',
+      verbose,
+      progressBar: undefined,
+    })
+    if (statement.startsWith('PermitRootLogin')) {
+      return statement.split(' ')[1]
+    }
+  } catch {
+    // the grep did not return any results, so it won't exit with a code 0
+    // assume that it didn't work, return null
+    return null
   }
 
   return null
