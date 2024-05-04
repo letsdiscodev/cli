@@ -27,6 +27,10 @@ export default class Init extends Command {
   static flags = {
     version: Flags.string({default: 'latest', description: 'version of disco daemon to install'}),
     verbose: Flags.boolean({default: false, description: 'show extra output'}),
+    host: Flags.string({
+      description:
+        'hostname to use, when installing using an internal IP for the SSH connection, e.g. disco init root@10.1.2.3 --host disco.example.com',
+    }),
     'local-image': Flags.string({description: 'local Docker image to upload and use (mostly for Disco development)'}),
     'advertise-addr': Flags.string({
       description: 'fixed IP address used to add nodes. defaults to resolving domain name of ssh connection',
@@ -37,7 +41,8 @@ export default class Init extends Command {
     const {args, flags} = await this.parse(Init)
     const {version, verbose, 'local-image': imageFlag, 'advertise-addr': advertiseAddrFlag} = flags
     const image = imageFlag === undefined ? `letsdiscodev/daemon:${version}` : imageFlag
-    const [argUsername, host] = args.sshString.split('@')
+    const [argUsername, sshHost] = args.sshString.split('@')
+    const host = flags.host === undefined ? sshHost : flags.host
     let username = argUsername
     if (isDiscoAlreadyInConfig(host)) {
       this.error('host already present in .disco config')
@@ -99,9 +104,6 @@ export default class Init extends Command {
       progressBar = new SingleBar({format: '[{bar}] {percentage}%', clearOnComplete: true})
       progressBar.start(count, 0)
     }
-
-    await installSpecificEnvRequirements({ssh, verbose, progressBar})
-    ssh = await reconnectSshAfterRebootIfNeeded({ssh, verbose, host, username, password})
 
     await installDockerIfNeeded({dockerAlreadyInstalled, verbose, ssh, progressBar})
 
@@ -398,46 +400,6 @@ async function userCanSudoWitoutPassword({ssh, verbose}: {ssh: NodeSSH; verbose:
   }
 }
 
-async function installSpecificEnvRequirements({
-  ssh,
-  verbose,
-  progressBar,
-}: {
-  ssh: NodeSSH
-  verbose: boolean
-  progressBar: SingleBar | undefined
-}): Promise<void> {
-  const unameR = await runSshCommand({ssh, command: 'uname -r', verbose, progressBar: undefined})
-  if (verbose) {
-    process.stdout.write('uname -r\n')
-    process.stdout.write(unameR)
-  }
-
-  const isPi = /raspi/.test(unameR)
-  if (isPi) {
-    if (verbose) {
-      process.stdout.write('Detected Raspberry Pi\n')
-    }
-
-    try {
-      // check if linux-modules-extra-raspi is already installed
-      await runSshCommand({ssh, command: 'apt list --installed | grep linux-modules-extra-raspi', verbose, progressBar})
-    } catch {
-      // linux-modules-extra-raspi is not already installed
-      if (progressBar !== undefined) {
-        progressBar.setTotal(progressBar.getTotal() + 600)
-      }
-
-      await runSshCommand({ssh, command: 'apt install -y linux-modules-extra-raspi', verbose, progressBar})
-      await runSshCommand({ssh, command: 'shutdown --reboot 0', verbose, progressBar})
-      ssh.dispose()
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 3000)
-      })
-    }
-  }
-}
-
 async function setupRootSshAccess({
   ssh,
   verbose,
@@ -629,56 +591,4 @@ async function restartSshD({
     verbose,
     progressBar: undefined,
   })
-}
-
-async function reconnectSshAfterRebootIfNeeded({
-  ssh,
-  verbose,
-  host,
-  username,
-  password,
-}: {
-  ssh: NodeSSH
-  verbose: boolean
-  host: string
-  username: string
-  password: boolean | string | undefined
-}): Promise<NodeSSH> {
-  if (ssh.isConnected()) {
-    if (verbose) {
-      process.stdout.write('Still connected with SSH, not trying to reconnect\n')
-    }
-
-    return ssh
-  }
-
-  let retries = 50
-  while (retries > 0) {
-    try {
-      if (verbose) {
-        process.stdout.write(`Reconnecting SSH session after rebooting, ${retries} attempts left.\n`)
-      }
-
-      // eslint-disable-next-line no-await-in-loop
-      ;({ssh, password} = await connectSsh({
-        host,
-        username,
-        // do not ask for password if there's no password at this point
-        password: password === undefined ? false : password,
-      }))
-      return ssh
-    } catch {
-      retries--
-      if (verbose) {
-        process.stdout.write(`Failed to connect. Waiting 3 seconds.\n`)
-      }
-
-      // eslint-disable-next-line no-await-in-loop
-      await new Promise((resolve) => {
-        setTimeout(resolve, 3000)
-      })
-    }
-  }
-
-  throw new Error('Failed to connect to SSH after rebooting')
 }
