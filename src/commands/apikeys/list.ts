@@ -21,7 +21,8 @@ export default class ApikeysList extends Command {
     const data = await res.json()
     this.log('Public                           Private                          Name')
     for (const key of data.apiKeys) {
-      this.log(`${key.publicKey} ${key.privateKey} ${key.name}`)
+      const lastUsed = key.lastUsed === null ? 'never' : key.lastUsed
+      this.log(`${key.publicKey} ${key.privateKey} ${key.name} (last used: ${lastUsed})`)
     }
   }
 }
