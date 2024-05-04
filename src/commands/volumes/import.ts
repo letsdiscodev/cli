@@ -17,7 +17,7 @@ export default class VolumesImport extends Command {
   public async run(): Promise<void> {
     const {flags} = await this.parse(VolumesImport)
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${getDisco(flags.disco || null).host}/.disco/projects/${flags.project}/volumes/${flags.volume}`
+    const url = `https://${getDisco(flags.disco || null).host}/api/projects/${flags.project}/volumes/${flags.volume}`
 
     const res = await request({method: 'PUT', url, discoConfig, bodyStream: process.stdin})
     await res.json()

@@ -21,7 +21,7 @@ export default class DeployOutput extends Command {
     const {flags} = await this.parse(DeployOutput)
 
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/.disco/projects/${flags.project}/deployments/${flags.deployment}/output`
+    const url = `https://${discoConfig.host}/api/projects/${flags.project}/deployments/${flags.deployment}/output`
     readEventSource(url, discoConfig, {
       onMessage(event: MessageEvent) {
         const message = JSON.parse(event.data)

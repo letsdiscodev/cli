@@ -22,7 +22,7 @@ export default class MetaUpgrade extends Command {
     const {flags} = await this.parse(MetaUpgrade)
 
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/.disco/disco/upgrade`
+    const url = `https://${discoConfig.host}/api/disco/upgrade`
 
     const body: UpgradeParams = {
       pull: !flags.dontPull,

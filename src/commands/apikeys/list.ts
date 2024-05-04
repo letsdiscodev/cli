@@ -16,7 +16,7 @@ export default class ApikeysList extends Command {
     const {flags} = await this.parse(ApikeysList)
     const discoConfig = getDisco(flags.disco || null)
 
-    const url = `https://${discoConfig.host}/.disco/api-keys`
+    const url = `https://${discoConfig.host}/api/api-keys`
     const res = await request({method: 'GET', url, discoConfig})
     const data = await res.json()
     this.log('Public                           Private                          Name')

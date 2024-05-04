@@ -14,7 +14,7 @@ export default class GithubReposList extends Command {
   public async run(): Promise<void> {
     const {flags} = await this.parse(GithubReposList)
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/.disco/github-app-repos`
+    const url = `https://${discoConfig.host}/api/github-app-repos`
 
     const res = await request({method: 'GET', url, discoConfig})
     const data = await res.json()

@@ -14,7 +14,7 @@ export default class MetaInfo extends Command {
   public async run(): Promise<void> {
     const {flags} = await this.parse(MetaInfo)
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/.disco/disco/meta`
+    const url = `https://${discoConfig.host}/api/disco/meta`
 
     const res = await request({method: 'GET', url, discoConfig})
     const data = await res.json()

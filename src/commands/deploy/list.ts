@@ -17,7 +17,7 @@ export default class DeployList extends Command {
     const {flags} = await this.parse(DeployList)
 
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/.disco/projects/${flags.project}/deployments`
+    const url = `https://${discoConfig.host}/api/projects/${flags.project}/deployments`
     const res = await request({method: 'GET', url, discoConfig})
     const data = await res.json()
     for (const deployment of data.deployments) {

@@ -28,7 +28,7 @@ export default class Deploy extends Command {
   public async run(): Promise<void> {
     const {flags} = await this.parse(Deploy)
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/.disco/projects/${flags.project}/deployments`
+    const url = `https://${discoConfig.host}/api/projects/${flags.project}/deployments`
 
     const discoFile = flags.file ? await fs.promises.readFile(flags.file, 'utf8') : undefined
     const reqBody: DeployRequest = {}
@@ -43,7 +43,7 @@ export default class Deploy extends Command {
     const res = await request({method: 'POST', url, body: reqBody, discoConfig, expectedStatuses: [201]})
     const data = await res.json()
 
-    const deploymentUrl = `https://${discoConfig.host}/.disco/projects/${flags.project}/deployments/${data.deployment.number}/output`
+    const deploymentUrl = `https://${discoConfig.host}/api/projects/${flags.project}/deployments/${data.deployment.number}/output`
     readEventSource(deploymentUrl, discoConfig, {
       onMessage(event: MessageEvent) {
         const message = JSON.parse(event.data)

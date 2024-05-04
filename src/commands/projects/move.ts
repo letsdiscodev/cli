@@ -36,13 +36,13 @@ export default class ProjectsMove extends Command {
     const fromDiscoConfig = getDisco(flags['from-disco'])
     const toDiscoConfig = getDisco(flags['to-disco'])
 
-    const exportUrl = `https://${fromDiscoConfig.host}/.disco/projects/${flags.project}/export`
+    const exportUrl = `https://${fromDiscoConfig.host}/api/projects/${flags.project}/export`
 
     const exportResponse = await request({method: 'GET', url: exportUrl, discoConfig: fromDiscoConfig})
     const exportResult: ProjectExport = await exportResponse.json()
 
     // create project
-    const createUrl = `https://${toDiscoConfig.host}/.disco/projects`
+    const createUrl = `https://${toDiscoConfig.host}/api/projects`
 
     // TODO check that exportResult.deployment.commit exists
     // otherwise, it could mean that the project that's being
@@ -73,7 +73,7 @@ export default class ProjectsMove extends Command {
     if (createResult.deployment) {
       this.log(`Deploying ${flags.project}, version ${createResult.deployment.number}`)
 
-      const outputStream = `https://${toDiscoConfig.host}/.disco/projects/${flags.project}/deployments/${createResult.deployment.number}/output`
+      const outputStream = `https://${toDiscoConfig.host}/api/projects/${flags.project}/deployments/${createResult.deployment.number}/output`
 
       readEventSource(outputStream, toDiscoConfig, {
         onMessage(event) {

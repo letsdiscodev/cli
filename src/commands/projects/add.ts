@@ -29,7 +29,7 @@ export default class ProjectsAdd extends Command {
     }
 
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/.disco/projects`
+    const url = `https://${discoConfig.host}/api/projects`
 
     const body = {
       name: flags.name,
@@ -45,7 +45,7 @@ export default class ProjectsAdd extends Command {
     if (data.deployment) {
       const project = flags.name
       this.log(`Deploying ${project}, version ${data.deployment.number}`)
-      const url = `https://${discoConfig.host}/.disco/projects/${project}/deployments/${data.deployment.number}/output`
+      const url = `https://${discoConfig.host}/api/projects/${project}/deployments/${data.deployment.number}/output`
 
       readEventSource(url, discoConfig, {
         onMessage(event: MessageEvent) {

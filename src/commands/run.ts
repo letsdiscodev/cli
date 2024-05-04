@@ -23,7 +23,7 @@ export default class Run extends Command {
     const {args, flags} = await this.parse(Run)
 
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/.disco/projects/${flags.project}/runs`
+    const url = `https://${discoConfig.host}/api/projects/${flags.project}/runs`
     const body = {
       command: args.command,
       service: flags.service ?? null,
@@ -31,7 +31,7 @@ export default class Run extends Command {
     }
     const res = await request({method: 'POST', url, discoConfig, body, expectedStatuses: [202]})
     const data = await res.json()
-    const outputUrl = `https://${discoConfig.host}/.disco/projects/${flags.project}/runs/${data.run.number}/output`
+    const outputUrl = `https://${discoConfig.host}/api/projects/${flags.project}/runs/${data.run.number}/output`
     readEventSource(outputUrl, discoConfig, {
       onMessage(event: MessageEvent) {
         const message = JSON.parse(event.data)

@@ -28,7 +28,7 @@ export default class Scale extends Command {
   public async run(): Promise<void> {
     const {argv, flags} = await this.parse(Scale)
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/.disco/projects/${flags.project}/scale`
+    const url = `https://${discoConfig.host}/api/projects/${flags.project}/scale`
     const reqBody = {services: {}} as Record<string, Record<string, number>>
     for (const service of argv as string[]) {
       const parts = service.split('=')

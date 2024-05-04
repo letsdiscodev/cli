@@ -19,7 +19,7 @@ export default class MetaHost extends Command {
     const {args, flags} = await this.parse(MetaHost)
 
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/.disco/disco/host`
+    const url = `https://${discoConfig.host}/api/disco/host`
 
     request({method: 'POST', url, discoConfig, body: {host: args.domain}})
       .then(async (res) => {

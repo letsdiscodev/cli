@@ -20,7 +20,7 @@ export default class ApikeysRemove extends Command {
     const {args, flags} = await this.parse(ApikeysRemove)
 
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/.disco/api-keys/${args.publicKey}`
+    const url = `https://${discoConfig.host}/api/api-keys/${args.publicKey}`
     await request({method: 'DELETE', url, discoConfig, expectedStatuses: [200, 204]})
   }
 }

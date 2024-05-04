@@ -16,7 +16,7 @@ export default class SyslogList extends Command {
     const {flags} = await this.parse(SyslogList)
 
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/.disco/syslog`
+    const url = `https://${discoConfig.host}/api/syslog`
     const res = await request({method: 'GET', url, discoConfig})
     const data = await res.json()
 

@@ -30,7 +30,7 @@ export default class NodesAdd extends Command {
     // eslint-disable-next-line new-cap
     const nodeScriptUrl = GET_NODE_SCRIPT_URL(flags.version)
 
-    const url = `https://${discoConfig.host}/.disco/disco/swarm/join-token`
+    const url = `https://${discoConfig.host}/api/disco/swarm/join-token`
     const res = await request({
       method: 'GET',
       url,

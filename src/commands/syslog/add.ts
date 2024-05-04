@@ -23,7 +23,7 @@ export default class SyslogAdd extends Command {
     const {args, flags} = await this.parse(SyslogAdd)
 
     const discoConfig = getDisco(flags.disco || null)
-    const requestUrl = `https://${discoConfig.host}/.disco/syslog`
+    const requestUrl = `https://${discoConfig.host}/api/syslog`
     const res = await request({
       method: 'POST',
       url: requestUrl,

@@ -11,7 +11,7 @@ export default class InvitesAccept extends Command {
   static override description = 'accept an invite to deploy to a server'
 
   static override examples = [
-    '<%= config.bin %> <%= command.id %> https://mymachine.com/.disco/api-key-invites/8979ab987a9b879',
+    '<%= config.bin %> <%= command.id %> https://mymachine.com/api-key-invites/8979ab987a9b879',
   ]
 
   static override flags = {

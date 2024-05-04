@@ -17,7 +17,7 @@ export default class VolumesList extends Command {
     const {flags} = await this.parse(VolumesList)
 
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/.disco/projects/${flags.project}/volumes`
+    const url = `https://${discoConfig.host}/api/projects/${flags.project}/volumes`
     const res = await request({method: 'GET', url, discoConfig})
     const data = await res.json()
     for (const volume of data.volumes) {

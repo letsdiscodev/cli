@@ -32,7 +32,7 @@ export default class EnvSet extends Command {
 
     const discoConfig = getDisco(flags.disco || null)
 
-    const url = `https://${discoConfig.host}/.disco/projects/${flags.project}/env`
+    const url = `https://${discoConfig.host}/api/projects/${flags.project}/env`
     const body: EnvVarRequestBody = {
       envVariables: [],
     }
@@ -50,7 +50,7 @@ export default class EnvSet extends Command {
     const res = await request({method: 'POST', url, discoConfig, body})
     const data = await res.json()
     // stream deployment
-    const deploymentUrl = `https://${discoConfig.host}/.disco/projects/${flags.project}/deployments/${data.deployment.number}/output`
+    const deploymentUrl = `https://${discoConfig.host}/api/projects/${flags.project}/deployments/${data.deployment.number}/output`
     readEventSource(deploymentUrl, discoConfig, {
       onMessage(event: MessageEvent) {
         const output = JSON.parse(event.data)

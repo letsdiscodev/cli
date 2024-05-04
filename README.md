@@ -325,7 +325,7 @@ DESCRIPTION
   accept an invite to deploy to a server
 
 EXAMPLES
-  $ disco invite:accept https://mymachine.com/.disco/api-key-invites/8979ab987a9b879
+  $ disco invite:accept https://mymachine.com/api-key-invites/8979ab987a9b879
 ```
 
 _See code: [src/commands/invite/accept.ts](https://github.com/letsdiscodev/cli/blob/v0.4.1/src/commands/invite/accept.ts)_

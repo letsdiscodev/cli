@@ -22,12 +22,12 @@ export default class EnvRemove extends Command {
 
     const discoConfig = getDisco(flags.disco || null)
     this.log(`Removing env variable for ${flags.project}: ${args.envVar}`)
-    const url = `https://${discoConfig.host}/.disco/projects/${flags.project}/env/${args.envVar}`
+    const url = `https://${discoConfig.host}/api/projects/${flags.project}/env/${args.envVar}`
     const res = await request({method: 'DELETE', url, discoConfig})
     const data = await res.json()
     if (data.deployment) {
       // stream deployment
-      const deploymentUrl = `https://${discoConfig.host}/.disco/projects/${flags.project}/deployments/${data.deployment.number}/output`
+      const deploymentUrl = `https://${discoConfig.host}/api/projects/${flags.project}/deployments/${data.deployment.number}/output`
       readEventSource(deploymentUrl, discoConfig, {
         onMessage(event: MessageEvent) {
           const output = JSON.parse(event.data)

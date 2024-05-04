@@ -20,7 +20,7 @@ export default class ProjectsRemove extends Command {
 
     const discoConfig = getDisco(flags.disco || null)
 
-    const url = `https://${discoConfig.host}/.disco/projects/${args.project}`
+    const url = `https://${discoConfig.host}/api/projects/${args.project}`
     try {
       await request({method: 'DELETE', url, discoConfig, expectedStatuses: [200, 204]})
     } catch (error: unknown) {

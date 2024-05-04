@@ -21,7 +21,7 @@ export default class InvitesCreate extends Command {
     const {args, flags} = await this.parse(InvitesCreate)
 
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/.disco/api-key-invites`
+    const url = `https://${discoConfig.host}/api/api-key-invites`
     const body = {
       name: args.name,
     }

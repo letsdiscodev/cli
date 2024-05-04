@@ -23,7 +23,7 @@ export default class Logs extends Command {
 
     const discoConfig = getDisco(flags.disco || null)
 
-    let url = `https://${discoConfig.host}/.disco/logs`
+    let url = `https://${discoConfig.host}/api/logs`
 
     if (flags.project) {
       url = `${url}/${flags.project}`

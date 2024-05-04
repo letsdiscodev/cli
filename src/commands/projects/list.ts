@@ -19,7 +19,7 @@ export default class ProjectsList extends Command {
     const {flags} = await this.parse(ProjectsList)
 
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/.disco/projects`
+    const url = `https://${discoConfig.host}/api/projects`
     const res = await request({method: 'GET', url, discoConfig})
     const data = await res.json()
     this.log(data.projects.map((project: Project) => project.name).join('\n'))

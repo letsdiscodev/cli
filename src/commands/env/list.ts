@@ -17,7 +17,7 @@ export default class EnvList extends Command {
     const {flags} = await this.parse(EnvList)
     const discoConfig = getDisco(flags.disco || null)
     this.log(`Fetching env variables for ${flags.project}`)
-    const url = `https://${discoConfig.host}/.disco/projects/${flags.project}/env`
+    const url = `https://${discoConfig.host}/api/projects/${flags.project}/env`
     const res = await request({method: 'GET', url, discoConfig, expectedStatuses: [200, 404]})
     if (res.status === 404) {
       this.log('')

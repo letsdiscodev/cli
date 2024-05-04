@@ -19,7 +19,7 @@ export default class GithubAppsAdd extends Command {
     const body = {
       organization,
     }
-    const url = `https://${discoConfig.host}/.disco/github-apps/create`
+    const url = `https://${discoConfig.host}/api/github-apps/create`
     const res = await request({method: 'POST', url, discoConfig, body, expectedStatuses: [201]})
     const respBody = await res.json()
     this.log('Open this URL in your browser:')
