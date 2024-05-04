@@ -421,6 +421,7 @@ async function setupRootSshAccess({
 
   await uploadRootSshPublicKey({ssh, verbose, password})
   await restartSshD({ssh, verbose, password})
+  ssh.dispose()
 }
 
 async function readPermitRootLogin({ssh, verbose}: {ssh: NodeSSH; verbose: boolean}): Promise<null | string> {
