@@ -28,12 +28,7 @@ jobs:
             echo "tag=v$package_version" >> $GITHUB_OUTPUT
           fi
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      - name: Setup git
-        if: ${{ steps.version-check.outputs.skipped == 'false' }}
-        run: |
-          git config --global user.email ${{ secrets.GH_EMAIL }}
-          git config --global user.name ${{ secrets.GH_USERNAME }}
+          GH_TOKEN: ${{ GITHUB_TOKEN }}
       - name: Generate oclif README
         if: ${{ steps.version-check.outputs.skipped == 'false' }}
         id: oclif-readme
@@ -52,5 +47,5 @@ jobs:
           name: ${{ steps.version-check.outputs.tag }}
           tag: ${{ steps.version-check.outputs.tag }}
           commit: ${{ github.ref_name }}
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ GITHUB_TOKEN }}
           skipIfReleaseExists: true
