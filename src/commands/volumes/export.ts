@@ -1,10 +1,10 @@
 import {Command, Flags} from '@oclif/core'
 
-import {getDisco} from '../../config'
-import {request} from '../../auth-request'
+import {getDisco} from '../../config.js'
+import {request} from '../../auth-request.js'
 
 export default class VolumesExport extends Command {
-  static override description = 'describe the command here'
+  static override description = 'TODO describe the command here'
 
   static override examples = ['<%= config.bin %> <%= command.id %>']
 

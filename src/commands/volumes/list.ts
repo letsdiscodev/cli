@@ -1,7 +1,7 @@
 import {Command, Flags} from '@oclif/core'
 
-import {getDisco} from '../../config'
-import {request} from '../../auth-request'
+import {getDisco} from '../../config.js'
+import {request} from '../../auth-request.js'
 
 export default class VolumesList extends Command {
   static override description = "list all project's volumes"
@@ -19,7 +19,7 @@ export default class VolumesList extends Command {
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects/${flags.project}/volumes`
     const res = await request({method: 'GET', url, discoConfig})
-    const data = await res.json()
+    const data = (await res.json()) as any
     for (const volume of data.volumes) {
       this.log(volume.name)
     }

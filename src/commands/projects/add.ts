@@ -1,6 +1,6 @@
 import {Command, Flags} from '@oclif/core'
-import {getDisco} from '../../config'
-import {request, readEventSource} from '../../auth-request'
+import {getDisco} from '../../config.js'
+import {request, readEventSource} from '../../auth-request.js'
 
 export default class ProjectsAdd extends Command {
   static description = 'add a project'
@@ -38,7 +38,7 @@ export default class ProjectsAdd extends Command {
     }
 
     const res = await request({method: 'POST', url, discoConfig, body, expectedStatuses: [201]})
-    const data = await res.json()
+    const data = (await res.json()) as any
 
     this.log(`Project added`)
 

@@ -1,7 +1,7 @@
 import {Args, Command, Flags} from '@oclif/core'
 
-import {getDisco} from '../config'
-import {request, readEventSource} from '../auth-request'
+import {getDisco} from '../config.js'
+import {request, readEventSource} from '../auth-request.js'
 
 export default class Run extends Command {
   static override args = {
@@ -30,7 +30,8 @@ export default class Run extends Command {
       timeout: flags.timeout,
     }
     const res = await request({method: 'POST', url, discoConfig, body, expectedStatuses: [202]})
-    const data = await res.json()
+    const data = (await res.json()) as any
+
     const outputUrl = `https://${discoConfig.host}/api/projects/${flags.project}/runs/${data.run.number}/output`
     readEventSource(outputUrl, discoConfig, {
       onMessage(event: MessageEvent) {

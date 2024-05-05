@@ -1,6 +1,6 @@
 import {Args, Command, Flags} from '@oclif/core'
-import {getDisco} from '../../config'
-import {request} from '../../auth-request'
+import {getDisco} from '../../config.js'
+import {request} from '../../auth-request.js'
 
 export default class ProjectsRemove extends Command {
   static args = {

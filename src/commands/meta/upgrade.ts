@@ -1,6 +1,6 @@
 import {Command, Flags} from '@oclif/core'
-import {getDisco} from '../../config'
-import {request} from '../../auth-request'
+import {getDisco} from '../../config.js'
+import {request} from '../../auth-request.js'
 
 interface UpgradeParams {
   pull: boolean

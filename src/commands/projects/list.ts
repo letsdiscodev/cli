@@ -1,6 +1,6 @@
 import {Command, Flags} from '@oclif/core'
-import {getDisco} from '../../config'
-import {request} from '../../auth-request'
+import {getDisco} from '../../config.js'
+import {request} from '../../auth-request.js'
 
 interface Project {
   name: string
@@ -21,7 +21,7 @@ export default class ProjectsList extends Command {
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects`
     const res = await request({method: 'GET', url, discoConfig})
-    const data = await res.json()
+    const data = (await res.json()) as any
     this.log(data.projects.map((project: Project) => project.name).join('\n'))
   }
 }

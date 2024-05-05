@@ -1,7 +1,7 @@
 import {Args, Command, Flags} from '@oclif/core'
 
-import {getDisco} from '../../config'
-import {request} from '../../auth-request'
+import {getDisco} from '../../config.js'
+import {request} from '../../auth-request.js'
 
 interface EnvVarResponse {
   envVariable: {
@@ -36,7 +36,7 @@ export default class EnvGet extends Command {
       return
     }
 
-    const data: EnvVarResponse = await res.json()
+    const data: EnvVarResponse = (await res.json()) as any
     this.log(data.envVariable.value)
   }
 }

@@ -1,7 +1,7 @@
 import {Args, Command, Flags} from '@oclif/core'
 
-import {getDisco} from '../../config'
-import {request} from '../../auth-request'
+import {getDisco} from '../../config.js'
+import {request} from '../../auth-request.js'
 
 export default class InvitesCreate extends Command {
   static override args = {
@@ -26,7 +26,7 @@ export default class InvitesCreate extends Command {
       name: args.name,
     }
     const res = await request({method: 'POST', url, discoConfig, body, expectedStatuses: [201]})
-    const data = await res.json()
+    const data = (await res.json()) as any
     this.log('Send this link to the new user:')
     this.log(data.apiKeyInvite.url)
   }

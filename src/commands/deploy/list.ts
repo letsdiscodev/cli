@@ -1,7 +1,7 @@
 import {Command, Flags} from '@oclif/core'
 
-import {getDisco} from '../../config'
-import {request} from '../../auth-request'
+import {getDisco} from '../../config.js'
+import {request} from '../../auth-request.js'
 
 export default class DeployList extends Command {
   static override description = 'list the deployments for a project'
@@ -19,7 +19,7 @@ export default class DeployList extends Command {
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects/${flags.project}/deployments`
     const res = await request({method: 'GET', url, discoConfig})
-    const data = await res.json()
+    const data = (await res.json()) as any
     for (const deployment of data.deployments) {
       console.log(`${deployment.created}\t${deployment.number}\t${deployment.status}`)
     }

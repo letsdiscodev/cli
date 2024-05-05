@@ -10,5 +10,4 @@
     "perfectionist/sort-object-types": "off",
     "perfectionist/sort-classes": "off"
   },
-  "ignorePatterns": ["**/*.d.ts"]
 }

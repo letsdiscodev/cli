@@ -1,7 +1,7 @@
 import {Command, Flags} from '@oclif/core'
 
-import {getDisco} from '../../config'
-import {request} from '../../auth-request'
+import {getDisco} from '../../config.js'
+import {request} from '../../auth-request.js'
 
 export default class SyslogList extends Command {
   static override description = 'see list of all log destinations'
@@ -18,7 +18,7 @@ export default class SyslogList extends Command {
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/syslog`
     const res = await request({method: 'GET', url, discoConfig})
-    const data = await res.json()
+    const data = (await res.json()) as any
 
     if (data.urls.length > 0) {
       console.log('Current Syslog URLs:')

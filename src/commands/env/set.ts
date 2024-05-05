@@ -1,7 +1,7 @@
 import {Args, Command, Flags} from '@oclif/core'
 
-import {getDisco} from '../../config'
-import {request, readEventSource} from '../../auth-request'
+import {getDisco} from '../../config.js'
+import {request, readEventSource} from '../../auth-request.js'
 
 interface EnvVarRequestBody {
   envVariables: {name: string; value: string}[]
@@ -48,7 +48,7 @@ export default class EnvSet extends Command {
     }
 
     const res = await request({method: 'POST', url, discoConfig, body})
-    const data = await res.json()
+    const data = (await res.json()) as any
     // stream deployment
     const deploymentUrl = `https://${discoConfig.host}/api/projects/${flags.project}/deployments/${data.deployment.number}/output`
     readEventSource(deploymentUrl, discoConfig, {

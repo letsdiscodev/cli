@@ -1,7 +1,7 @@
 import {Command, Flags} from '@oclif/core'
 
-import {getDisco} from '../config'
-import {readEventSource} from '../auth-request'
+import {getDisco} from '../config.js'
+import {readEventSource} from '../auth-request.js'
 
 export default class Logs extends Command {
   static description = 'fetch logs'

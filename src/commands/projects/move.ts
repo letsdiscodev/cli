@@ -1,6 +1,6 @@
 import {Command, Flags} from '@oclif/core'
-import {getDisco} from '../../config'
-import {request, readEventSource} from '../../auth-request'
+import {getDisco} from '../../config.js'
+import {request, readEventSource} from '../../auth-request.js'
 
 interface ProjectExport {
   name: string
@@ -39,7 +39,7 @@ export default class ProjectsMove extends Command {
     const exportUrl = `https://${fromDiscoConfig.host}/api/projects/${flags.project}/export`
 
     const exportResponse = await request({method: 'GET', url: exportUrl, discoConfig: fromDiscoConfig})
-    const exportResult: ProjectExport = await exportResponse.json()
+    const exportResult: ProjectExport = (await exportResponse.json()) as any
 
     // create project
     const createUrl = `https://${toDiscoConfig.host}/api/projects`
@@ -68,7 +68,7 @@ export default class ProjectsMove extends Command {
       body: createBody,
       expectedStatuses: [201],
     })
-    const createResult = await createResponse.json()
+    const createResult = (await createResponse.json()) as any
 
     if (createResult.deployment) {
       this.log(`Deploying ${flags.project}, version ${createResult.deployment.number}`)

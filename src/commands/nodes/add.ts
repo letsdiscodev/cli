@@ -1,7 +1,7 @@
 import {Args, Command, Flags} from '@oclif/core'
 
-import {getDisco} from '../../config'
-import {request} from '../../auth-request'
+import {getDisco} from '../../config.js'
+import {request} from '../../auth-request.js'
 
 import * as fs from 'node:fs'
 import * as os from 'node:os'
@@ -36,7 +36,7 @@ export default class NodesAdd extends Command {
       url,
       discoConfig,
     })
-    const data = await res.json()
+    const data = (await res.json()) as any
 
     const token = data.joinToken
     const {ip} = data

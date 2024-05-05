@@ -1,7 +1,7 @@
 import {Command, Flags} from '@oclif/core'
 
-import {getDisco} from '../../config'
-import {request} from '../../auth-request'
+import {getDisco} from '../../config.js'
+import {request} from '../../auth-request.js'
 
 export default class ApikeysList extends Command {
   static override description = 'list all api keys'
@@ -18,7 +18,7 @@ export default class ApikeysList extends Command {
 
     const url = `https://${discoConfig.host}/api/api-keys`
     const res = await request({method: 'GET', url, discoConfig})
-    const data = await res.json()
+    const data = (await res.json()) as any
     this.log('Public                           Private                          Name')
     for (const key of data.apiKeys) {
       const lastUsed = key.lastUsed === null ? 'never' : key.lastUsed

@@ -1,7 +1,7 @@
 import {Args, Command, Flags} from '@oclif/core'
 import fetch from 'node-fetch'
 
-import {addDisco, isDiscoAlreadyInConfig} from '../../config'
+import {addDisco, isDiscoAlreadyInConfig} from '../../config.js'
 
 export default class InvitesAccept extends Command {
   static override args = {
@@ -33,7 +33,7 @@ export default class InvitesAccept extends Command {
     }
 
     let showOnly = flags['show-only']
-    const data = await res.json()
+    const data = (await res.json()) as any
 
     if (isDiscoAlreadyInConfig(data.meta.discoHost)) {
       this.log(`server ${data.meta.discoHost} already in config, here's your API key:`)

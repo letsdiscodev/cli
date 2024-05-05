@@ -1,9 +1,14 @@
-# disco command line tool
+cli
+=================
 
-Please refer to [the disco documentation site](https://docs.letsdisco.dev/)
+deploy and manage your web projects
 
----
- 
+
+[![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
+[![Version](https://img.shields.io/npm/v/cli.svg)](https://npmjs.org/package/cli)
+[![Downloads/week](https://img.shields.io/npm/dw/cli.svg)](https://npmjs.org/package/cli)
+
+
 <!-- toc -->
 * [Usage](#usage)
 * [Commands](#commands)
@@ -15,7 +20,7 @@ $ npm install -g disco
 $ disco COMMAND
 running command...
 $ disco (--version)
-disco/0.4.1 darwin-arm64 node-v20.8.0
+disco/0.4.1 darwin-arm64 node-v20.12.2
 $ disco --help [COMMAND]
 USAGE
   $ disco COMMAND
@@ -33,6 +38,8 @@ USAGE
 * [`disco env:list`](#disco-envlist)
 * [`disco env:remove [ENVVAR]`](#disco-envremove-envvar)
 * [`disco env:set [VARIABLES]`](#disco-envset-variables)
+* [`disco github:apps:add`](#disco-githubappsadd)
+* [`disco github:repos:list`](#disco-githubreposlist)
 * [`disco help [COMMAND]`](#disco-help-command)
 * [`disco init SSHSTRING`](#disco-init-sshstring)
 * [`disco invite:accept URL`](#disco-inviteaccept-url)
@@ -264,6 +271,47 @@ EXAMPLES
 
 _See code: [src/commands/env/set.ts](https://github.com/letsdiscodev/cli/blob/v0.4.1/src/commands/env/set.ts)_
 
+## `disco github:apps:add`
+
+add a Github app
+
+```
+USAGE
+  $ disco github:apps:add [--organization <value>] [--disco <value>]
+
+FLAGS
+  --disco=<value>
+  --organization=<value>
+
+DESCRIPTION
+  add a Github app
+
+EXAMPLES
+  $ disco github:apps:add
+```
+
+_See code: [src/commands/github/apps/add.ts](https://github.com/letsdiscodev/cli/blob/v0.4.1/src/commands/github/apps/add.ts)_
+
+## `disco github:repos:list`
+
+list Github repos accessible thoughs Github Apps
+
+```
+USAGE
+  $ disco github:repos:list [--disco <value>]
+
+FLAGS
+  --disco=<value>
+
+DESCRIPTION
+  list Github repos accessible thoughs Github Apps
+
+EXAMPLES
+  $ disco github:repos:list
+```
+
+_See code: [src/commands/github/repos/list.ts](https://github.com/letsdiscodev/cli/blob/v0.4.1/src/commands/github/repos/list.ts)_
+
 ## `disco help [COMMAND]`
 
 Display help for disco.
@@ -282,7 +330,7 @@ DESCRIPTION
   Display help for disco.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.0.20/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.0.21/src/commands/help.ts)_
 
 ## `disco init SSHSTRING`
 
@@ -290,19 +338,24 @@ initializes a new server
 
 ```
 USAGE
-  $ disco init SSHSTRING [--version <value>] [--verbose]
+  $ disco init SSHSTRING [--version <value>] [--verbose] [--host <value>] [--local-image <value>]
+    [--advertise-addr <value>]
 
 FLAGS
-  --verbose          show extra output
-  --version=<value>  [default: latest] version of disco daemon to install
+  --advertise-addr=<value>  fixed IP address used to add nodes. defaults to resolving domain name of ssh connection
+  --host=<value>            hostname to use, when installing using an internal IP for the SSH connection, e.g. disco
+                            init root@10.1.2.3 --host disco.example.com
+  --local-image=<value>     local Docker image to upload and use (mostly for Disco development)
+  --verbose                 show extra output
+  --version=<value>         [default: latest] version of disco daemon to install
 
 DESCRIPTION
   initializes a new server
 
 EXAMPLES
-  $ disco init root@12.34.56.78
+  $ disco init root@disco.example.com
 
-  $ disco init root@12.34.56.78 --version 0.4.0
+  $ disco init root@disco.example.com --version 0.4.0
 ```
 
 _See code: [src/commands/init.ts](https://github.com/letsdiscodev/cli/blob/v0.4.1/src/commands/init.ts)_
@@ -467,14 +520,14 @@ add a project
 
 ```
 USAGE
-  $ disco projects:add --name <value> [--domain <value>] [--github-repo <value>] [--disco <value>] [--deploy]
+  $ disco projects:add --name <value> [--domain <value>] [--github <value>] [--disco <value>]
 
 FLAGS
-  --deploy               deploy the project after adding it
-  --disco=<value>        server to use
-  --domain=<value>       domain name where the app will be served, e.g. www.example.com
-  --github-repo=<value>  URL used to clone the repo, e.g. git@github.com:example/example.git
-  --name=<value>         (required) project name
+  --disco=<value>   server to use
+  --domain=<value>  domain name where the app will be served, e.g. www.example.com
+  --github=<value>  full name of the Github repository, including user or organization and repository name, e.g.
+                    myuser/myproject
+  --name=<value>    (required) project name
 
 DESCRIPTION
   add a project
@@ -700,7 +753,7 @@ _See code: [src/commands/syslog/remove.ts](https://github.com/letsdiscodev/cli/b
 
 ## `disco volumes:export`
 
-describe the command here
+TODO describe the command here
 
 ```
 USAGE
@@ -712,7 +765,7 @@ FLAGS
   --volume=<value>   (required)
 
 DESCRIPTION
-  describe the command here
+  TODO describe the command here
 
 EXAMPLES
   $ disco volumes:export
@@ -722,7 +775,7 @@ _See code: [src/commands/volumes/export.ts](https://github.com/letsdiscodev/cli/
 
 ## `disco volumes:import`
 
-describe the command here
+TODO describe the command here
 
 ```
 USAGE
@@ -734,7 +787,7 @@ FLAGS
   --volume=<value>   (required)
 
 DESCRIPTION
-  describe the command here
+  TODO describe the command here
 
 EXAMPLES
   $ disco volumes:import

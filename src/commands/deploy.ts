@@ -1,8 +1,8 @@
 import {Command, Flags} from '@oclif/core'
 import * as fs from 'node:fs'
 
-import {getDisco} from '../config'
-import {request, readEventSource} from '../auth-request'
+import {getDisco} from '../config.js'
+import {request, readEventSource} from '../auth-request.js'
 
 interface DeployRequest {
   commit?: string
@@ -41,7 +41,7 @@ export default class Deploy extends Command {
     }
 
     const res = await request({method: 'POST', url, body: reqBody, discoConfig, expectedStatuses: [201]})
-    const data = await res.json()
+    const data = (await res.json()) as any
 
     const deploymentUrl = `https://${discoConfig.host}/api/projects/${flags.project}/deployments/${data.deployment.number}/output`
     readEventSource(deploymentUrl, discoConfig, {

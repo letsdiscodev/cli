@@ -1,6 +1,6 @@
 import {Command, Flags} from '@oclif/core'
-import {getDisco} from '../../../config'
-import {request} from '../../../auth-request'
+import {getDisco} from '../../../config.js'
+import {request} from '../../../auth-request.js'
 
 export default class GithubAppsAdd extends Command {
   static description = 'add a Github app'
@@ -21,7 +21,7 @@ export default class GithubAppsAdd extends Command {
     }
     const url = `https://${discoConfig.host}/api/github-apps/create`
     const res = await request({method: 'POST', url, discoConfig, body, expectedStatuses: [201]})
-    const respBody = await res.json()
+    const respBody = (await res.json()) as any
     this.log('Open this URL in your browser:')
     this.log(respBody.pendingApp.url)
   }

@@ -1,7 +1,7 @@
 import {Command, Flags} from '@oclif/core'
 
-import {getDisco} from '../../config'
-import {readEventSource} from '../../auth-request'
+import {getDisco} from '../../config.js'
+import {readEventSource} from '../../auth-request.js'
 
 export default class DeployOutput extends Command {
   static override description = 'see the output of the latest deployment, or a particular deployment'

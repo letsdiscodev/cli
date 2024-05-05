@@ -8,7 +8,7 @@ import {NodeSSH} from 'node-ssh'
 import inquirerPassword from '@inquirer/password'
 import select from '@inquirer/select'
 import input from '@inquirer/input'
-import {addDisco, isDiscoAlreadyInConfig} from '../config'
+import {addDisco, isDiscoAlreadyInConfig} from '../config.js'
 import {SingleBar} from 'cli-progress'
 import {Readable} from 'node:stream'
 

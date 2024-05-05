@@ -1,7 +1,7 @@
 import {Args, Command, Flags} from '@oclif/core'
 
-import {getDisco} from '../../config'
-import {request, readEventSource} from '../../auth-request'
+import {getDisco} from '../../config.js'
+import {request, readEventSource} from '../../auth-request.js'
 
 export default class EnvRemove extends Command {
   static override args = {
@@ -24,7 +24,7 @@ export default class EnvRemove extends Command {
     this.log(`Removing env variable for ${flags.project}: ${args.envVar}`)
     const url = `https://${discoConfig.host}/api/projects/${flags.project}/env/${args.envVar}`
     const res = await request({method: 'DELETE', url, discoConfig})
-    const data = await res.json()
+    const data = (await res.json()) as any
     if (data.deployment) {
       // stream deployment
       const deploymentUrl = `https://${discoConfig.host}/api/projects/${flags.project}/deployments/${data.deployment.number}/output`

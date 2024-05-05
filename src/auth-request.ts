@@ -1,7 +1,7 @@
 import EventSource, {EventSourceInitDict} from 'eventsource'
-import fetch from 'node-fetch'
+import fetch, {RequestInit} from 'node-fetch'
 
-import {DiscoConfig} from './config'
+import {DiscoConfig} from './config.js'
 import {Readable} from 'node:stream'
 
 export interface EventWithMessage extends Event {
@@ -47,7 +47,7 @@ export function request({
   expectedStatuses?: number[]
   bodyStream?: Readable
 }) {
-  const params: fetch.RequestInit = {
+  const params: RequestInit = {
     method,
     headers: {
       Accept: 'application/json',

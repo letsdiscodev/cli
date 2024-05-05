@@ -1,115 +1,114 @@
 {
-  "name": "disco",
-  "version": "0.4.1",
-  "description": "deploy and manage your web projects",
-  "keywords": [
-    "oclif"
-  ],
-  "homepage": "https://github.com/letsdiscodev/cli",
-  "bugs": "https://github.com/letsdiscodev/cli/issues",
-  "repository": "letsdiscodev/cli",
-  "license": "MIT",
-  "author": "The Disco Team",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "bin": {
-    "disco": "./bin/run.js"
-  },
-  "files": [
-    "/bin",
-    "/dist",
-    "/oclif.manifest.json"
-  ],
-  "scripts": {
-    "build": "shx rm -rf dist && tsc -b",
-    "lint": "eslint . --ext .ts",
-    "prepack": "npm run build && oclif manifest && oclif readme",
-    "postpack": "shx rm -f oclif.manifest.json",
-    "prepare": "npm run build",
-    "test": "mocha --forbid-only \"test/**/*.test.ts\"",
-    "posttest": "npm run lint",
-    "pack-tarballs": "oclif pack tarballs",
-    "pack-macos": "oclif pack macos"
-  },
-  "oclif": {
-    "bin": "disco",
-    "commands": "./dist/commands",
-    "dirname": "disco",
-    "plugins": [
-      "@oclif/plugin-help",
-      "@oclif/plugin-update"
+    "name": "disco",
+    "description": "deploy and manage your web projects",
+    "version": "0.4.1",
+    "author": "The disco Team",
+    "bin": {
+        "disco": "./bin/run.js"
+    },
+    "bugs": "https://github.com/letsdiscodev/cli/issues",
+    "dependencies": {
+        "@inquirer/input": "^2.1.6",
+        "@inquirer/password": "^2.1.6",
+        "@inquirer/select": "^2.3.2",
+        "@oclif/core": "^3",
+        "@oclif/plugin-help": "^6",
+        "@oclif/plugin-plugins": "^5",
+        "chalk": "^5.3.0",
+        "cli-progress": "^3.12.0",
+        "eventsource": "^2.0.2",
+        "node-fetch": "^3.3.2",
+        "node-ssh": "^13.2.0"
+    },
+    "devDependencies": {
+        "@oclif/prettier-config": "^0.2.1",
+        "@oclif/test": "^3",
+        "@types/chai": "^4",
+        "@types/eventsource": "^1.1.15",
+        "@types/mocha": "^10",
+        "@types/node": "^18",
+        "@types/ssh2": "^1.15.0",
+        "chai": "^4",
+        "eslint": "^8",
+        "eslint-config-oclif": "^5",
+        "eslint-config-oclif-typescript": "^3",
+        "eslint-config-prettier": "^9",
+        "mocha": "^10",
+        "oclif": "^4",
+        "shx": "^0.3.3",
+        "ts-node": "^10",
+        "typescript": "^5"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "files": [
+        "/bin",
+        "/dist",
+        "/oclif.manifest.json"
     ],
-    "topicSeparator": ":",
-    "topics": {
-      "apikeys": {
-        "description": "list and remove api keys"
-      },
-      "deploy": {
-        "description": "manage deployments and see deployment output"
-      },
-      "env": {
-        "description": "read, set and remove environment variables"
-      },
-      "invite": {
-        "description": "create and accept invites to manage a server"
-      },
-      "meta": {
-        "description": "get and set meta information"
-      },
-      "projects": {
-        "description": "add, list, move and remove projects"
-      },
-      "syslog": {
-        "description": "add, list and remove log destinations"
-      },
-      "volumes": {
-        "description": "list, import and export volume data"
-      }
+    "homepage": "https://github.com/letsdiscodev/cli",
+    "keywords": [
+        "oclif"
+    ],
+    "license": "MIT",
+    "main": "dist/index.js",
+    "type": "module",
+    "oclif": {
+        "bin": "disco",
+        "dirname": "disco",
+        "commands": "./dist/commands",
+        "plugins": [
+            "@oclif/plugin-help"
+        ],
+        "topicSeparator": ":",
+        "topics": {
+            "apikeys": {
+                "description": "list and remove api keys"
+            },
+            "deploy": {
+                "description": "manage deployments and see deployment output"
+            },
+            "env": {
+                "description": "read, set and remove environment variables"
+            },
+            "github": {
+                "description": "manage your github apps"
+            },
+            "invite": {
+                "description": "create and accept invites to manage a server"
+            },
+            "meta": {
+                "description": "get and set meta information"
+            },
+            "projects": {
+                "description": "add, list, move and remove projects"
+            },
+            "syslog": {
+                "description": "add, list and remove log destinations"
+            },
+            "volumes": {
+                "description": "list, import and export volume data"
+            }
+        },
+        "macos": {
+            "identifier": "dev.letsdisco.cli"
+        },
+        "update": {
+            "s3": {
+                "bucket": "disco-cli-assets"
+            }
+        }
     },
-    "macos": {
-      "identifier": "dev.letsdisco.cli"
+    "repository": "letsdiscodev/cli",
+    "scripts": {
+        "build": "shx rm -rf dist && tsc -b",
+        "lint": "eslint . --ext .ts",
+        "postpack": "shx rm -f oclif.manifest.json",
+        "posttest": "npm run lint",
+        "prepack": "oclif manifest && oclif readme",
+        "test": "mocha --forbid-only \"test/**/*.test.ts\"",
+        "version": "oclif readme && git add README.md"
     },
-    "update": {
-      "s3": {
-        "bucket": "disco-cli-assets"
-      }
-    }
-  },
-  "dependencies": {
-    "@inquirer/input": "^2.1.5",
-    "@inquirer/password": "^2.1.4",
-    "@inquirer/select": "^2.3.1",
-    "@oclif/core": "^3",
-    "@oclif/plugin-help": "^6",
-    "@oclif/plugin-plugins": "^5",
-    "@types/ssh2-streams": "^0.1.12",
-    "chalk": "^4",
-    "cli-progress": "^3.12.0",
-    "eventsource": "^2.0.2",
-    "node-fetch": "^2.7.0",
-    "node-ssh": "^13.1.0"
-  },
-  "devDependencies": {
-    "@oclif/prettier-config": "^0.2.1",
-    "@oclif/test": "^3",
-    "@types/chai": "^4",
-    "@types/eventsource": "^1.1.15",
-    "@types/mocha": "^10.0.0",
-    "@types/node": "^18",
-    "@types/node-fetch": "^2.6.11",
-    "@typescript-eslint/eslint-plugin": "^7.6.0",
-    "chai": "^4",
-    "eslint": "^8.57.0",
-    "eslint-config-oclif": "^5",
-    "eslint-config-oclif-typescript": "^3",
-    "eslint-config-prettier": "^9.1.0",
-    "mocha": "^10",
-    "oclif": "^4",
-    "shx": "^0.3.3",
-    "ts-node": "^10.9.2",
-    "typescript": "^5"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+    "types": "dist/index.d.ts"
 }
