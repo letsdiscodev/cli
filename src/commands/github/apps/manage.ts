@@ -2,6 +2,21 @@ import {Args, Command, Flags} from '@oclif/core'
 import {getDisco} from '../../../config.js'
 import {request} from '../../../auth-request.js'
 
+type GithubApp = {
+  id: number
+  owner: {
+    id: number
+    login: string
+    type: 'Organization' | 'User'
+  }
+  appUrl: string
+  installUrl: string
+  installation: {
+    id: number
+    manageUrl: string
+  } | null
+}
+
 export default class GithubAppsManage extends Command {
   static description = 'manage Github app'
 
@@ -20,8 +35,9 @@ export default class GithubAppsManage extends Command {
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/github-apps`
     const res = await request({method: 'GET', url, discoConfig, expectedStatuses: [200]})
-    const respBody = await res.json()
-    const filteredApps = respBody.githubApps.filter((app) => app.owner.login === args.owner)
+    const respBody = (await res.json()) as {githubApps: GithubApp[]}
+    const githubApps = respBody.githubApps as GithubApp[]
+    const filteredApps = githubApps.filter((app) => app.owner.login === args.owner)
     if (filteredApps.length === 0) {
       this.error('Not found. You can install the Github app with github:apps:add')
     }
