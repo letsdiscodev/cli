@@ -4,7 +4,7 @@ import {request} from '../../auth-request.js'
 
 export default class ProjectsRemove extends Command {
   static args = {
-    project: Args.string({description: 'project to remove'}),
+    project: Args.string({description: 'project to remove', required: true}),
   }
 
   static description = 'remove a project'
