@@ -24,8 +24,8 @@ export default class ProjectsAdd extends Command {
   public async run(): Promise<void> {
     const {flags} = await this.parse(ProjectsAdd)
 
-    if (flags.github !== undefined && !/^\S+\/\S+$/.test(flags.github)) {
-      this.error('Invalid Github repository')
+    if (flags.github !== undefined && !/^\w+\/\w+$/.test(flags.github)) {
+      this.error('Invalid Github repository format, expected "user/repo"')
     }
 
     const discoConfig = getDisco(flags.disco || null)
