@@ -14,7 +14,7 @@ export default class MetaUpgrade extends Command {
 
   static flags = {
     image: Flags.string({required: false, description: 'the image to use. Defaults to letsdiscodev/daemon:latest'}),
-    dontPull: Flags.boolean({required: false, description: "don't pull the image before upgrading"}),
+    'dont-pull': Flags.boolean({required: false, description: "don't pull the image before upgrading"}),
     disco: Flags.string({required: false}),
   }
 
@@ -25,7 +25,7 @@ export default class MetaUpgrade extends Command {
     const url = `https://${discoConfig.host}/api/disco/upgrade`
 
     const body: UpgradeParams = {
-      pull: !flags.dontPull,
+      pull: !flags['dont-pull'],
     }
     if (flags.image) {
       body.image = flags.image
