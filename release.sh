@@ -25,8 +25,6 @@ fi
 # watch out as it has a 'v' at the beginning
 latest_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
 
-# get the version by cat'ing package.json into jq and extracting the version
-version=$(cat package.json | jq -r '.version')
 
 # check if the latest release is the same as the version in package.json
 if [ "$latest_release" = "v$version" ]; then
@@ -34,13 +32,6 @@ if [ "$latest_release" = "v$version" ]; then
   exit 1
 fi
 
-python -c "import os; print(os.environ['version'])"
-
-#FIXME
-#FIXME
-#FIXME
-#FIXME
-exit 1
 
 # ---
 
@@ -57,7 +48,10 @@ oclif upload tarballs --no-xz
 
 # promote tarballs
 
-# get the hash from calling python and passing -c "...some script"
-hash=$(python3 -c "from pathlib import Path; print(str(list(Path('./dist').glob('disco-v0.5.5*'))[0]).split('-')[2])")
+# get the hash from calling python
+hash=$(export PACKAGE_VERSION=$version && python3 -c "from pathlib import Path; import os; print(str(list(Path('./dist').glob('disco-v' + os.environ[PACKAGE_VERSION] + '*'))[0]).split('-')[2])")
 
-oclif promote --sha $hash --version $version --no-xz
+# get the version by cat'ing package.json into jq and extracting the version
+version=$(cat package.json | jq -r '.version')
+
+oclif promote --sha $hash --version v$version --no-xz
