@@ -22,13 +22,14 @@ if [ -z "${AWS_SECRET_ACCESS_KEY}" ]; then
 fi
 
 # get the latest release pushed to the repo
+# watch out as it has a 'v' at the beginning
 latest_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
 
 # get the version by cat'ing package.json into jq and extracting the version
 version=$(cat package.json | jq -r '.version')
 
 # check if the latest release is the same as the version in package.json
-if [ "$latest_release" = "$version" ]; then
+if [ "$latest_release" = "v$version" ]; then
   echo "The latest release is the same as the version in package.json. Please update the version in package.json before running this script"
   exit 1
 fi
