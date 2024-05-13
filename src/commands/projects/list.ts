@@ -4,6 +4,9 @@ import {request} from '../../auth-request.js'
 
 interface Project {
   name: string
+  github: {
+    fullName: string
+  }
 }
 
 export default class ProjectsList extends Command {
@@ -21,7 +24,9 @@ export default class ProjectsList extends Command {
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects`
     const res = await request({method: 'GET', url, discoConfig})
-    const data = (await res.json()) as any
-    this.log(data.projects.map((project: Project) => project.name).join('\n'))
+    const respBody = (await res.json()) as {projects: Project[]}
+    for (const project of respBody.projects) {
+      this.log(`${project.name} (${project.github.fullName})`)
+    }
   }
 }
