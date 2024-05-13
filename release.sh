@@ -21,7 +21,7 @@ fi
 rm -rf dist
 rm -rf tmp
 
-npm run ci
+npm ci
 
 npm run build
 
