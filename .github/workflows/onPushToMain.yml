@@ -35,7 +35,7 @@ jobs:
           git config --global user.email ${{ secrets.GH_EMAIL }}
           git config --global user.name ${{ secrets.GH_USERNAME }}
       - name: Generate oclif README
-        if: ${{ steps.version-check.outputs.skipped == 'false' }}
+        if: ${{ false && steps.version-check.outputs.skipped == 'false' }}
         id: oclif-readme
         run: |
           npm install
