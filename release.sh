@@ -6,13 +6,13 @@ if [[ `git status --porcelain` ]]; then
   exit 1
 fi
 
-if [[ ! -v $AWS_ACCESS_KEY_ID ]]; then
+if [ -z "${AWS_ACCESS_KEY_ID}" ]; then
   # fail
   echo "AWS_ACCESS_KEY_ID is not set Please set it before running this script"
   exit 1
 fi
 
-if [[ ! -v $AWS_SECRET_ACCESS_KEY ]]; then
+if [ -z "${AWS_SECRET_ACCESS_KEY}" ]; then
   # fail
   echo "AWS_SECRET_ACCESS_KEY is not set Please set it before running this script"
   exit 1
