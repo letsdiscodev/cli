@@ -48,7 +48,7 @@ oclif upload tarballs --no-xz
 
 # promote tarballs
 
-# get the hash from calling python
+# get the hash by calling python
 hash=$(export PACKAGE_VERSION=$version && python3 -c "from pathlib import Path; import os; print(str(list(Path('./dist').glob('disco-v' + os.environ['PACKAGE_VERSION'] + '*'))[0]).split('-')[2])")
 
 # get the version by cat'ing package.json into jq and extracting the version
