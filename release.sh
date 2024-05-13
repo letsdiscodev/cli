@@ -54,4 +54,4 @@ hash=$(export PACKAGE_VERSION=$version && python3 -c "from pathlib import Path; 
 # get the version by cat'ing package.json into jq and extracting the version
 version=$(cat package.json | jq -r '.version')
 
-oclif promote --sha $hash --version v$version --no-xz
+oclif promote --sha $hash --version $version --no-xz
