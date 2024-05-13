@@ -1,7 +1,7 @@
 {
     "name": "disco",
     "description": "deploy and manage your web projects",
-    "version": "0.5.1",
+    "version": "0.5.3",
     "author": "The disco Team",
     "bin": {
         "disco": "./bin/run.js"
@@ -60,7 +60,8 @@
         "commands": "./dist/commands",
         "plugins": [
             "@oclif/plugin-help",
-            "@oclif/plugin-plugins"
+            "@oclif/plugin-plugins",
+            "@oclif/plugin-update"
         ],
         "topicSeparator": ":",
         "topics": {
@@ -96,6 +97,7 @@
             "identifier": "dev.letsdisco.cli"
         },
         "update": {
+            "disableNpmLookup": true,
             "s3": {
                 "bucket": "disco-cli-assets"
             }
