@@ -34,6 +34,13 @@ if [ "$latest_release" = "v$version" ]; then
   exit 1
 fi
 
+python -c "import os; print(os.environ['version'])"
+
+#FIXME
+#FIXME
+#FIXME
+#FIXME
+exit 1
 
 # ---
 
@@ -48,7 +55,8 @@ oclif pack tarballs --no-xz
 
 oclif upload tarballs --no-xz
 
-# TODO promote tarballs -- extract hash somehow
+# promote tarballs
+
 # get the hash from calling python and passing -c "...some script"
 hash=$(python3 -c "from pathlib import Path; print(str(list(Path('./dist').glob('disco-v0.5.5*'))[0]).split('-')[2])")
 
