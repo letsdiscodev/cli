@@ -1,7 +1,7 @@
 {
     "name": "disco",
     "description": "deploy and manage your web projects",
-    "version": "0.5.4",
+    "version": "0.5.5",
     "author": "The disco Team",
     "bin": {
         "disco": "./bin/run.js"
