@@ -47,7 +47,7 @@ jobs:
           fi
       - name: Create Github Release
         uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5
-        if: ${{ steps.version-check.outputs.skipped == 'false' }}
+        if: ${{ false && steps.version-check.outputs.skipped == 'false' }}
         with:
           name: ${{ steps.version-check.outputs.tag }}
           tag: ${{ steps.version-check.outputs.tag }}
