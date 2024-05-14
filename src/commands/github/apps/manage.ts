@@ -1,6 +1,7 @@
 import {Args, Command, Flags} from '@oclif/core'
 import {getDisco} from '../../../config.js'
 import {request} from '../../../auth-request.js'
+import open from 'open'
 
 type GithubApp = {
   id: number
@@ -48,11 +49,19 @@ export default class GithubAppsManage extends Command {
 
     const githubApp = filteredApps[0]
     if (githubApp.installation === null) {
-      this.log('Complete installation here')
+      this.log('Opening the URL to complete the installation:')
+      this.log('')
       this.log(githubApp.installUrl)
+      this.log('')
+      this.log('(If the URL does not open, please copy and paste it into your browser)')
+      await open(githubApp.installUrl)
     } else {
-      this.log('Manage installation here')
+      this.log('Opening the URL to manage the installation:')
+      this.log('')
       this.log(githubApp.installation.manageUrl)
+      this.log('')
+      this.log('(If the URL does not open, please copy and paste it into your browser)')
+      await open(githubApp.installation.manageUrl)
     }
   }
 }

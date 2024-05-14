@@ -1,7 +1,7 @@
 {
     "name": "disco",
     "description": "deploy and manage your web projects",
-    "version": "0.5.10",
+    "version": "0.5.11",
     "author": "The disco Team",
     "bin": {
         "disco": "./bin/run.js"
@@ -19,7 +19,8 @@
         "cli-progress": "^3.12.0",
         "eventsource": "^2.0.2",
         "node-fetch": "^3.3.2",
-        "node-ssh": "^13.2.0"
+        "node-ssh": "^13.2.0",
+        "open": "^10.1.0"
     },
     "devDependencies": {
         "@oclif/prettier-config": "^0.2.1",

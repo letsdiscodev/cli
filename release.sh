@@ -21,6 +21,12 @@ if [ -z "${AWS_SECRET_ACCESS_KEY}" ]; then
   exit 1
 fi
 
+if [ -z "${AWS_CLOUDFRONT_DISTRIBUTION_ID}" ]; then
+  # fail
+  echo "AWS_CLOUDFRONT_DISTRIBUTION_ID is not set Please set it before running this script"
+  exit 1
+fi
+
 # get the latest release pushed to the repo
 # watch out as it has a 'v' at the beginning
 latest_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
@@ -54,3 +60,5 @@ oclif upload tarballs --no-xz
 hash=$(export PACKAGE_VERSION=$version && python3 -c "from pathlib import Path; import os; print(str(list(Path('./dist').glob('disco-v' + os.environ['PACKAGE_VERSION'] + '*'))[0]).split('-')[2])")
 
 oclif promote --sha $hash --version $version --no-xz
+
+aws create-invalidation --distribution-id $AWS_CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
