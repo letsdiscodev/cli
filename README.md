@@ -20,7 +20,7 @@ $ npm install -g disco
 $ disco COMMAND
 running command...
 $ disco (--version)
-disco/0.5.10 darwin-arm64 node-v20.12.2
+disco/0.5.11 darwin-arm64 node-v20.12.2
 $ disco --help [COMMAND]
 USAGE
   $ disco COMMAND
@@ -98,7 +98,7 @@ EXAMPLES
   $ disco apikeys:list
 ```
 
-_See code: [src/commands/apikeys/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/apikeys/list.ts)_
+_See code: [src/commands/apikeys/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/apikeys/list.ts)_
 
 ## `disco apikeys:remove [PUBLICKEY]`
 
@@ -121,7 +121,7 @@ EXAMPLES
   $ disco apikeys:remove API_KEY
 ```
 
-_See code: [src/commands/apikeys/remove.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/apikeys/remove.ts)_
+_See code: [src/commands/apikeys/remove.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/apikeys/remove.ts)_
 
 ## `disco deploy`
 
@@ -146,7 +146,7 @@ EXAMPLES
   $ disco deploy --project mysite --commit 7b5c8f935328c1af49c9037cac9dee7bf0bd8c7e
 ```
 
-_See code: [src/commands/deploy.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/deploy.ts)_
+_See code: [src/commands/deploy.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/deploy.ts)_
 
 ## `disco deploy:list`
 
@@ -167,7 +167,7 @@ EXAMPLES
   $ disco deploy:list --project mysite
 ```
 
-_See code: [src/commands/deploy/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/deploy/list.ts)_
+_See code: [src/commands/deploy/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/deploy/list.ts)_
 
 ## `disco deploy:output`
 
@@ -191,7 +191,7 @@ EXAMPLES
   $ disco deploy:output --project mysite --deployment 4
 ```
 
-_See code: [src/commands/deploy/output.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/deploy/output.ts)_
+_See code: [src/commands/deploy/output.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/deploy/output.ts)_
 
 ## `disco domains:add DOMAIN`
 
@@ -215,7 +215,7 @@ EXAMPLES
   $ disco domains:add www.example.com --project mysite
 ```
 
-_See code: [src/commands/domains/add.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/domains/add.ts)_
+_See code: [src/commands/domains/add.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/domains/add.ts)_
 
 ## `disco domains:list`
 
@@ -236,7 +236,7 @@ EXAMPLES
   $ disco domains:list --project mysite
 ```
 
-_See code: [src/commands/domains/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/domains/list.ts)_
+_See code: [src/commands/domains/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/domains/list.ts)_
 
 ## `disco domains:remove DOMAIN`
 
@@ -260,7 +260,7 @@ EXAMPLES
   $ disco domains:remove www.example.com --project mysite
 ```
 
-_See code: [src/commands/domains/remove.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/domains/remove.ts)_
+_See code: [src/commands/domains/remove.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/domains/remove.ts)_
 
 ## `disco env:get [ENVVAR]`
 
@@ -284,7 +284,7 @@ EXAMPLES
   $ disco env:get --project mysite API_KEY
 ```
 
-_See code: [src/commands/env/get.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/env/get.ts)_
+_See code: [src/commands/env/get.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/env/get.ts)_
 
 ## `disco env:list`
 
@@ -305,7 +305,7 @@ EXAMPLES
   $ disco env:list --project mysite
 ```
 
-_See code: [src/commands/env/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/env/list.ts)_
+_See code: [src/commands/env/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/env/list.ts)_
 
 ## `disco env:remove [ENVVAR]`
 
@@ -329,7 +329,7 @@ EXAMPLES
   $ disco env:remove --project mysite API_KEY
 ```
 
-_See code: [src/commands/env/remove.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/env/remove.ts)_
+_See code: [src/commands/env/remove.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/env/remove.ts)_
 
 ## `disco env:set [VARIABLES]`
 
@@ -355,7 +355,7 @@ EXAMPLES
   $ disco env:set API_KEY=0x97BCD3 OTHER_API_KEY=sk_f98a7f97as896
 ```
 
-_See code: [src/commands/env/set.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/env/set.ts)_
+_See code: [src/commands/env/set.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/env/set.ts)_
 
 ## `disco github:apps:add`
 
@@ -376,7 +376,7 @@ EXAMPLES
   $ disco github:apps:add
 ```
 
-_See code: [src/commands/github/apps/add.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/github/apps/add.ts)_
+_See code: [src/commands/github/apps/add.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/github/apps/add.ts)_
 
 ## `disco github:apps:list`
 
@@ -396,7 +396,7 @@ EXAMPLES
   $ disco github:apps:list
 ```
 
-_See code: [src/commands/github/apps/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/github/apps/list.ts)_
+_See code: [src/commands/github/apps/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/github/apps/list.ts)_
 
 ## `disco github:apps:manage OWNER`
 
@@ -419,7 +419,7 @@ EXAMPLES
   $ disco github:apps:manage
 ```
 
-_See code: [src/commands/github/apps/manage.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/github/apps/manage.ts)_
+_See code: [src/commands/github/apps/manage.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/github/apps/manage.ts)_
 
 ## `disco github:apps:prune`
 
@@ -439,7 +439,7 @@ EXAMPLES
   $ disco github:apps:prune
 ```
 
-_See code: [src/commands/github/apps/prune.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/github/apps/prune.ts)_
+_See code: [src/commands/github/apps/prune.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/github/apps/prune.ts)_
 
 ## `disco github:repos:list`
 
@@ -459,7 +459,7 @@ EXAMPLES
   $ disco github:repos:list
 ```
 
-_See code: [src/commands/github/repos/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/github/repos/list.ts)_
+_See code: [src/commands/github/repos/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/github/repos/list.ts)_
 
 ## `disco help [COMMAND]`
 
@@ -507,7 +507,7 @@ EXAMPLES
   $ disco init root@disco.example.com --version 0.4.0
 ```
 
-_See code: [src/commands/init.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/init.ts)_
+_See code: [src/commands/init.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/init.ts)_
 
 ## `disco invite:accept URL`
 
@@ -530,7 +530,7 @@ EXAMPLES
   $ disco invite:accept https://mymachine.com/api-key-invites/8979ab987a9b879
 ```
 
-_See code: [src/commands/invite/accept.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/invite/accept.ts)_
+_See code: [src/commands/invite/accept.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/invite/accept.ts)_
 
 ## `disco invite:create NAME`
 
@@ -553,7 +553,7 @@ EXAMPLES
   $ disco invite:create --disco mymachine.com zoe
 ```
 
-_See code: [src/commands/invite/create.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/invite/create.ts)_
+_See code: [src/commands/invite/create.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/invite/create.ts)_
 
 ## `disco logs`
 
@@ -575,7 +575,7 @@ EXAMPLES
   $ disco logs
 ```
 
-_See code: [src/commands/logs.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/logs.ts)_
+_See code: [src/commands/logs.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/logs.ts)_
 
 ## `disco meta:host DOMAIN`
 
@@ -595,7 +595,7 @@ EXAMPLES
   $ disco meta:host example.com
 ```
 
-_See code: [src/commands/meta/host.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/meta/host.ts)_
+_See code: [src/commands/meta/host.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/meta/host.ts)_
 
 ## `disco meta:info`
 
@@ -615,7 +615,7 @@ EXAMPLES
   $ disco meta:info
 ```
 
-_See code: [src/commands/meta/info.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/meta/info.ts)_
+_See code: [src/commands/meta/info.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/meta/info.ts)_
 
 ## `disco meta:upgrade`
 
@@ -637,7 +637,7 @@ EXAMPLES
   $ disco meta:upgrade
 ```
 
-_See code: [src/commands/meta/upgrade.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/meta/upgrade.ts)_
+_See code: [src/commands/meta/upgrade.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/meta/upgrade.ts)_
 
 ## `disco nodes:add SSHSTRING`
 
@@ -661,7 +661,7 @@ EXAMPLES
   $ disco nodes:add root@12.34.56.78
 ```
 
-_See code: [src/commands/nodes/add.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/nodes/add.ts)_
+_See code: [src/commands/nodes/add.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/nodes/add.ts)_
 
 ## `disco plugins`
 
@@ -974,7 +974,7 @@ EXAMPLES
   $ disco projects:add
 ```
 
-_See code: [src/commands/projects/add.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/projects/add.ts)_
+_See code: [src/commands/projects/add.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/projects/add.ts)_
 
 ## `disco projects:list`
 
@@ -994,7 +994,7 @@ EXAMPLES
   $ disco projects:list
 ```
 
-_See code: [src/commands/projects/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/projects/list.ts)_
+_See code: [src/commands/projects/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/projects/list.ts)_
 
 ## `disco projects:move`
 
@@ -1016,7 +1016,7 @@ EXAMPLES
   $ disco projects:move --project mysite --from-disco 10.1.1.1 --to-disco 10.2.2.2
 ```
 
-_See code: [src/commands/projects/move.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/projects/move.ts)_
+_See code: [src/commands/projects/move.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/projects/move.ts)_
 
 ## `disco projects:remove PROJECT`
 
@@ -1039,7 +1039,7 @@ EXAMPLES
   $ disco projects:remove project-name
 ```
 
-_See code: [src/commands/projects/remove.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/projects/remove.ts)_
+_See code: [src/commands/projects/remove.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/projects/remove.ts)_
 
 ## `disco run [COMMAND]`
 
@@ -1065,7 +1065,7 @@ EXAMPLES
   $ disco run --project mysite "python migrate.py"
 ```
 
-_See code: [src/commands/run.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/run.ts)_
+_See code: [src/commands/run.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/run.ts)_
 
 ## `disco runcommand [PROJECT] [COMMAND] [ARGS]`
 
@@ -1091,7 +1091,7 @@ EXAMPLES
   $ disco runcommand postgres db:add -- "--project flask"
 ```
 
-_See code: [src/commands/runcommand.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/runcommand.ts)_
+_See code: [src/commands/runcommand.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/runcommand.ts)_
 
 ## `disco scale SERVICES`
 
@@ -1117,7 +1117,7 @@ EXAMPLES
   $ disco scale --project mysite web=3 worker=2
 ```
 
-_See code: [src/commands/scale.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/scale.ts)_
+_See code: [src/commands/scale.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/scale.ts)_
 
 ## `disco syslog:add [SYSLOGDESTINATION]`
 
@@ -1142,7 +1142,7 @@ EXAMPLES
   $ disco syslog:add syslog+tls://logs.example.com:4415
 ```
 
-_See code: [src/commands/syslog/add.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/syslog/add.ts)_
+_See code: [src/commands/syslog/add.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/syslog/add.ts)_
 
 ## `disco syslog:list`
 
@@ -1162,7 +1162,7 @@ EXAMPLES
   $ disco syslog:list
 ```
 
-_See code: [src/commands/syslog/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/syslog/list.ts)_
+_See code: [src/commands/syslog/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/syslog/list.ts)_
 
 ## `disco syslog:remove [SYSLOGDESTINATION]`
 
@@ -1187,7 +1187,7 @@ EXAMPLES
   $ disco syslog:remove syslog+tls://logs.example.com:4415
 ```
 
-_See code: [src/commands/syslog/remove.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/syslog/remove.ts)_
+_See code: [src/commands/syslog/remove.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/syslog/remove.ts)_
 
 ## `disco update [CHANNEL]`
 
@@ -1246,7 +1246,7 @@ EXAMPLES
   $ disco volumes:export
 ```
 
-_See code: [src/commands/volumes/export.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/volumes/export.ts)_
+_See code: [src/commands/volumes/export.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/volumes/export.ts)_
 
 ## `disco volumes:import`
 
@@ -1268,7 +1268,7 @@ EXAMPLES
   $ disco volumes:import
 ```
 
-_See code: [src/commands/volumes/import.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/volumes/import.ts)_
+_See code: [src/commands/volumes/import.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/volumes/import.ts)_
 
 ## `disco volumes:list`
 
@@ -1289,5 +1289,5 @@ EXAMPLES
   $ disco volumes:list --project mysite
 ```
 
-_See code: [src/commands/volumes/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.10/src/commands/volumes/list.ts)_
+_See code: [src/commands/volumes/list.ts](https://github.com/letsdiscodev/cli/blob/v0.5.11/src/commands/volumes/list.ts)_
 <!-- commandsstop -->

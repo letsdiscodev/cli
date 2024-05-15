@@ -4,6 +4,7 @@ import fs from 'node:fs/promises'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import * as child from 'node:child_process'
+import * as net from 'node:net'
 import {NodeSSH} from 'node-ssh'
 import inquirerPassword from '@inquirer/password'
 import select from '@inquirer/select'
@@ -42,6 +43,12 @@ export default class Init extends Command {
     const {version, verbose, 'local-image': imageFlag, 'advertise-addr': advertiseAddrFlag} = flags
     const image = imageFlag === undefined ? `letsdiscodev/daemon:${version}` : imageFlag
     const [argUsername, sshHost] = args.sshString.split('@')
+
+    // check that sshHost is not an ip address
+    if (!flags.host && net.isIP(sshHost)) {
+      this.error('host must be a domain name')
+    }
+
     const host = flags.host === undefined ? sshHost : flags.host
     let username = argUsername
     if (isDiscoAlreadyInConfig(host)) {
