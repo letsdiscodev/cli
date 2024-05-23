@@ -35,10 +35,11 @@ latest_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
 version=$(cat package.json | jq -r '.version')
 
 # check if the latest release is the same as the version in package.json
-if [ "$latest_release" = "v$version" ]; then
-  echo "The latest release is the same as the version in package.json. Please update the version in package.json before running this script"
-  exit 1
-fi
+# don't use right now as this script is not running as part of the github release workflow
+# if [ "$latest_release" = "v$version" ]; then
+#   echo "The latest release is the same as the version in package.json. Please update the version in package.json before running this script"
+#   exit 1
+# fi
 
 
 # ---

@@ -71,7 +71,7 @@ export default class Init extends Command {
     let ssh
     let password
     try {
-      ;({ssh, password} = await connectSsh({host, username}))
+      ;({ssh, password} = await connectSsh({host: sshHost, username}))
     } catch {
       this.error('could not connect to SSH')
     }
@@ -96,7 +96,7 @@ export default class Init extends Command {
       await setupRootSshAccess({ssh, password: passwordToUse, verbose})
       username = 'root'
       try {
-        ;({ssh, password} = await connectSsh({host, username}))
+        ;({ssh, password} = await connectSsh({host: sshHost, username}))
       } catch {
         this.error('could not connect to SSH as root')
       }
