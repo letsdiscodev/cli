@@ -1,3 +1,7 @@
+# to run this:
+# eval $(cat .env) && bash release.sh
+# ---
+
 # exit on error
 set -e
 # print every command being run
