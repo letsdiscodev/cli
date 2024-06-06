@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # to run this:
 # eval $(cat .env) && bash release.sh
 # ---
