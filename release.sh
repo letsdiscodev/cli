@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # to run this:
-# eval $(cat .env) && bash release.sh
+# export $(cat .env | xargs)  && ./release.sh
 # ---
 
 # exit on error
@@ -35,7 +35,7 @@ fi
 
 # get the latest release pushed to the repo
 # watch out as it has a 'v' at the beginning
-latest_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
+# latest_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
 
 # get the version by cat'ing package.json into jq and extracting the version
 version=$(cat package.json | jq -r '.version')
