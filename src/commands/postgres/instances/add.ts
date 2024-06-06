@@ -3,7 +3,7 @@ import {getDisco} from '../../../config.js'
 import {request, readEventSource} from '../../../auth-request.js'
 
 export default class PostgresInstancesAdd extends Command {
-  static description = 'list Postgres instances'
+  static description = 'add a Postgres instance'
 
   static examples = ['<%= config.bin %> <%= command.id %>']
 
@@ -16,7 +16,7 @@ export default class PostgresInstancesAdd extends Command {
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects/postgres-addon/cgi/endpoints/instances`
     const res = await request({method: 'POST', url, discoConfig, expectedStatuses: [201]})
-    const respBody = (await res.json()) as {project: {name: string}, deployment: {number: number}}
+    const respBody = (await res.json()) as {project: {name: string}; deployment: {number: number}}
     this.log(`Added instance ${respBody.project.name}`)
     const deploymentUrl = `https://${discoConfig.host}/api/projects/${respBody.project.name}/deployments/${respBody.deployment.number}/output`
 

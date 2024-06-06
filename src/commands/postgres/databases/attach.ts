@@ -2,9 +2,8 @@ import {Command, Flags} from '@oclif/core'
 import {getDisco} from '../../../config.js'
 import {request} from '../../../auth-request.js'
 
-
 export default class PostgresDatabasesAttach extends Command {
-  static description = 'add Postgres databases'
+  static description = 'attach a Postgres database to a project'
 
   static examples = ['<%= config.bin %> <%= command.id %>']
 

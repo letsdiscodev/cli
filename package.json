@@ -1,7 +1,7 @@
 {
     "name": "disco",
     "description": "deploy and manage your web projects",
-    "version": "0.5.13",
+    "version": "0.5.14",
     "author": "The disco Team",
     "bin": {
         "disco": "./bin/run.js"
@@ -84,6 +84,18 @@
             },
             "meta": {
                 "description": "get and set meta information"
+            },
+            "postgres": {
+                "description": "manage postgres databases"
+            },
+            "postgres:addon": {
+                "description": "manage postgres addons"
+            },
+            "postgres:databases": {
+                "description": "manage postgres databases"
+            },
+            "postgres:instances": {
+                "description": "manage postgres instances"
             },
             "projects": {
                 "description": "add, list, move and remove projects"

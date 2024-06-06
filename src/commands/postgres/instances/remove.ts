@@ -3,7 +3,7 @@ import {getDisco} from '../../../config.js'
 import {request} from '../../../auth-request.js'
 
 export default class PostgresInstancesRemove extends Command {
-  static description = 'list Postgres instances'
+  static description = 'remove a Postgres instance'
 
   static examples = ['<%= config.bin %> <%= command.id %>']
 

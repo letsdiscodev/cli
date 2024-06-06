@@ -2,9 +2,8 @@ import {Command, Flags} from '@oclif/core'
 import {getDisco} from '../../../config.js'
 import {request} from '../../../auth-request.js'
 
-
 export default class PostgresDatabasesRemove extends Command {
-  static description = 'add Postgres databases'
+  static description = 'remove a Postgres database'
 
   static examples = ['<%= config.bin %> <%= command.id %>']
 

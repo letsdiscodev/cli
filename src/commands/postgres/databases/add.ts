@@ -3,12 +3,12 @@ import {getDisco} from '../../../config.js'
 import {request} from '../../../auth-request.js'
 
 type PostgresDatabase = {
-  created: string;
-  name: string;
+  created: string
+  name: string
 }
 
 export default class PostgresDatabasesAdd extends Command {
-  static description = 'add Postgres databases'
+  static description = 'add a Postgres database'
 
   static examples = ['<%= config.bin %> <%= command.id %>']
 

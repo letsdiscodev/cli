@@ -2,9 +2,8 @@ import {Command, Flags} from '@oclif/core'
 import {getDisco} from '../../../config.js'
 import {request} from '../../../auth-request.js'
 
-
 export default class PostgresDatabasesDetach extends Command {
-  static description = 'add Postgres databases'
+  static description = 'detach a Postgres database from a project'
 
   static examples = ['<%= config.bin %> <%= command.id %>']
 
