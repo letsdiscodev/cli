@@ -36,6 +36,9 @@ export default class Init extends Command {
     'advertise-addr': Flags.string({
       description: 'fixed IP address used to add nodes. defaults to resolving domain name of ssh connection',
     }),
+    'cloudflare-tunnel': Flags.string({
+      description: 'Cloudflare Tunnel token, if you want to run Disco behind a Cloudflare tunnel',
+    }),
   }
 
   public async run(): Promise<void> {
@@ -126,7 +129,15 @@ export default class Init extends Command {
       this.log('Initializing Disco')
     }
 
-    const apiKey = await initDisco({ssh, host, advertiseAddr, image, verbose, progressBar})
+    const apiKey = await initDisco({
+      ssh,
+      host,
+      advertiseAddr,
+      cloudflareTunnel: flags['cloudflare-tunnel'],
+      image,
+      verbose,
+      progressBar,
+    })
     if (verbose) {
       this.log('Adding Disco to local config')
     }
@@ -299,6 +310,7 @@ async function initDisco({
   ssh,
   host,
   advertiseAddr,
+  cloudflareTunnel,
   image,
   verbose,
   progressBar,
@@ -306,6 +318,7 @@ async function initDisco({
   ssh: NodeSSH
   host: string
   advertiseAddr: string
+  cloudflareTunnel: string | undefined
   image: string
   verbose: boolean
   progressBar: SingleBar | undefined
@@ -323,6 +336,7 @@ async function initDisco({
     `--env DISCO_ADVERTISE_ADDR="${advertiseAddr}" ` +
     '--env HOST_HOME=$HOME ' +
     `--env DISCO_IMAGE=${image} ` +
+    (cloudflareTunnel === undefined ? '' : `--env CLOUDFLARE_TUNNEL_TOKEN=${cloudflareTunnel} `) +
     `${image} ` +
     'disco_init'
   const output = await runSshCommand({ssh, command, verbose, progressBar})
