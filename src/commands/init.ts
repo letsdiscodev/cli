@@ -61,7 +61,7 @@ export default class Init extends Command {
     let advertiseAddr = advertiseAddrFlag
     if (advertiseAddr === undefined) {
       advertiseAddr = await new Promise<string>((resolve, reject) => {
-        dns.lookup(host, (err, address, _) => {
+        dns.lookup(sshHost, (err, address, _) => {
           if (err) {
             reject(err)
           } else {
