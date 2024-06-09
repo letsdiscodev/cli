@@ -14,7 +14,7 @@ export default class PostgresAddonUpdate extends Command {
   public async run(): Promise<void> {
     const {flags} = await this.parse(PostgresAddonUpdate)
     const discoConfig = getDisco(flags.disco || null)
-    const project = 'postgres-addon';
+    const project = 'postgres-addon'
     const url = `https://${discoConfig.host}/api/projects/${project}/deployments`
     const res = await request({method: 'POST', url, body: {}, discoConfig, expectedStatuses: [201]})
     const data = (await res.json()) as any

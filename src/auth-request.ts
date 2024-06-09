@@ -38,6 +38,7 @@ export function request({
   discoConfig,
   body,
   expectedStatuses = [200],
+  extraHeaders,
   bodyStream,
 }: {
   method: string
@@ -45,6 +46,7 @@ export function request({
   discoConfig: DiscoConfig
   body?: unknown
   expectedStatuses?: number[]
+  extraHeaders?: Record<string, string>,
   bodyStream?: Readable
 }) {
   const params: RequestInit = {
@@ -60,7 +62,15 @@ export function request({
       ...params.headers,
       'Content-Type': 'application/json',
     }
+
     params.body = JSON.stringify(body)
+  }
+
+  if (extraHeaders !== undefined) {
+    params.headers = {
+      ...params.headers,
+      ...extraHeaders,
+    }
   }
 
   if (bodyStream) {

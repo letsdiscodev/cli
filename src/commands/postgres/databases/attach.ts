@@ -20,6 +20,15 @@ export default class PostgresDatabasesAttach extends Command {
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects/postgres-addon/cgi/endpoints/instances/${flags.instance}/databases/${flags.database}/attach`
     const reqBody = {envVar: flags['env-var'], project: flags.project}
-    await request({method: 'POST', url, discoConfig, body: reqBody, expectedStatuses: [200]})
+    await request({
+      method: 'POST',
+      url,
+      discoConfig,
+      body: reqBody,
+      expectedStatuses: [200],
+      extraHeaders: {
+        'X-Disco-Include-API-Key': 'true',
+      },
+    })
   }
 }

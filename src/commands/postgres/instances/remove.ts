@@ -16,6 +16,14 @@ export default class PostgresInstancesRemove extends Command {
     const {flags} = await this.parse(PostgresInstancesRemove)
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects/postgres-addon/cgi/endpoints/instances/${flags.instance}`
-    await request({method: 'DELETE', url, discoConfig, expectedStatuses: [200]})
+    await request({
+      method: 'DELETE',
+      url,
+      discoConfig,
+      expectedStatuses: [200],
+      extraHeaders: {
+        'X-Disco-Include-API-Key': 'true',
+      },
+    })
   }
 }

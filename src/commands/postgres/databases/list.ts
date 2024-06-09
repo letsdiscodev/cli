@@ -3,8 +3,8 @@ import {getDisco} from '../../../config.js'
 import {request} from '../../../auth-request.js'
 
 type PostgresDatabase = {
-  created: string;
-  name: string;
+  created: string
+  name: string
 }
 
 export default class PostgresDatabasesList extends Command {
@@ -21,7 +21,15 @@ export default class PostgresDatabasesList extends Command {
     const {flags} = await this.parse(PostgresDatabasesList)
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects/postgres-addon/cgi/endpoints/instances/${flags.instance}/databases`
-    const res = await request({method: 'GET', url, discoConfig, expectedStatuses: [200]})
+    const res = await request({
+      method: 'GET',
+      url,
+      discoConfig,
+      expectedStatuses: [200],
+      extraHeaders: {
+        'X-Disco-Include-API-Key': 'true',
+      },
+    })
     const respBody = (await res.json()) as {databases: PostgresDatabase[]}
     for (const database of respBody.databases) {
       this.log(database.name)

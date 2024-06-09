@@ -15,7 +15,7 @@ export default class PostgresAddonInstall extends Command {
     const {flags} = await this.parse(PostgresAddonInstall)
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects`
-    const project = 'postgres-addon';
+    const project = 'postgres-addon'
     const body = {
       name: project,
       githubRepo: 'letsdiscodev/disco-addon-postgres',

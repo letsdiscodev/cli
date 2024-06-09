@@ -14,7 +14,7 @@ export default class PostgresAddonRemove extends Command {
   public async run(): Promise<void> {
     const {flags} = await this.parse(PostgresAddonRemove)
     const discoConfig = getDisco(flags.disco || null)
-    const project = 'postgres-addon';
+    const project = 'postgres-addon'
     const url = `https://${discoConfig.host}/api/projects/${project}`
     try {
       await request({method: 'DELETE', url, discoConfig, expectedStatuses: [200, 204]})

@@ -21,7 +21,15 @@ export default class PostgresDatabasesAdd extends Command {
     const {flags} = await this.parse(PostgresDatabasesAdd)
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects/postgres-addon/cgi/endpoints/instances/${flags.instance}/databases`
-    const res = await request({method: 'POST', url, discoConfig, expectedStatuses: [201]})
+    const res = await request({
+      method: 'POST',
+      url,
+      discoConfig,
+      expectedStatuses: [201],
+      extraHeaders: {
+        'X-Disco-Include-API-Key': 'true',
+      },
+    })
     const respBody = (await res.json()) as {database: PostgresDatabase}
     this.log(respBody.database.name)
   }

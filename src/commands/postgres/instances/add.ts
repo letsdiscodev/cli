@@ -15,7 +15,15 @@ export default class PostgresInstancesAdd extends Command {
     const {flags} = await this.parse(PostgresInstancesAdd)
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects/postgres-addon/cgi/endpoints/instances`
-    const res = await request({method: 'POST', url, discoConfig, expectedStatuses: [201]})
+    const res = await request({
+      method: 'POST',
+      url,
+      discoConfig,
+      expectedStatuses: [201],
+      extraHeaders: {
+        'X-Disco-Include-API-Key': 'true',
+      },
+    })
     const respBody = (await res.json()) as {project: {name: string}; deployment: {number: number}}
     this.log(`Added instance ${respBody.project.name}`)
     const deploymentUrl = `https://${discoConfig.host}/api/projects/${respBody.project.name}/deployments/${respBody.deployment.number}/output`
