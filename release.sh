@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # to run this:
-# export $(cat .env | xargs)  && ./release.sh
+# export $(cat .env | xargs) && ./release.sh
 # ---
 
 # exit on error
