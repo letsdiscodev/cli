@@ -20,7 +20,7 @@ set -x
 # TODO
 # TODO
 # TODO
-# TODOD
+# TODO
 # check that package.json on public site has previous-er version
 # and refuse to release if we haven't updated the package.json version!!!!
 
