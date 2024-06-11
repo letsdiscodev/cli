@@ -18,6 +18,10 @@ export default class ProjectsAdd extends Command {
       description:
         'full name of the Github repository, including user or organization and repository name, e.g. myuser/myproject',
     }),
+    branch: Flags.string({
+      required: false,
+      description: 'the branch of the repository to use',
+    }),
     disco: Flags.string({required: false, description: 'server to use'}),
   }
 
@@ -35,6 +39,7 @@ export default class ProjectsAdd extends Command {
       name: flags.name,
       githubRepo: flags.github,
       domain: flags.domain,
+      branch: flags.branch,
     }
 
     const res = await request({method: 'POST', url, discoConfig, body, expectedStatuses: [201]})
