@@ -9,6 +9,21 @@ set -e
 # print every command being run
 set -x
 
+# TODO
+# TODO
+# TODO
+# TODO
+# TODO
+# TODO
+# TODO
+# TODO
+# TODO
+# TODO
+# TODO
+# TODOD
+# check that package.json on public site has previous-er version
+# and refuse to release if we haven't updated the package.json version!!!!
+
 # fail if git status shows changes not staged for commit
 if [[ `git status --porcelain` ]]; then
   echo "There are changes not staged for commit. Please commit or stash them before running this script"
