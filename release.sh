@@ -9,20 +9,16 @@ set -e
 # print every command being run
 set -x
 
-# TODO
-# TODO
-# TODO
-# TODO
-# TODO
-# TODO
-# TODO
-# TODO
-# TODO
-# TODO
-# TODO
-# TODO
-# check that package.json on public site has previous-er version
-# and refuse to release if we haven't updated the package.json version!!!!
+# curl + jq package.json to get version number from repo
+# https://raw.githubusercontent.com/letsdiscodev/cli/main/package.json
+# store version number in variable
+version_from_repo=$(curl -s https://raw.githubusercontent.com/letsdiscodev/cli/main/package.json | jq -r '.version')
+version_from_package=$(cat package.json | jq -r '.version')
+# if the versions are the same, fail/exit/quit.
+if [ "$version_from_repo" = "$version_from_package" ]; then
+  echo "The version in package.json is the same as the version in the repo. Please update the version in package.json before running this script"
+  exit 1
+fi
 
 # fail if git status shows changes not staged for commit
 if [[ `git status --porcelain` ]]; then
