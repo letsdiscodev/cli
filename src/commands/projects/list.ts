@@ -6,7 +6,8 @@ interface Project {
   name: string
   github: {
     fullName: string
-  }
+    branch: null | string
+  } | null
 }
 
 export default class ProjectsList extends Command {
@@ -26,7 +27,8 @@ export default class ProjectsList extends Command {
     const res = await request({method: 'GET', url, discoConfig})
     const respBody = (await res.json()) as {projects: Project[]}
     for (const project of respBody.projects) {
-      const githubRepoPart = project.github ? ` (${project.github.fullName})` : ''
+      const branchPart = project.github?.branch ? `#${project.github.branch}` : ''
+      const githubRepoPart = project.github ? ` (${project.github.fullName}${branchPart})` : ''
       this.log(`${project.name}${githubRepoPart}`)
     }
   }
