@@ -1,7 +1,7 @@
 {
     "name": "disco",
     "description": "deploy and manage your web projects",
-    "version": "0.5.20",
+    "version": "0.5.21",
     "author": "The disco Team",
     "bin": {
         "disco": "./bin/run.js"
@@ -115,7 +115,8 @@
         "update": {
             "disableNpmLookup": true,
             "s3": {
-                "bucket": "disco-cli-assets"
+                "bucket": "disco-cli-assets",
+                "host": "https://s3.console.aws.amazon.com/"
             }
         }
     },
