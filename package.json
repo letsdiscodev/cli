@@ -1,7 +1,7 @@
 {
     "name": "disco",
     "description": "deploy and manage your web projects",
-    "version": "0.5.16",
+    "version": "0.5.17",
     "author": "The disco Team",
     "bin": {
         "disco": "./bin/run.js"
@@ -12,6 +12,7 @@
         "@inquirer/password": "^2.1.6",
         "@inquirer/select": "^2.3.2",
         "@oclif/core": "^3",
+        "@oclif/plugin-autocomplete": "^3.1.2",
         "@oclif/plugin-help": "^6",
         "@oclif/plugin-plugins": "^5",
         "@oclif/plugin-update": "^4",
@@ -61,6 +62,7 @@
         "dirname": "disco",
         "commands": "./dist/commands",
         "plugins": [
+            "@oclif/plugin-autocomplete",
             "@oclif/plugin-help",
             "@oclif/plugin-plugins",
             "@oclif/plugin-update"
@@ -125,7 +127,7 @@
         "posttest": "npm run lint",
         "prepack": "oclif manifest",
         "test": "mocha --forbid-only \"test/**/*.test.ts\"",
-        "readme": "oclif readme --readme-path ../docs.letsdisco.dev/docs/disco-cli-reference.md"
+        "readme": "oclif readme --repository-prefix \"<%- repo %>/blob/main/<%- commandPath %>\" --readme-path ../docs.letsdisco.dev/docs/disco-cli-reference.md"
     },
     "types": "dist/index.d.ts"
 }
