@@ -568,6 +568,14 @@ async function uploadRootSshPublicKey({
     stdin: password,
     progressBar: undefined,
   })
+  // on AWS EC2 Ubuntu, they have this preventing you from logging in as root, remove it.
+  await runSshCommand({
+    ssh,
+    command: `sudo sed -i '/Please login as the user/d' /root/.ssh/authorized_keys`,
+    verbose,
+    stdin: password,
+    progressBar: undefined,
+  })
   let keyAlreadyAuthorized
   try {
     await runSshCommand({
