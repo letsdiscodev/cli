@@ -201,7 +201,7 @@ async function installDockerIfNeeded({
       await installDocker({ssh, verbose, progressBar})
     } catch (error) {
       if ((error as Error).toString().includes('Could not get lock')) {
-        throw new Error(`Package manager already busy. Try again in a few miniutes.`)
+        throw new Error(`Package manager already busy. Try again in a few minutes.`)
       }
 
       throw new Error(`Failed to install Docker\n${error}`)
