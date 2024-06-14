@@ -200,6 +200,10 @@ async function installDockerIfNeeded({
     try {
       await installDocker({ssh, verbose, progressBar})
     } catch (error) {
+      if ((error as Error).toString().includes('Could not get lock')) {
+        throw new Error(`Package manager already busy. Try again in a few minutes.`)
+      }
+
       throw new Error(`Failed to install Docker\n${error}`)
     }
   } else if (verbose) {
@@ -565,6 +569,14 @@ async function uploadRootSshPublicKey({
   await runSshCommand({
     ssh,
     command: `sudo ${password === undefined ? ' ' : '-S '}touch /root/.ssh/authorized_keys`,
+    verbose,
+    stdin: password,
+    progressBar: undefined,
+  })
+  // on AWS EC2 Ubuntu, they have this preventing you from logging in as root, remove it.
+  await runSshCommand({
+    ssh,
+    command: `sudo sed -i '/Please login as the user/d' /root/.ssh/authorized_keys`,
     verbose,
     stdin: password,
     progressBar: undefined,
