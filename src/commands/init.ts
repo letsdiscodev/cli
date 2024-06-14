@@ -242,19 +242,20 @@ async function connectSsh({
   username: string
   password?: boolean | string | undefined // false means don't try password
 }): Promise<{ssh: NodeSSH; password: string | undefined}> {
-  const privKeyPaths = await getSshPrivateKeyPaths()
+  // use the ssh-agent, because it makes it so much easier.
+  // i.e. it will (usually? always?) find the right key to use, it will
+  // deal with keys that have passphrases, etc.
+  const sshAuthSocket = process.platform === 'win32' ? 'pageant' : process.env.SSH_AUTH_SOCK
   const ssh = new NodeSSH()
-  for await (const sshKeyPath of privKeyPaths) {
-    try {
-      await ssh.connect({
-        host,
-        privateKeyPath: sshKeyPath,
-        username,
-        timeout: 5,
-      })
-      return {ssh, password: undefined}
-    } catch {}
-  }
+  try {
+    await ssh.connect({
+      host,
+      username,
+      agent: sshAuthSocket,
+      timeout: 5,
+    })
+    return {ssh, password: undefined}
+  } catch {}
 
   if (password === undefined) {
     password = await inquirerPassword({message: `${username}@${host}'s password:`})
