@@ -44,19 +44,20 @@ export function discoAlreadyInConfig(name: string): boolean {
 export function getDisco(name: null | string): DiscoConfig {
   const config = getConfig()
 
+  const availableDiscosOutput = Object.keys(config.discos)
+    .sort()
+    .map((d) => ux.colorize('green', `- ${d}`))
+    .join('\n')
+
   if (name === null) {
     const discos = Object.keys(config.discos)
     if (discos.length !== 1) {
-      throw new Error('Please specify --disco')
+      throw new Error(`Please specify the --disco option.\n\nAvailable discos:\n${availableDiscosOutput}`)
     }
 
     name = discos[0]
   } else if (!(name in config.discos)) {
-    throw new Error(
-      `disco ${name} not in config. available discos:\n${Object.keys(config.discos)
-        .map((d) => ux.colorize('green', `- ${d}`))
-        .join('\n')}`,
-    )
+    throw new Error(`disco "${name}" not in config.\n\nAvailable discos:\n${availableDiscosOutput}`)
   }
 
   return config.discos[name]
