@@ -554,6 +554,22 @@ async function uploadRootSshPublicKey({
         resolve()
       })
     })
+
+    // ssh-add the new key
+    await new Promise<void>((resolve, reject) => {
+      child.exec(`ssh-add ${localPrivKeyPath}`, (error, stdout, stderr) => {
+        if (error) {
+          reject(new Error('Error running ssh-add'))
+        }
+
+        if (verbose) {
+          process.stdout.write(stdout)
+          process.stderr.write(stderr)
+        }
+
+        resolve()
+      })
+    })
   } else {
     localPublicKeyPath = `${selectedPrivKeyName}.pub`
   }
@@ -576,18 +592,23 @@ async function uploadRootSshPublicKey({
   // on AWS EC2 Ubuntu, they have this preventing you from logging in as root, remove it.
   await runSshCommand({
     ssh,
-    command: `sudo sed -i '/Please login as the user/d' /root/.ssh/authorized_keys`,
+    command: `sudo ${
+      password === undefined ? ' ' : '-S '
+    }sed -i '/Please login as the user/d' /root/.ssh/authorized_keys`,
     verbose,
     stdin: password,
     progressBar: undefined,
   })
+
   let keyAlreadyAuthorized
   try {
     await runSshCommand({
       ssh,
-      command: `sudo ${
-        password === undefined ? ' ' : '-S '
-      }sh -c "cat /root/.ssh/authorized_keys | grep '${publicKeyContent}'"`,
+      // grep the trimmed version of the public key content, otherwise
+      // there's a carriage return at the end of the line
+      command: `sudo ${password === undefined ? ' ' : '-S '}sh -c "grep '${publicKeyContent
+        .toString('utf8')
+        .trim()}' /root/.ssh/authorized_keys"`,
       verbose,
       stdin: password,
       progressBar: undefined,
