@@ -21,7 +21,8 @@
         "eventsource": "^2.0.2",
         "node-fetch": "^3.3.2",
         "node-ssh": "^13.2.0",
-        "open": "^10.1.0"
+        "open": "^10.1.0",
+        "tunnel-ssh": "^5.1.2"
     },
     "devDependencies": {
         "@oclif/prettier-config": "^0.2.1",
