@@ -24,8 +24,8 @@ export default class PostgresInstancesAdd extends Command {
         'X-Disco-Include-API-Key': 'true',
       },
     })
-    const respBody = (await res.json()) as {project: {name: string}; deployment: {number: number}}
-    this.log(`Added instance ${respBody.project.name}`)
+    const respBody = (await res.json()) as {instance: {name: string}, project: {name: string}; deployment: {number: number}}
+    this.log(`Added instance ${respBody.instance.name}`)
     const deploymentUrl = `https://${discoConfig.host}/api/projects/${respBody.project.name}/deployments/${respBody.deployment.number}/output`
 
     readEventSource(deploymentUrl, discoConfig, {
