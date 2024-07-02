@@ -12,7 +12,7 @@ interface Handlers {
   onMessage: (event: MessageEvent) => void
 }
 
-export function readEventSource(url: string, discoConfig: DiscoConfig, handlers: Handlers) {
+export function readEventSource(url: string, discoConfig: DiscoConfig, handlers: Handlers): Promise<void> {
   const params: EventSourceInitDict = {
     headers: {
       Accept: 'text/event-stream',
@@ -27,8 +27,11 @@ export function readEventSource(url: string, discoConfig: DiscoConfig, handlers:
   // 'output' is our way of saying that we're sending a message
   es.addEventListener('output', handlers.onMessage)
   // sending 'end' is our way of signaling that we want to close the connection
-  es.addEventListener('end', () => {
-    es.close()
+  return new Promise((resolve) => {
+    es.addEventListener('end', () => {
+      es.close()
+      resolve()
+    })
   })
 }
 
@@ -46,7 +49,7 @@ export function request({
   discoConfig: DiscoConfig
   body?: unknown
   expectedStatuses?: number[]
-  extraHeaders?: Record<string, string>,
+  extraHeaders?: Record<string, string>
   bodyStream?: Readable
 }) {
   const params: RequestInit = {
