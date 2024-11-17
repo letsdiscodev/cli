@@ -37,13 +37,23 @@ export default class Init extends Command {
       description: 'fixed IP address used to add nodes. defaults to resolving domain name of ssh connection',
     }),
     'cloudflare-tunnel': Flags.string({
-      description: 'Cloudflare Tunnel token, if you want to run Disco behind a Cloudflare tunnel',
+      description: 'Cloudflare Tunnel token, if you want to run disco behind a Cloudflare tunnel',
+    }),
+    'identity-file': Flags.string({
+      char: 'i',
+      description: 'SSH key to use for authentication',
     }),
   }
 
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(Init)
-    const {version, verbose, 'local-image': imageFlag, 'advertise-addr': advertiseAddrFlag} = flags
+    const {
+      version,
+      verbose,
+      'local-image': imageFlag,
+      'advertise-addr': advertiseAddrFlag,
+      'identity-file': identityFile,
+    } = flags
     const image = imageFlag === undefined ? `letsdiscodev/daemon:${version}` : imageFlag
     const [argUsername, sshHost] = args.sshString.split('@')
 
@@ -74,7 +84,7 @@ export default class Init extends Command {
     let ssh
     let password
     try {
-      ;({ssh, password} = await connectSsh({host: sshHost, username}))
+      ;({ssh, password} = await connectSsh({host: sshHost, username, identityFile}))
     } catch {
       this.error('could not connect to SSH')
     }
@@ -99,7 +109,7 @@ export default class Init extends Command {
       await setupRootSshAccess({ssh, password: passwordToUse, verbose})
       username = 'root'
       try {
-        ;({ssh, password} = await connectSsh({host: sshHost, username}))
+        ;({ssh, password} = await connectSsh({host: sshHost, username, identityFile}))
       } catch {
         this.error('could not connect to SSH as root')
       }
@@ -241,10 +251,12 @@ async function connectSsh({
   host,
   username,
   password,
+  identityFile,
 }: {
   host: string
   username: string
   password?: boolean | string | undefined // false means don't try password
+  identityFile?: string
 }): Promise<{ssh: NodeSSH; password: string | undefined}> {
   // use the ssh-agent, because it makes it so much easier.
   // i.e. it will (usually? always?) find the right key to use, it will
@@ -255,6 +267,7 @@ async function connectSsh({
     await ssh.connect({
       host,
       username,
+      privateKeyPath: identityFile,
       agent: sshAuthSocket,
       timeout: 5,
     })
@@ -296,10 +309,10 @@ async function installDocker({
     'sudo apt-get update',
     'DEBIAN_FRONTEND=noninteractive sudo apt-get install -y ca-certificates curl gnupg',
     'sudo install -m 0755 -d /etc/apt/keyrings',
-    'curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg',
+    'curl -fsSL https://download.docker.com/linux/$(. /etc/os-release && echo "$ID")/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg',
     'sudo chmod a+r /etc/apt/keyrings/docker.gpg',
     'echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] ' +
-      'https://download.docker.com/linux/ubuntu ' +
+      'https://download.docker.com/linux/$(. /etc/os-release && echo "$ID") ' +
       '$(. /etc/os-release && echo "$VERSION_CODENAME") stable" | ' +
       'sudo tee /etc/apt/sources.list.d/docker.list > /dev/null',
     'sudo apt-get update',
