@@ -76,6 +76,9 @@
             "deploy": {
                 "description": "manage deployments and see deployment output"
             },
+            "discos": {
+                "description": "manage discos"
+            },
             "env": {
                 "description": "read, set and remove environment variables"
             },
