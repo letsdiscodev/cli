@@ -37,7 +37,7 @@ export default class Init extends Command {
       description: 'fixed IP address used to add nodes. defaults to resolving domain name of ssh connection',
     }),
     'cloudflare-tunnel': Flags.string({
-      description: 'Cloudflare Tunnel token, if you want to run Disco behind a Cloudflare tunnel',
+      description: 'Cloudflare Tunnel token, if you want to run disco behind a Cloudflare tunnel',
     }),
     'identity-file': Flags.string({
       char: 'i',
