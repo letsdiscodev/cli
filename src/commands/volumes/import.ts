@@ -4,7 +4,7 @@ import {getDisco} from '../../config.js'
 import {request} from '../../auth-request.js'
 
 export default class VolumesImport extends Command {
-  static override description = 'TODO describe the command here'
+  static override description = 'import a volume'
 
   static override examples = ['<%= config.bin %> <%= command.id %>']
 
