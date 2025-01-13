@@ -7,6 +7,13 @@ interface UpgradeParams {
   image?: string
 }
 
+async function getTheCurrentVersion(discoConfig: any) {
+  const url = `https://${discoConfig.host}/api/disco/meta`
+  const res = await request({method: 'GET', url, discoConfig})
+  const data = (await res.json()) as any
+  return data.version
+}
+
 export default class MetaUpgrade extends Command {
   static description = 'upgrade server'
 
@@ -22,6 +29,9 @@ export default class MetaUpgrade extends Command {
     const {flags} = await this.parse(MetaUpgrade)
 
     const discoConfig = getDisco(flags.disco || null)
+
+    const currentVersion = await getTheCurrentVersion(discoConfig)
+
     const url = `https://${discoConfig.host}/api/disco/upgrade`
 
     const body: UpgradeParams = {
@@ -31,9 +41,13 @@ export default class MetaUpgrade extends Command {
       body.image = flags.image
     }
 
+    this.log('Starting upgrade...')
+
     request({method: 'POST', url, discoConfig, body})
       .then(() => {
-        this.log(`Upgrade started`)
+        this.log(`Current version: ${currentVersion}`)
+        this.log('Upgrade in progress...')
+        this.log('Check status with "disco meta:info"')
       })
       .catch((error) => {
         this.warn(error?.message ?? 'An error occurred')
