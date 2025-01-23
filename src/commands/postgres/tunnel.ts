@@ -2,36 +2,28 @@ import {Command, Flags} from '@oclif/core'
 import {getDisco} from '../../config.js'
 import {request} from '../../auth-request.js'
 import {createTunnel} from 'tunnel-ssh'
-import {AddressInfo, createServer} from 'node:net'
+import {AddressInfo} from 'node:net'
+import {detect} from 'detect-port'
 
 async function portIsAvailable(port: number): Promise<boolean> {
-  const isAvailable = await new Promise<boolean>((resolve) => {
-    const server = createServer()
-    server.once('error', (err: {code: string}) => {
-      if (err.code === 'EADDRINUSE') {
-        resolve(false) // not available
-      }
-    })
-
-    server.once('listening', () => {
-      // close the server if listening doesn't fail
-      server.close()
-      resolve(true)
-    })
-
-    server.listen(port)
+  return new Promise((resolve, reject) => {
+    detect(port)
+      .then((realPort) => {
+        resolve(realPort === port)
+      })
+      .catch((error) => {
+        reject(error)
+      })
   })
-
-  return isAvailable
 }
 
 async function localPort(portFlag: number | undefined): Promise<number | undefined> {
   if (portFlag === undefined) {
     // prefer 5432, but if in use, let OS pick a port
     const portInUse = !(await portIsAvailable(5432))
-    return portInUse ? undefined : 5432; 
+    return portInUse ? 0 : 5432
   }
-  
+
   // port specified as CLI arg, use it
   return portFlag
 }
@@ -98,7 +90,7 @@ export default class PostgresTunnel extends Command {
 
     const tunnelOptions = {
       // do not close tunnel when third party app disconnects
-      autoClose: false, 
+      autoClose: false,
     }
 
     const serverOptions = {
@@ -110,7 +102,7 @@ export default class PostgresTunnel extends Command {
     if (flags.port !== undefined && !(await portIsAvailable(flags.port))) {
       this.error(`Port ${flags.port} already in use`)
     }
-    
+
     const [tunnelServer, tunnelClient] = await createTunnel(tunnelOptions, serverOptions, sshOptions, forwardOptions)
     tunnelServer.on('connection', (socket) => {
       socket.on('error', () => {
@@ -118,10 +110,14 @@ export default class PostgresTunnel extends Command {
         // instead of crashing on errors like ECONNRESET
       })
     })
-    this.log('Tunnel created. Connection string:')
+    this.log('Tunnel created!')
+    this.log('')
+    this.log('Connection string:')
     const {port} = tunnelServer.address() as AddressInfo
     const connString = `postgresql://${dbInfo.user}:${dbInfo.password}@localhost:${port}/${dbInfo.database}`
     this.log(connString)
+    this.log('')
+    this.log('Press Ctrl+C to close the tunnel')
     const extendInterval = setInterval(async () => {
       await request({
         method: 'POST',
