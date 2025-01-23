@@ -14,7 +14,7 @@ export default class EnvGet extends Command {
     envVar: Args.string({description: 'environment variable to read'}),
   }
 
-  static override description = 'read the environment variables'
+  static override description = 'read one environment variable'
 
   static override examples = ['<%= config.bin %> <%= command.id %> --project mysite API_KEY']
 
