@@ -1,6 +1,8 @@
 ### how to release
 
 ```bash
+# use node 22!!
+nvm use
 export $(cat .env | xargs) && ./release.sh
 ```
 
