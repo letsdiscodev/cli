@@ -29,9 +29,9 @@ async function localPort(portFlag: number | undefined): Promise<number | undefin
   if (portFlag === undefined) {
     // prefer 5432, but if in use, let OS pick a port
     const portInUse = !(await portIsAvailable(5432))
-    return portInUse ? undefined : 5432; 
+    return portInUse ? undefined : 5432
   }
-  
+
   // port specified as CLI arg, use it
   return portFlag
 }
@@ -46,6 +46,7 @@ export default class PostgresTunnel extends Command {
     project: Flags.string({required: true}),
     'env-var': Flags.string({required: false}),
     port: Flags.integer({required: false}),
+    'super-user': Flags.boolean({default: false, description: 'connect as super user instead of database owner'}),
   }
 
   public async run(): Promise<void> {
@@ -62,6 +63,7 @@ export default class PostgresTunnel extends Command {
       body: {
         project: flags.project,
         envVar: flags['env-var'],
+        superUser: flags['super-user'],
       },
       discoConfig,
       expectedStatuses: [200],
@@ -98,7 +100,7 @@ export default class PostgresTunnel extends Command {
 
     const tunnelOptions = {
       // do not close tunnel when third party app disconnects
-      autoClose: false, 
+      autoClose: false,
     }
 
     const serverOptions = {
@@ -110,7 +112,7 @@ export default class PostgresTunnel extends Command {
     if (flags.port !== undefined && !(await portIsAvailable(flags.port))) {
       this.error(`Port ${flags.port} already in use`)
     }
-    
+
     const [tunnelServer, tunnelClient] = await createTunnel(tunnelOptions, serverOptions, sshOptions, forwardOptions)
     tunnelServer.on('connection', (socket) => {
       socket.on('error', () => {
