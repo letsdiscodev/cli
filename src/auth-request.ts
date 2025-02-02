@@ -26,6 +26,10 @@ export function readEventSource(url: string, discoConfig: DiscoConfig, handlers:
   // ... or throw error and close connection?
   // 'output' is our way of saying that we're sending a message
   es.addEventListener('output', handlers.onMessage)
+
+  // handler below only used for meta:stats handler
+  es.addEventListener('stats', handlers.onMessage)
+
   // sending 'end' is our way of signaling that we want to close the connection
   return new Promise((resolve) => {
     es.addEventListener('end', () => {

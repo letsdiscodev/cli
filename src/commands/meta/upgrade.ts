@@ -31,6 +31,8 @@ export default class MetaUpgrade extends Command {
     const discoConfig = getDisco(flags.disco || null)
 
     const currentVersion = await getTheCurrentVersion(discoConfig)
+    // print version before continuing
+    this.log(`Current version: ${currentVersion}`)
 
     const url = `https://${discoConfig.host}/api/disco/upgrade`
 
@@ -41,12 +43,11 @@ export default class MetaUpgrade extends Command {
       body.image = flags.image
     }
 
-    this.log('Starting upgrade...')
-
+    this.log('Requesting upgrade...')
+    // there will be a pause now, TODO show animation..?
     request({method: 'POST', url, discoConfig, body})
       .then(() => {
-        this.log(`Current version: ${currentVersion}`)
-        this.log('Upgrade in progress...')
+        this.log('Starting upgrade.')
         this.log('Check status with "disco meta:info"')
       })
       .catch((error) => {
