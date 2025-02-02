@@ -21,7 +21,7 @@ async function localPort(portFlag: number | undefined): Promise<number | undefin
   if (portFlag === undefined) {
     // prefer 5432, but if in use, let OS pick a port
     const portInUse = !(await portIsAvailable(5432))
-    return portInUse ? 0 : 5432
+    return portInUse ? undefined : 5432
   }
 
   // port specified as CLI arg, use it
@@ -38,6 +38,7 @@ export default class PostgresTunnel extends Command {
     project: Flags.string({required: true}),
     'env-var': Flags.string({required: false}),
     port: Flags.integer({required: false}),
+    'super-user': Flags.boolean({default: false, description: 'connect as super user instead of database owner'}),
   }
 
   public async run(): Promise<void> {
@@ -54,6 +55,7 @@ export default class PostgresTunnel extends Command {
       body: {
         project: flags.project,
         envVar: flags['env-var'],
+        superUser: flags['super-user'],
       },
       discoConfig,
       expectedStatuses: [200],
