@@ -1,9 +1,9 @@
 import {Args, Command, Flags} from '@oclif/core'
 
-import {getDisco} from '../config.js'
-import {request} from '../auth-request.js'
+import {getDisco} from '../../config.js'
+import {request} from '../../auth-request.js'
 
-export default class Scale extends Command {
+export default class ScaleSet extends Command {
   static override args = {
     services: Args.string({
       description: 'service or services to scale and number of replicas, e.g. web=3',
@@ -26,7 +26,7 @@ export default class Scale extends Command {
   }
 
   public async run(): Promise<void> {
-    const {argv, flags} = await this.parse(Scale)
+    const {argv, flags} = await this.parse(ScaleSet)
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects/${flags.project}/scale`
     const reqBody = {services: {}} as Record<string, Record<string, number>>
