@@ -72,8 +72,15 @@ export default class PostgresCreate extends Command {
     if (instances.length === 0) {
       this.log('No Postgres instance yet. Adding one.')
       const url = `https://${discoConfig.host}/api/projects/postgres-addon/cgi/endpoints/instances`
+      const reqBody = {
+        // disco will set these to sensible defaults
+        // ie postgres 17.2 as of this writing
+        image: null,
+        version: null,
+      }
       const res = await request({
         method: 'POST',
+        body: reqBody,
         url,
         discoConfig,
         expectedStatuses: [201],
