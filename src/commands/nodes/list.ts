@@ -36,7 +36,7 @@ export default class NodesList extends Command {
     }
 
     for (const node of nodes) {
-      this.log(`${node.name}${node.isLeader ? ' (main)' : ''}`);
+      this.log(`${node.name} [${node.address}]${node.isLeader ? ' (main)' : ''}`);
     }
   }
 }
