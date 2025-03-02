@@ -48,6 +48,8 @@ export default class NodesAdd extends Command {
 
     if (registryHost === null) {
       this.log("Image registry not configured")
+      this.log("You can install the addon by using the command disco registry:addon:install. For example:")
+      this.log(`disco registry:addon:install --domain registry.example.com --disco ${discoConfig.name}`)
       return;
     }
 
