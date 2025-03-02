@@ -191,24 +191,30 @@ async function uploadLocalImage({image, ssh, verbose}: {image: string; ssh: Node
   }
 }
 
-async function installDockerIfNeeded({
+export async function installDockerIfNeeded({
   dockerAlreadyInstalled,
+  dockerVersion,
   verbose,
   ssh,
   progressBar,
 }: {
   dockerAlreadyInstalled: boolean
+  dockerVersion?: string,
   verbose: boolean
   ssh: NodeSSH
   progressBar: SingleBar | undefined
 }): Promise<void> {
   if (!dockerAlreadyInstalled) {
     if (verbose) {
-      process.stdout.write('Installing Docker\n')
+      if (dockerVersion === undefined) {
+        process.stdout.write('Installing Docker\n')
+      } else {
+        process.stdout.write(`Installing Docker ${dockerVersion}\n`)
+      }
     }
 
     try {
-      await installDocker({ssh, verbose, progressBar})
+      await installDocker({ssh, dockerVersion, verbose, progressBar})
     } catch (error) {
       if ((error as Error).toString().includes('Could not get lock')) {
         throw new Error(`Package manager already busy. Try again in a few minutes.`)
@@ -247,7 +253,7 @@ async function getSshPrivateKeyPaths(): Promise<string[]> {
   return privKeyPaths
 }
 
-async function connectSsh({
+export async function connectSsh({
   host,
   username,
   password,
@@ -291,17 +297,19 @@ async function connectSsh({
   throw new Error('Failed to connect with SSH')
 }
 
-async function checkDockerInstalled(ssh: NodeSSH): Promise<boolean> {
+export async function checkDockerInstalled(ssh: NodeSSH): Promise<boolean> {
   const {code} = await ssh.execCommand('command -v docker >/dev/null 2>&1')
   return code === 0
 }
 
 async function installDocker({
   ssh,
+  dockerVersion,
   verbose,
   progressBar,
 }: {
   ssh: NodeSSH
+  dockerVersion?: string
   verbose: boolean
   progressBar: SingleBar | undefined
 }): Promise<void> {
@@ -316,9 +324,21 @@ async function installDocker({
       '$(. /etc/os-release && echo "$VERSION_CODENAME") stable" | ' +
       'sudo tee /etc/apt/sources.list.d/docker.list > /dev/null',
     'sudo apt-get update',
-    'DEBIAN_FRONTEND=noninteractive sudo apt-get install -y docker-ce docker-ce-cli ' +
-      'containerd.io docker-buildx-plugin docker-compose-plugin',
   ]
+  if (dockerVersion === undefined) {
+    commands.push(
+      'DEBIAN_FRONTEND=noninteractive sudo apt-get install -y docker-ce docker-ce-cli ' +
+        'containerd.io docker-buildx-plugin docker-compose-plugin',
+    )
+  } else {
+    commands.push(
+      `DEBIAN_FRONTEND=noninteractive sudo apt-get install -y \
+        docker-ce=$(apt-cache madison docker-ce | grep --fixed-strings ${dockerVersion} | head -1 | awk '{print $3}') \
+        docker-ce-cli=$(apt-cache madison docker-ce-cli | grep --fixed-strings ${dockerVersion} | head -1 | awk '{print $3}') \
+        containerd.io docker-buildx-plugin docker-compose-plugin`,
+    )
+  }
+
   for await (const command of commands) {
     await runSshCommand({ssh, command, verbose, progressBar})
   }
@@ -362,7 +382,7 @@ async function initDisco({
   return apiKey
 }
 
-function extractApiKey(output: string): string {
+export function extractApiKey(output: string): string {
   const match = output.match(/Created API key: ([a-z0-9]{32})/)
   if (!match) {
     throw new Error('could not extract API key')
@@ -371,7 +391,7 @@ function extractApiKey(output: string): string {
   return match[1]
 }
 
-async function runSshCommand({
+export async function runSshCommand({
   ssh,
   command,
   stdin,
@@ -422,7 +442,7 @@ async function runSshCommand({
   return stdout
 }
 
-async function userCanSudoWitoutPassword({ssh, verbose}: {ssh: NodeSSH; verbose: boolean}): Promise<boolean> {
+export async function userCanSudoWitoutPassword({ssh, verbose}: {ssh: NodeSSH; verbose: boolean}): Promise<boolean> {
   try {
     await runSshCommand({ssh, command: 'sudo -n true', verbose, progressBar: undefined})
     if (verbose) {
@@ -439,7 +459,7 @@ async function userCanSudoWitoutPassword({ssh, verbose}: {ssh: NodeSSH; verbose:
   }
 }
 
-async function setupRootSshAccess({
+export async function setupRootSshAccess({
   ssh,
   verbose,
   password,
