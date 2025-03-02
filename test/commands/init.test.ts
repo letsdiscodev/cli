@@ -1,6 +1,6 @@
 import {expect} from '@oclif/test'
 
-import {extractApiKey} from '../../src/commands/init'
+import {extractApiKey} from '../../src/commands/init.js'
 
 describe('init utils', () => {
   describe('extractApiKey', () => {

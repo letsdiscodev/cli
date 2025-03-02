@@ -1,34 +1,37 @@
 import {Args, Command, Flags} from '@oclif/core'
-
+import {NodeSSH} from 'node-ssh'
+import inquirerPassword from '@inquirer/password'
+import {SingleBar} from 'cli-progress'
 import {getDisco} from '../../config.js'
 import {request} from '../../auth-request.js'
-
-import * as fs from 'node:fs'
-import * as os from 'node:os'
-import * as path from 'node:path'
-import {NodeSSH} from 'node-ssh'
-
-const GET_NODE_SCRIPT_URL = (version: string) => `https://downloads.letsdisco.dev/${version}/node`
+import { checkDockerInstalled, connectSsh, installDockerIfNeeded, runSshCommand, setupRootSshAccess, userCanSudoWitoutPassword } from '../init.js'
 
 export default class NodesAdd extends Command {
-  static override args = {
-    sshString: Args.string({description: 'ssh user@IP to connect to new machine', required: true}),
+  static args = {
+    sshString: Args.string({required: true}),
   }
 
-  static override description = 'add a new server to your deployment'
+  static description = 'initializes a new server'
 
-  static override examples = ['<%= config.bin %> <%= command.id %> root@12.34.56.78']
+  static examples = [
+    '<%= config.bin %> <%= command.id %> root@disco.example.com',
+    '<%= config.bin %> <%= command.id %> root@disco.example.com --version 0.4.0',
+  ]
 
-  static override flags = {
+  static flags = {
+    verbose: Flags.boolean({default: false, description: 'show extra output'}),
+    'identity-file': Flags.string({
+      char: 'i',
+      description: 'SSH key to use for authentication',
+    }),
     disco: Flags.string({required: false}),
-    version: Flags.string({required: false, default: 'latest'}),
   }
 
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(NodesAdd)
-    const discoConfig = getDisco(flags.disco || null)
-    // eslint-disable-next-line new-cap
-    const nodeScriptUrl = GET_NODE_SCRIPT_URL(flags.version)
+    const {verbose, 'identity-file': identityFile, disco} = flags
+
+    const discoConfig = getDisco(disco || null)
 
     const url = `https://${discoConfig.host}/api/disco/swarm/join-token`
     const res = await request({
@@ -36,65 +39,106 @@ export default class NodesAdd extends Command {
       url,
       discoConfig,
     })
-    const data = (await res.json()) as any
+    const {joinToken, ip: leaderIp, dockerVersion, registryHost} = (await res.json()) as {
+      joinToken: string
+      ip: string
+      dockerVersion: string
+      registryHost: null | string
+    }
 
-    const token = data.joinToken
-    const {ip} = data
-    const command = `curl ${nodeScriptUrl} | sudo IP=${ip} TOKEN=${token} sh`
+    if (registryHost === null) {
+      this.log("Image registry not configured")
+      this.log("You can install the addon by using the command disco registry:addon:install. For example:")
+      this.log(`disco registry:addon:install --domain registry.example.com --disco ${discoConfig.name}`)
+      return;
+    }
 
-    // TODO centralize this code which is identical to code in init.ts
+    const [argUsername, host] = args.sshString.split('@')
 
-    const [username, host] = args.sshString.split('@')
+    let username = argUsername
 
-    const sshKeyPaths = [
-      path.join(os.homedir(), '.ssh', 'id_ed25519'),
-      path.join(os.homedir(), '.ssh', 'id_rsa'),
-    ].filter((p) => {
-      try {
-        return fs.statSync(p).isFile()
-      } catch {
-        return false
+    let ssh
+    let password
+    try {
+      ;({ssh, password} = await connectSsh({host, username, identityFile}))
+    } catch {
+      this.error('could not connect to SSH')
+    }
+
+    if (username !== 'root') {
+      const canSudoWithoutPassword = await userCanSudoWitoutPassword({ssh, verbose})
+      // use password if provided, or ask for one if needed
+      const passwordToUse =
+        password === undefined
+          ? canSudoWithoutPassword
+            ? undefined
+            : await inquirerPassword({message: `${username}@${host}'s password:`})
+          : password
+      if (verbose) {
+        if (passwordToUse === undefined) {
+          process.stdout.write('Will not use password\n')
+        } else {
+          process.stdout.write('Will use password\n')
+        }
       }
-    })
 
-    if (sshKeyPaths.length === 0) {
-      this.error('could not find an SSH key in ~/.ssh')
-    }
-
-    const ssh = new NodeSSH()
-
-    let connected = false
-    for await (const sshKeyPath of sshKeyPaths) {
+      await setupRootSshAccess({ssh, password: passwordToUse, verbose})
+      username = 'root'
       try {
-        await ssh.connect({
-          host,
-          privateKeyPath: sshKeyPath,
-          username,
-        })
-        connected = true
-        break
+        ;({ssh, password} = await connectSsh({host, username, identityFile}))
       } catch {
-        // skip error
+        this.error('could not connect to SSH as root')
       }
     }
 
-    if (!connected) {
-      this.error('could not connect to server')
+    const dockerAlreadyInstalled = await checkDockerInstalled(ssh)
+    let progressBar
+    if (!verbose) {
+      const dockerInstallOutputCount = 309
+      const count = dockerAlreadyInstalled ? 0 : dockerInstallOutputCount;
+      progressBar = new SingleBar({format: '[{bar}] {percentage}%', clearOnComplete: true})
+      progressBar.start(count, 0)
     }
 
-    this.log('connected')
+    await installDockerIfNeeded({dockerAlreadyInstalled, verbose, ssh, dockerVersion, progressBar})
 
-    // do something with stderr output?
-    const {code} = await ssh.execCommand(command, {
-      onStdout(chunk) {
-        const str = chunk.toString('utf8')
-        process.stdout.write(str)
-      },
+
+    if (verbose) {
+      this.log('Joining Swarm')
+    }
+
+    await joinSwarm({
+      ssh,
+      joinToken,
+      leaderIp,
+      verbose,
+      progressBar,
     })
-    if (code !== 0) {
-      this.error('failed to run ssh script')
-    }
 
     ssh.dispose()
+    if (progressBar !== undefined) {
+      progressBar.stop()
+    }
+
+    this.log('Done')
   }
 }
+
+
+async function joinSwarm({
+  ssh,
+  joinToken,
+  leaderIp,
+  verbose,
+  progressBar,
+}: {
+  ssh: NodeSSH
+  joinToken: string,
+  leaderIp: string,
+  verbose: boolean
+  progressBar: SingleBar | undefined
+}): Promise<void> {
+  const command = `docker swarm join --token ${joinToken} ${leaderIp}:2377`;
+  await runSshCommand({ssh, command, verbose, progressBar})
+}
+
