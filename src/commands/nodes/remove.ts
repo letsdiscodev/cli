@@ -2,12 +2,11 @@ import {Args, Command, Flags} from '@oclif/core'
 import {getDisco} from '../../config.js'
 import {request} from '../../auth-request.js'
 
-export default class NodesList extends Command {
-  static description = 'initializes a new server'
+export default class NodesRemove extends Command {
+  static description = 'remove node'
 
   static examples = [
-    '<%= config.bin %> <%= command.id %> root@disco.example.com',
-    '<%= config.bin %> <%= command.id %> root@disco.example.com --version 0.4.0',
+    '<%= config.bin %> <%= command.id %> brilliant-fleet',
   ]
 
   static flags = {
@@ -19,7 +18,7 @@ export default class NodesList extends Command {
   }
 
   public async run(): Promise<void> {
-    const {flags, args} = await this.parse(NodesList)
+    const {flags, args} = await this.parse(NodesRemove)
     const {disco} = flags
     const {name} = args;
 

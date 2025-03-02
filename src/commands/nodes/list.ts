@@ -3,11 +3,10 @@ import {getDisco} from '../../config.js'
 import {request} from '../../auth-request.js'
 
 export default class NodesList extends Command {
-  static description = 'initializes a new server'
+  static description = 'show node list'
 
   static examples = [
-    '<%= config.bin %> <%= command.id %> root@disco.example.com',
-    '<%= config.bin %> <%= command.id %> root@disco.example.com --version 0.4.0',
+    '<%= config.bin %> <%= command.id %>',
   ]
 
   static flags = {
@@ -37,7 +36,7 @@ export default class NodesList extends Command {
     }
 
     for (const node of nodes) {
-      this.log(`${node.name}${node.isLeader ? ' (main)' : ''}, state: ${node.state}`);
+      this.log(`${node.name}${node.isLeader ? ' (main)' : ''}`);
     }
   }
 }
