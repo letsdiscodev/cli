@@ -331,11 +331,6 @@ async function installDocker({
         'containerd.io docker-buildx-plugin docker-compose-plugin',
     )
   } else {
-    process.stdout.write(      `DEBIAN_FRONTEND=noninteractive sudo apt-get install -y \
-      docker-ce=$(apt-cache madison docker-ce | grep --fixed-strings ${dockerVersion} | head -1 | awk '{print $3}') \
-      docker-ce-cli=$(apt-cache madison docker-ce-cli | grep --fixed-strings ${dockerVersion} | head -1 | awk '{print $3}') \
-      containerd.io docker-buildx-plugin docker-compose-plugin\n`,
-)
     commands.push(
       `DEBIAN_FRONTEND=noninteractive sudo apt-get install -y \
         docker-ce=$(apt-cache madison docker-ce | grep --fixed-strings ${dockerVersion} | head -1 | awk '{print $3}') \
