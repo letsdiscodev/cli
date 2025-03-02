@@ -382,7 +382,7 @@ async function initDisco({
   return apiKey
 }
 
-function extractApiKey(output: string): string {
+export function extractApiKey(output: string): string {
   const match = output.match(/Created API key: ([a-z0-9]{32})/)
   if (!match) {
     throw new Error('could not extract API key')
