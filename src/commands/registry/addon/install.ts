@@ -3,8 +3,8 @@ import {DiscoConfig, getDisco} from '../../../config.js'
 import {request, readEventSource} from '../../../auth-request.js'
 
 const addonProjectName = 'addon-registry';
-const addonRepo = 'antoineleclair/disco-addon-docker-registry'; // TODO update
-const branch = 'rework'; // TODO update
+const addonRepo = 'letsdiscodev/disco-addon-docker-registry';
+const branch = 'main';
 
 export default class RegistryAddonInstall extends Command {
   static description = 'install Registry addon'
@@ -22,15 +22,15 @@ export default class RegistryAddonInstall extends Command {
   public async run(): Promise<void> {
     const {flags} = await this.parse(RegistryAddonInstall)
     const discoConfig = getDisco(flags.disco || null)
-    this.log('addProject')
+    this.log(`Adding ${addonProjectName} project`)
     await addProject({discoConfig, domain: flags.domain})
-    this.log('setProjectEnvVariables')
+    this.log(`Setting env variables for ${addonProjectName}`)
     await setProjectEnvVariables({discoConfig, domain: flags.domain})
-    this.log('addUser')
+    this.log('Adding user to registry')
     const {username, password} = await addUser({discoConfig})
-    this.log('setupRegistry')
+    this.log('Setting up Disco to use Registry')
     await setupRegistry({discoConfig, username, password, domain: flags.domain})
-    this.log('done')
+    this.log('Done')
   }
 }
 
