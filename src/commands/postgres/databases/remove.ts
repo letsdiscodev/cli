@@ -11,12 +11,13 @@ export default class PostgresDatabasesRemove extends Command {
     disco: Flags.string({required: false}),
     instance: Flags.string({required: true}),
     database: Flags.string({required: true}),
+    detach: Flags.boolean({default: false, description: 'detach from any project the database was attached to'}),
   }
 
   public async run(): Promise<void> {
     const {flags} = await this.parse(PostgresDatabasesRemove)
     const discoConfig = getDisco(flags.disco || null)
-    const url = `https://${discoConfig.host}/api/projects/postgres-addon/cgi/endpoints/instances/${flags.instance}/databases/${flags.database}`
+    const url = `https://${discoConfig.host}/api/projects/postgres-addon/cgi/endpoints/instances/${flags.instance}/databases/${flags.database}?detach=${flags.detach ? 'true' : 'false'}`
     await request({
       method: 'DELETE',
       url,
