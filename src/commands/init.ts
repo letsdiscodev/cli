@@ -6,9 +6,7 @@ import * as path from 'node:path'
 import * as child from 'node:child_process'
 import * as net from 'node:net'
 import {NodeSSH} from 'node-ssh'
-import inquirerPassword from '@inquirer/password'
-import select from '@inquirer/select'
-import input from '@inquirer/input'
+import {select, input, password as inquirerPassword} from '@inquirer/prompts'
 import {addDisco, isDiscoAlreadyInConfig} from '../config.js'
 import {SingleBar} from 'cli-progress'
 import {Readable} from 'node:stream'
@@ -45,6 +43,8 @@ export default class Init extends Command {
     }),
   }
 
+  // FIXME deal with the 'complexity' eslint warning..?
+  /* eslint-disable complexity */
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(Init)
     const {
@@ -81,10 +81,17 @@ export default class Init extends Command {
       })
     }
 
+    const passphrase = identityFile ? await maybeGetKeyPassphrase({identityFile}) : undefined
+
     let ssh
     let password
     try {
-      ;({ssh, password} = await connectSsh({host: sshHost, username, identityFile}))
+      ;({ssh, password} = await connectSsh({
+        host: sshHost,
+        username,
+        identityFile,
+        passphrase: passphrase ?? undefined,
+      }))
     } catch {
       this.error('could not connect to SSH')
     }
@@ -162,6 +169,27 @@ export default class Init extends Command {
   }
 }
 
+async function maybeGetKeyPassphrase({identityFile}: {identityFile: string}): Promise<null | string> {
+  // identify file might have a passphrase.
+  // hack-ish way to check if a passphrase is required below.
+  // from https://stackoverflow.com/a/70160696
+
+  // ssh-keygen -y -P "" -f ~/.ssh/id_rsa
+  // if getting an exit error code (ie not 0), then the key has a passphrase. prompt for it and then pass it.
+  return new Promise<null | string>((resolve) => {
+    child.exec(`ssh-keygen -y -P "" -f ${identityFile}`, (error, _stdout, _stderr) => {
+      if (error) {
+        // the key has a passphrase, prompt for it
+        inquirerPassword({message: 'Enter passphrase for key: '}).then((passphrase) => {
+          resolve(passphrase)
+        })
+      } else {
+        resolve(null)
+      }
+    })
+  })
+}
+
 async function uploadLocalImage({image, ssh, verbose}: {image: string; ssh: NodeSSH; verbose: boolean}): Promise<void> {
   if (verbose) {
     process.stdout.write(`Uploading image ${image}\n`)
@@ -199,7 +227,7 @@ export async function installDockerIfNeeded({
   progressBar,
 }: {
   dockerAlreadyInstalled: boolean
-  dockerVersion?: string,
+  dockerVersion?: string
   verbose: boolean
   ssh: NodeSSH
   progressBar: SingleBar | undefined
@@ -258,11 +286,13 @@ export async function connectSsh({
   username,
   password,
   identityFile,
+  passphrase,
 }: {
   host: string
   username: string
   password?: boolean | string | undefined // false means don't try password
   identityFile?: string
+  passphrase?: string
 }): Promise<{ssh: NodeSSH; password: string | undefined}> {
   // use the ssh-agent, because it makes it so much easier.
   // i.e. it will (usually? always?) find the right key to use, it will
@@ -276,6 +306,7 @@ export async function connectSsh({
       privateKeyPath: identityFile,
       agent: sshAuthSocket,
       timeout: 5,
+      passphrase,
     })
     return {ssh, password: undefined}
   } catch {}

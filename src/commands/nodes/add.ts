@@ -1,10 +1,17 @@
 import {Args, Command, Flags} from '@oclif/core'
 import {NodeSSH} from 'node-ssh'
-import inquirerPassword from '@inquirer/password'
+import {password as inquirerPassword} from '@inquirer/prompts'
 import {SingleBar} from 'cli-progress'
 import {getDisco} from '../../config.js'
 import {request} from '../../auth-request.js'
-import { checkDockerInstalled, connectSsh, installDockerIfNeeded, runSshCommand, setupRootSshAccess, userCanSudoWitoutPassword } from '../init.js'
+import {
+  checkDockerInstalled,
+  connectSsh,
+  installDockerIfNeeded,
+  runSshCommand,
+  setupRootSshAccess,
+  userCanSudoWitoutPassword,
+} from '../init.js'
 
 export default class NodesAdd extends Command {
   static args = {
@@ -39,7 +46,12 @@ export default class NodesAdd extends Command {
       url,
       discoConfig,
     })
-    const {joinToken, ip: leaderIp, dockerVersion, registryHost} = (await res.json()) as {
+    const {
+      joinToken,
+      ip: leaderIp,
+      dockerVersion,
+      registryHost,
+    } = (await res.json()) as {
       joinToken: string
       ip: string
       dockerVersion: string
@@ -47,10 +59,10 @@ export default class NodesAdd extends Command {
     }
 
     if (registryHost === null) {
-      this.log("Image registry not configured")
-      this.log("You can install the addon by using the command disco registry:addon:install. For example:")
+      this.log('Image registry not configured')
+      this.log('You can install the addon by using the command disco registry:addon:install. For example:')
       this.log(`disco registry:addon:install --domain registry.example.com --disco ${discoConfig.name}`)
-      return;
+      return
     }
 
     const [argUsername, host] = args.sshString.split('@')
@@ -95,13 +107,12 @@ export default class NodesAdd extends Command {
     let progressBar
     if (!verbose) {
       const dockerInstallOutputCount = 309
-      const count = dockerAlreadyInstalled ? 0 : dockerInstallOutputCount;
+      const count = dockerAlreadyInstalled ? 0 : dockerInstallOutputCount
       progressBar = new SingleBar({format: '[{bar}] {percentage}%', clearOnComplete: true})
       progressBar.start(count, 0)
     }
 
     await installDockerIfNeeded({dockerAlreadyInstalled, verbose, ssh, dockerVersion, progressBar})
-
 
     if (verbose) {
       this.log('Joining Swarm')
@@ -124,7 +135,6 @@ export default class NodesAdd extends Command {
   }
 }
 
-
 async function joinSwarm({
   ssh,
   joinToken,
@@ -133,12 +143,11 @@ async function joinSwarm({
   progressBar,
 }: {
   ssh: NodeSSH
-  joinToken: string,
-  leaderIp: string,
+  joinToken: string
+  leaderIp: string
   verbose: boolean
   progressBar: SingleBar | undefined
 }): Promise<void> {
-  const command = `docker swarm join --token ${joinToken} ${leaderIp}:2377`;
+  const command = `docker swarm join --token ${joinToken} ${leaderIp}:2377`
   await runSshCommand({ssh, command, verbose, progressBar})
 }
-

@@ -1,7 +1,7 @@
 import {Command, Flags} from '@oclif/core'
 import {getDisco} from '../../config.js'
 import {request} from '../../auth-request.js'
-import {createTunnel} from 'tunnel-ssh'
+import {createTunnel, TunnelOptions} from 'tunnel-ssh'
 import {AddressInfo} from 'node:net'
 import {detect} from 'detect-port'
 
@@ -90,9 +90,10 @@ export default class PostgresTunnel extends Command {
       dstPort: 5432,
     }
 
-    const tunnelOptions = {
+    const tunnelOptions: TunnelOptions = {
       // do not close tunnel when third party app disconnects
       autoClose: false,
+      reconnectOnError: false,
     }
 
     const serverOptions = {

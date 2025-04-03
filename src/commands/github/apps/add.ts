@@ -2,7 +2,7 @@ import {Command, Flags} from '@oclif/core'
 import {getDisco} from '../../../config.js'
 import {request} from '../../../auth-request.js'
 import open from 'open'
-import input from '@inquirer/input'
+import {input} from '@inquirer/prompts'
 
 export default class GithubAppsAdd extends Command {
   static description = 'add a Github app'
