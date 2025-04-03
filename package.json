@@ -1,16 +1,14 @@
 {
     "name": "disco",
     "description": "deploy and manage your web projects",
-    "version": "0.5.42",
+    "version": "0.5.43",
     "author": "The Disco Team",
     "bin": {
         "disco": "./bin/run.js"
     },
     "bugs": "https://github.com/letsdiscodev/cli/issues",
     "dependencies": {
-        "@inquirer/input": "^4.1.8",
-        "@inquirer/password": "^4.0.11",
-        "@inquirer/select": "^4.1.0",
+        "@inquirer/prompts": "^7.4.0",
         "@oclif/core": "^4",
         "@oclif/plugin-autocomplete": "^3.1.2",
         "@oclif/plugin-help": "^6",
