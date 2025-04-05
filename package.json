@@ -31,7 +31,6 @@
         "@oclif/prettier-config": "^0.2.1",
         "@oclif/test": "^3",
         "@types/chai": "^4",
-        "@types/eventsource": "^3.0.0",
         "@types/mocha": "^10",
         "@types/node": "^18",
         "@types/ssh2": "^1.15.0",
