@@ -1,5 +1,6 @@
-import EventSource, {EventSourceInitDict} from 'eventsource'
+import {EventSource, FetchLike} from 'eventsource'
 import fetch, {RequestInit} from 'node-fetch'
+import {fetch as fetchNative} from 'node-fetch-native/proxy'
 
 import {DiscoConfig} from './config.js'
 import {Readable} from 'node:stream'
@@ -13,14 +14,18 @@ interface Handlers {
 }
 
 export function readEventSource(url: string, discoConfig: DiscoConfig, handlers: Handlers): Promise<void> {
-  const params: EventSourceInitDict = {
-    headers: {
-      Accept: 'text/event-stream',
-      Authorization: 'Basic ' + Buffer.from(`${discoConfig.apiKey}:`).toString('base64'),
-    },
-  }
+  const es = new EventSource(url, {
+    fetch: (input, init) =>
+      fetchNative(input, {
+        ...init,
+        headers: {
+          ...init?.headers,
+          Accept: 'text/event-stream',
+          Authorization: 'Basic ' + Buffer.from(`${discoConfig.apiKey}:`).toString('base64'),
+        },
+      }),
+  })
 
-  const es = new EventSource(url, params)
   // don't catch errors -- let eventsource 'handle'
   // them by trying to reconnect..?
   // ... or throw error and close connection?

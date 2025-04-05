@@ -1,7 +1,7 @@
 {
     "name": "disco",
     "description": "deploy and manage your web projects",
-    "version": "0.5.43",
+    "version": "0.5.44",
     "author": "The Disco Team",
     "bin": {
         "disco": "./bin/run.js"
@@ -20,8 +20,9 @@
         "cliui": "^8.0.1",
         "compare-versions": "^6.1.1",
         "detect-port": "^2.1.0",
-        "eventsource": "^2.0.2",
+        "eventsource": "^3.0.6",
         "node-fetch": "^3.3.2",
+        "node-fetch-native": "^1.6.6",
         "node-ssh": "^13.2.0",
         "open": "^10.1.0",
         "tunnel-ssh": "^5.1.2"
@@ -30,7 +31,7 @@
         "@oclif/prettier-config": "^0.2.1",
         "@oclif/test": "^3",
         "@types/chai": "^4",
-        "@types/eventsource": "^1.1.15",
+        "@types/eventsource": "^3.0.0",
         "@types/mocha": "^10",
         "@types/node": "^18",
         "@types/ssh2": "^1.15.0",
