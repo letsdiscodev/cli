@@ -1,6 +1,7 @@
 import {Args, Command, Flags} from '@oclif/core'
 import {getDisco} from '../../config.js'
 import {request} from '../../auth-request.js'
+import {confirm} from '@inquirer/prompts'
 
 export default class ProjectsRemove extends Command {
   static args = {
@@ -12,6 +13,7 @@ export default class ProjectsRemove extends Command {
   static examples = ['<%= config.bin %> <%= command.id %> project-name']
 
   static flags = {
+    'no-input': Flags.boolean({default: false, description: 'do not ask for confirmation'}),
     disco: Flags.string({required: false}),
   }
 
@@ -19,6 +21,17 @@ export default class ProjectsRemove extends Command {
     const {args, flags} = await this.parse(ProjectsRemove)
 
     const discoConfig = getDisco(flags.disco || null)
+
+    if (!flags['no-input']) {
+      const response = await confirm({
+        message: `Are you sure you want to remove the project "${args.project}"? This action cannot be undone.`,
+        default: false,
+      })
+      if (!response) {
+        this.log('Not doing anything.')
+        return
+      }
+    }
 
     const url = `https://${discoConfig.host}/api/projects/${args.project}`
     try {

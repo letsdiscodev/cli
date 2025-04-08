@@ -36,6 +36,7 @@ export default class EnvSet extends Command {
     const body: EnvVarRequestBody = {
       envVariables: [],
     }
+    // de-dupe this code as it also exists in projects:add
     for (const variable of argv) {
       const parts = (variable as string).split('=')
       const varName = parts[0]

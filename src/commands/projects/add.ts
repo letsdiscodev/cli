@@ -1,11 +1,25 @@
-import {Command, Flags} from '@oclif/core'
+import {Args, Command, Flags} from '@oclif/core'
 import {getDisco} from '../../config.js'
 import {request, readEventSource} from '../../auth-request.js'
 
 export default class ProjectsAdd extends Command {
-  static description = 'add a project'
+  static override args = {
+    variables: Args.string({description: 'environment variables to set'}),
+  }
 
-  static examples = ['<%= config.bin %> <%= command.id %>']
+  // set to be able to receive variable number of arguments
+  static strict = false
+
+  static description = `add a project to an existing disco instance
+
+this will deploy the project. from that point on, every "git push" to the project's repo will automatically trigger a new deployment.
+
+for most projects, you will need to pass a name, a domain name and a github repo. you can optionally pass environment variables as well.`
+
+  static examples = [
+    '<%= config.bin %> <%= command.id %> --name myblog --domain blog.example.com --github myuser/myblog',
+    '<%= config.bin %> <%= command.id %> --name myblog --domain blog.example.com --github myuser/myblog API_KEY=09asf07gaq0 OTHER_ENV_VAR=true',
+  ]
 
   static flags = {
     name: Flags.string({required: true, description: 'project name'}),
@@ -31,7 +45,7 @@ export default class ProjectsAdd extends Command {
   }
 
   public async run(): Promise<void> {
-    const {flags} = await this.parse(ProjectsAdd)
+    const {argv, flags} = await this.parse(ProjectsAdd)
 
     if (flags.github !== undefined && !/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(flags.github)) {
       this.error('Invalid Github repository format, expected "user/repo"')
@@ -48,11 +62,14 @@ or edit your GitHub repo permissions by running "disco github:apps:manage <your 
 
     const url = `https://${discoConfig.host}/api/projects`
 
+    const envVariables = extractEnvVars(argv as string[])
+
     const body = {
       name: flags.name,
       githubRepo: flags.github,
       domain: flags.domain,
       branch: flags.branch,
+      envVariables,
     }
 
     const res = await request({method: 'POST', url, discoConfig, body, expectedStatuses: [201]})
@@ -72,6 +89,26 @@ or edit your GitHub repo permissions by running "disco github:apps:manage <your 
       })
     }
   }
+}
+
+// based on code in env/set.ts
+function extractEnvVars(argv: string[]): {name: string; value: string}[] {
+  const envVars: {name: string; value: string}[] = []
+  for (const variable of argv) {
+    const parts = (variable as string).split('=')
+    const name = parts[0]
+    let value = parts.slice(1).join('=')
+    if (value[0] === value.slice(-1) && ['"', "'"].includes(value[0])) {
+      value = value.slice(1, -1)
+    }
+
+    envVars.push({
+      name,
+      value,
+    })
+  }
+
+  return envVars
 }
 
 async function isGithubRepoAuthorized(discoConfig: any, repoBeingChecked: string) {
