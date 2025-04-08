@@ -79,3 +79,8 @@ hash=$(export PACKAGE_VERSION=$version && python3 -c "from pathlib import Path; 
 oclif promote --sha $hash --version $version --no-xz
 
 aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
+
+echo "done"
+echo ""
+echo "***** * ** * * DONT FORGET TO GIT PUSH * * * ** * ******* *****"
+echo ""
