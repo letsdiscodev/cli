@@ -21,8 +21,9 @@ export default class VolumesExport extends Command {
     const url = `https://${discoConfig.host}/api/projects/${flags.project}/volumes/${flags.volume}`
     const res = await request({method: 'GET', url, discoConfig})
     // get binary data from response
-    const data = await res.buffer()
+    const data = await res.arrayBuffer()
+    const buffer = Buffer.from(data)
     // write binary data to stdout
-    process.stdout.write(data)
+    process.stdout.write(buffer)
   }
 }
