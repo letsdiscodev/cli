@@ -1,141 +1,141 @@
 {
-    "name": "disco",
-    "description": "deploy and manage your web projects",
-    "version": "0.5.45",
-    "author": "The Disco Team",
-    "bin": {
-        "disco": "./bin/run.js"
-    },
-    "bugs": "https://github.com/letsdiscodev/cli/issues",
-    "dependencies": {
-        "@inquirer/prompts": "^7.4.0",
-        "@oclif/core": "^4",
-        "@oclif/plugin-autocomplete": "^3.1.2",
-        "@oclif/plugin-help": "^6",
-        "@oclif/plugin-plugins": "^5",
-        "@oclif/plugin-update": "^4",
-        "@types/inquirer": "^9.0.7",
-        "chalk": "^5.3.0",
-        "cli-progress": "^3.12.0",
-        "cliui": "^8.0.1",
-        "compare-versions": "^6.1.1",
-        "detect-port": "^2.1.0",
-        "eventsource": "^3.0.6",
-        "node-fetch": "^3.3.2",
-        "node-fetch-native": "^1.6.6",
-        "node-ssh": "^13.2.0",
-        "open": "^10.1.0",
-        "tunnel-ssh": "^5.1.2",
-        "undici": "^7.7.0"
-    },
-    "devDependencies": {
-        "@oclif/prettier-config": "^0.2.1",
-        "@oclif/test": "^3",
-        "@types/chai": "^4",
-        "@types/mocha": "^10",
-        "@types/node": "^18",
-        "@types/ssh2": "^1.15.0",
-        "chai": "^4",
-        "eslint": "^8",
-        "eslint-config-oclif": "^5",
-        "eslint-config-oclif-typescript": "^3",
-        "eslint-config-prettier": "^9",
-        "mocha": "^10",
-        "oclif": "^4",
-        "shx": "^0.3.3",
-        "ts-node": "^10",
-        "typescript": "^5"
-    },
-    "engines": {
-        "node": ">=18.0.0"
-    },
-    "files": [
-        "/bin",
-        "/dist",
-        "/oclif.manifest.json"
+  "name": "disco",
+  "description": "deploy and manage your web projects",
+  "version": "0.5.46",
+  "author": "The Disco Team",
+  "bin": {
+    "disco": "./bin/run.js"
+  },
+  "bugs": "https://github.com/letsdiscodev/cli/issues",
+  "dependencies": {
+    "@inquirer/prompts": "^7.4.0",
+    "@oclif/core": "^4",
+    "@oclif/plugin-autocomplete": "^3.1.2",
+    "@oclif/plugin-help": "^6",
+    "@oclif/plugin-plugins": "^5",
+    "@oclif/plugin-update": "^4",
+    "@types/inquirer": "^9.0.7",
+    "chalk": "^5.3.0",
+    "cli-progress": "^3.12.0",
+    "cliui": "^8.0.1",
+    "compare-versions": "^6.1.1",
+    "detect-port": "^2.1.0",
+    "eventsource": "^3.0.6",
+    "node-fetch": "^3.3.2",
+    "node-fetch-native": "^1.6.6",
+    "node-ssh": "^13.2.0",
+    "open": "^10.1.0",
+    "tunnel-ssh": "^5.1.2",
+    "undici": "^7.7.0"
+  },
+  "devDependencies": {
+    "@oclif/prettier-config": "^0.2.1",
+    "@oclif/test": "^3",
+    "@types/chai": "^4",
+    "@types/mocha": "^10",
+    "@types/node": "^18",
+    "@types/ssh2": "^1.15.0",
+    "chai": "^4",
+    "eslint": "^8",
+    "eslint-config-oclif": "^5",
+    "eslint-config-oclif-typescript": "^3",
+    "eslint-config-prettier": "^9",
+    "mocha": "^10",
+    "oclif": "^4",
+    "shx": "^0.3.3",
+    "ts-node": "^10",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "/bin",
+    "/dist",
+    "/oclif.manifest.json"
+  ],
+  "homepage": "https://github.com/letsdiscodev/cli",
+  "keywords": [
+    "oclif"
+  ],
+  "license": "MIT",
+  "main": "dist/index.js",
+  "type": "module",
+  "oclif": {
+    "bin": "disco",
+    "dirname": "disco",
+    "commands": "./dist/commands",
+    "plugins": [
+      "@oclif/plugin-autocomplete",
+      "@oclif/plugin-help",
+      "@oclif/plugin-plugins",
+      "@oclif/plugin-update"
     ],
-    "homepage": "https://github.com/letsdiscodev/cli",
-    "keywords": [
-        "oclif"
-    ],
-    "license": "MIT",
-    "main": "dist/index.js",
-    "type": "module",
-    "oclif": {
-        "bin": "disco",
-        "dirname": "disco",
-        "commands": "./dist/commands",
-        "plugins": [
-            "@oclif/plugin-autocomplete",
-            "@oclif/plugin-help",
-            "@oclif/plugin-plugins",
-            "@oclif/plugin-update"
-        ],
-        "topicSeparator": ":",
-        "topics": {
-            "apikeys": {
-                "description": "list and remove api keys"
-            },
-            "deploy": {
-                "description": "manage deployments and see deployment output"
-            },
-            "discos": {
-                "description": "manage discos"
-            },
-            "env": {
-                "description": "read, set and remove environment variables"
-            },
-            "github": {
-                "description": "manage your github apps"
-            },
-            "invite": {
-                "description": "create and accept invites to manage a server"
-            },
-            "meta": {
-                "description": "get and set meta information"
-            },
-            "postgres": {
-                "description": "manage postgres databases"
-            },
-            "postgres:addon": {
-                "description": "manage postgres addons"
-            },
-            "postgres:databases": {
-                "description": "manage postgres databases"
-            },
-            "postgres:instances": {
-                "description": "manage postgres instances"
-            },
-            "projects": {
-                "description": "add, list, move and remove projects"
-            },
-            "syslog": {
-                "description": "add, list and remove log destinations"
-            },
-            "volumes": {
-                "description": "list, import and export volume data"
-            }
-        },
-        "macos": {
-            "identifier": "dev.letsdisco.cli"
-        },
-        "update": {
-            "disableNpmLookup": true,
-            "s3": {
-                "bucket": "disco-cli-assets",
-                "host": "https://cli-assets.letsdisco.dev/"
-            }
-        }
+    "topicSeparator": ":",
+    "topics": {
+      "apikeys": {
+        "description": "list and remove api keys"
+      },
+      "deploy": {
+        "description": "manage deployments and see deployment output"
+      },
+      "discos": {
+        "description": "manage discos"
+      },
+      "env": {
+        "description": "read, set and remove environment variables"
+      },
+      "github": {
+        "description": "manage your github apps"
+      },
+      "invite": {
+        "description": "create and accept invites to manage a server"
+      },
+      "meta": {
+        "description": "get and set meta information"
+      },
+      "postgres": {
+        "description": "manage postgres databases"
+      },
+      "postgres:addon": {
+        "description": "manage postgres addons"
+      },
+      "postgres:databases": {
+        "description": "manage postgres databases"
+      },
+      "postgres:instances": {
+        "description": "manage postgres instances"
+      },
+      "projects": {
+        "description": "add, list, move and remove projects"
+      },
+      "syslog": {
+        "description": "add, list and remove log destinations"
+      },
+      "volumes": {
+        "description": "list, import and export volume data"
+      }
     },
-    "repository": "letsdiscodev/cli",
-    "scripts": {
-        "build": "shx rm -rf dist && tsc -b",
-        "lint": "eslint . --ext .ts",
-        "postpack": "shx rm -f oclif.manifest.json",
-        "posttest": "npm run lint",
-        "prepack": "oclif manifest",
-        "test": "mocha --forbid-only \"test/**/*.test.ts\"",
-        "readme": "oclif readme --repository-prefix \"<%- repo %>/blob/main/<%- commandPath %>\" --readme-path ../docs.letsdisco.dev/docs/disco-cli-reference.md"
+    "macos": {
+      "identifier": "dev.letsdisco.cli"
     },
-    "types": "dist/index.d.ts"
+    "update": {
+      "disableNpmLookup": true,
+      "s3": {
+        "bucket": "disco-cli-assets",
+        "host": "https://cli-assets.letsdisco.dev/"
+      }
+    }
+  },
+  "repository": "letsdiscodev/cli",
+  "scripts": {
+    "build": "shx rm -rf dist && tsc -b",
+    "lint": "eslint . --ext .ts",
+    "postpack": "shx rm -f oclif.manifest.json",
+    "posttest": "npm run lint",
+    "prepack": "oclif manifest",
+    "test": "mocha --forbid-only \"test/**/*.test.ts\"",
+    "readme": "oclif readme --repository-prefix \"<%- repo %>/blob/main/<%- commandPath %>\" --readme-path ../docs.letsdisco.dev/docs/disco-cli-reference.md"
+  },
+  "types": "dist/index.d.ts"
 }
