@@ -4,8 +4,8 @@ import {Readable} from 'node:stream'
 
 import {Command, Flags} from '@oclif/core'
 
-import {getDisco} from '../../config.js'
 import {request} from '../../auth-request.js'
+import {getDisco} from '../../config.js'
 
 export default class VolumesImport extends Command {
   static override description = 'import a volume'
@@ -55,7 +55,21 @@ export default class VolumesImport extends Command {
       this.error(`Error reading from stdin: ${err.message}`)
     })
 
+    let extraHeaders: Record<string, string> = {}
+
     if (flags.input) {
+      // if we are given the file, get its actual file size, and then
+      // we'll pass it as a content-length header.
+      // incredibly... this is the volumes to run volumes:import for raspberry pis
+      // that use the cloudflare tunnel... we've seen consistently that the tunnel would...
+      // cut off? or somehow not let the stream'ed file through... and when we forced a content-length
+      // header, that problem went away.... so ... if you use a raspberry pi and a cloudflare tunnel,
+      // (and are somehow reading this comment), the solution is to NOT pipe .tar.gz volumes into
+      // disco volumes:import, but rather run volumes:import with the --input option...
+      // obviously, this is not ideal. but it is! what it is!
+
+      extraHeaders['Content-Length'] = fs.statSync(flags.input).size.toString()
+
       stream = this.getFileStream(flags.input)
       stream.on('error', (err) => {
         this.error(`Error reading from "${flags.input}": ${err.message}`)
@@ -64,7 +78,7 @@ export default class VolumesImport extends Command {
       this.error('No input provided. Please provide an input file with --input or pipe data to stdin')
     }
 
-    const res = await request({method: 'PUT', url, discoConfig, bodyStream: stream})
+    const res = await request({method: 'PUT', url, discoConfig, bodyStream: stream, extraHeaders})
     await res.json()
   }
 }
