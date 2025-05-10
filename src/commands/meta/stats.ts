@@ -32,14 +32,14 @@ export default class MetaStats extends Command {
 
     readEventSource(url, discoConfig, {
       onMessage: (event: MessageEvent) => {
-        this.formatAndPrintStats(JSON.parse(event.data).stats)
+        this.formatAndPrintStats(JSON.parse(event.data))
       },
     })
   }
 
-  private formatAndPrintStats(stats: any) {
+  private formatAndPrintStats(responseBody: any) {
     // Process each container's stats
-    const out = stats.map((stat: any) => {
+    const out = responseBody.stats.map((stat: any) => {
       // Calculate CPU percentage
       const cpuDelta = stat.cpu_stats.cpu_usage.total_usage - stat.precpu_stats.cpu_usage.total_usage
       const systemDelta = stat.cpu_stats.system_cpu_usage - stat.precpu_stats.system_cpu_usage
@@ -99,6 +99,13 @@ export default class MetaStats extends Command {
     process.stdout.write('\u001Bc')
     this.log(ui.toString())
     this.log('')
+    if (responseBody.df) {
+      // was added in daemon 0.25.3
+      const used = Math.round(responseBody.df.used/1024/1024 * 10) / 10;
+      const available = Math.round(responseBody.df.available/1024/1024 * 10) / 10;
+      this.log(`Disk usage: ${used}GB used, ${available}GB available.`)
+      this.log('')
+    }
     this.log('Press Ctrl+C to exit')
   }
 }
