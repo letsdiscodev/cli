@@ -22,13 +22,13 @@ export default class Run extends Command {
 
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(Run)
-
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects/${flags.project}/runs`
     const body = {
       command: args.command,
       service: flags.service ?? null,
       timeout: flags.timeout,
+      interactive: true,
     }
     const res = await request({method: 'POST', url, discoConfig, body, expectedStatuses: [202]})
     const respBody = (await res.json()) as {run: {
@@ -48,14 +48,22 @@ export default class Run extends Command {
           process.stderr.write(restOfMessage);
         } else if (prefix === 's:') {
           const statusCode = Number.parseInt(restOfMessage.toString('utf8'), 10);
-          this.exit(statusCode);
+          process.exitCode = statusCode;
+          ws.close(1000);
+          process.stdin.removeListener('data', stdinHandler);
+          process.stdin.setRawMode(false);
+          process.stdin.pause();
         }
       }
     });
+    const stdinHandler = (key: any) => {
+      ws.send(key, {binary: true});
+    };
     process.stdin.setRawMode(true);
     process.stdin.resume();
-    process.stdin.on( 'data', (key) => {      
-      ws.send(key, {binary: true});
+    process.stdin.on('data', stdinHandler);
+    ws.on('close', () => {
+      process.stdin.removeListener('data', stdinHandler);
     });
   }
 }
