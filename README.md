@@ -5,8 +5,9 @@
     <strong>The official command-line interface for the Disco open-source PaaS.</strong>
   </p>
   <p>
-    <a href="https://github.com/letsdiscodev/cli/blob/main/LICENSE"><img src="https://img.shields.io/github/license/letsdiscodev/cli?style=for-the-badge" alt="License"></a>
-    <a href="https://discord.gg/7J4vb5uUwU"><img src="https://img.shields.io/discord/1200593573062651914?style=for-the-badge&logo=discord&label=discord" alt="Discord"></a>
+    <a href="https://github.com/letsdiscodev/cli/blob/main/LICENSE"><img src="https://img.shields.io/github/license/letsdiscodev/cli" alt="License"></a>
+    <a href="https://discord.gg/7J4vb5uUwU"><img src="https://img.shields.io/discord/1200593573062651914?logo=discord&label=discord" alt="Discord"></a>
+    <a href="https://deepwiki.com/letsdiscodev/cli"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
   </p>
 </div>
 
