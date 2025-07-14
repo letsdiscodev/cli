@@ -45,9 +45,9 @@ For other installation methods, including Windows, please see our [official docu
 Get your first project deployed in minutes.
 
 1.  **Initialize your server:**
-    Provide the CLI with SSH access to your server. It will handle the rest.
+    Point a domain to your server's IP, then povide the CLI with SSH access to your server. It will handle the rest.
     ```bash
-    disco init root@server.example.com
+    disco init root@disco.example.com
     ```
 
 2.  **Connect your GitHub account:**
