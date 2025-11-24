@@ -1,7 +1,7 @@
 {
   "name": "disco",
   "description": "deploy and manage your web projects",
-  "version": "0.5.49",
+  "version": "0.5.50",
   "author": "The Disco Team",
   "bin": {
     "disco": "./bin/run.js"
@@ -135,7 +135,7 @@
     "posttest": "npm run lint",
     "prepack": "oclif manifest",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
-    "readme": "oclif readme --repository-prefix \"<%- repo %>/blob/main/<%- commandPath %>\" --readme-path ../docs.letsdisco.dev/docs/disco-cli-reference.md"
+    "readme": "node scripts/generate-readme.js"
   },
   "types": "dist/index.d.ts"
 }
