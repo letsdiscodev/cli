@@ -1,5 +1,6 @@
 {
   "extends": ["oclif", "oclif-typescript", "prettier"],
+  "ignorePatterns": ["tmp/**"],
   "rules": {
     "unicorn/better-regex": "off",
     "max-params": "off",

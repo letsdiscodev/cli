@@ -1,6 +1,8 @@
 import {Command, Flags} from '@oclif/core'
+
 import {getDisco} from '../../../config.js'
 import {request, readEventSource} from '../../../auth-request.js'
+import {DeployResponse} from '../../deploy.js'
 
 const addonProjectName = 'addon-registry';
 
@@ -18,7 +20,7 @@ export default class RegistryAddonUpdate extends Command {
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects/${addonProjectName}/deployments`
     const res = await request({method: 'POST', url, body: {}, discoConfig, expectedStatuses: [201]})
-    const data = (await res.json()) as any
+    const data = (await res.json()) as DeployResponse
 
     const deploymentUrl = `https://${discoConfig.host}/api/projects/${addonProjectName}/deployments/${data.deployment.number}/output`
     await readEventSource(deploymentUrl, discoConfig, {

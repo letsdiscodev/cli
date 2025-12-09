@@ -80,7 +80,7 @@ async function setProjectEnvVariables({discoConfig, domain}: {discoConfig: Disco
   }
 
   const res = await request({method: 'POST', url, discoConfig, body})
-  const data = (await res.json()) as any
+  const data = (await res.json()) as {deployment: {number: number}}
   const deploymentUrl = `https://${discoConfig.host}/api/projects/${addonProjectName}/deployments/${data.deployment.number}/output`
   await readEventSource(deploymentUrl, discoConfig, {
     onMessage(event: MessageEvent) {

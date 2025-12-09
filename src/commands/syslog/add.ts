@@ -2,6 +2,7 @@ import {Args, Command, Flags} from '@oclif/core'
 
 import {getDisco} from '../../config.js'
 import {request} from '../../auth-request.js'
+import {SyslogResponse} from './list.js'
 
 export default class SyslogAdd extends Command {
   static override args = {
@@ -34,7 +35,7 @@ export default class SyslogAdd extends Command {
       },
     })
 
-    const data = (await res.json()) as any
+    const data = (await res.json()) as SyslogResponse
     if (data.urls.length > 0) {
       this.log('Current Syslog URLs:')
       for (const url of data.urls) {

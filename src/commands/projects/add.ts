@@ -1,6 +1,9 @@
 import {Args, Command, Flags} from '@oclif/core'
-import {getDisco} from '../../config.js'
-import {request, readEventSource} from '../../auth-request.js'
+
+import {readEventSource, request} from '../../auth-request.js'
+import {DiscoConfig, getDisco} from '../../config.js'
+import {GithubReposResponse} from '../github/repos/list.js'
+import {ProjectCreateResponse} from '../postgres/addon/install.js'
 
 export default class ProjectsAdd extends Command {
   static override args = {
@@ -73,7 +76,7 @@ or edit your GitHub repo permissions by running "disco github:apps:manage <your 
     }
 
     const res = await request({method: 'POST', url, discoConfig, body, expectedStatuses: [201]})
-    const data = (await res.json()) as any
+    const data = (await res.json()) as ProjectCreateResponse
 
     this.log(`Project added`)
 
@@ -111,13 +114,13 @@ function extractEnvVars(argv: string[]): {name: string; value: string}[] {
   return envVars
 }
 
-async function isGithubRepoAuthorized(discoConfig: any, repoBeingChecked: string) {
+async function isGithubRepoAuthorized(discoConfig: DiscoConfig, repoBeingChecked: string) {
   // check if the user has access to the github repo
   const url = `https://${discoConfig.host}/api/github-app-repos`
 
   const res = await request({method: 'GET', url, discoConfig})
-  const data = (await res.json()) as any
+  const data = (await res.json()) as GithubReposResponse
 
-  const authorizedRepos = data.repos.map((r: any) => r.fullName)
+  const authorizedRepos = data.repos.map((r) => r.fullName)
   return authorizedRepos.includes(repoBeingChecked)
 }

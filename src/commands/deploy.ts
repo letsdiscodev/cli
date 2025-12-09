@@ -9,6 +9,12 @@ interface DeployRequest {
   discoFile?: string
 }
 
+export interface DeployResponse {
+  deployment: {
+    number: number
+  }
+}
+
 export default class Deploy extends Command {
   static override description = 'deploy a project, a specific commit or a disco.json file'
 
@@ -41,7 +47,7 @@ export default class Deploy extends Command {
     }
 
     const res = await request({method: 'POST', url, body: reqBody, discoConfig, expectedStatuses: [201]})
-    const data = (await res.json()) as any
+    const data = (await res.json()) as DeployResponse
 
     const deploymentUrl = `https://${discoConfig.host}/api/projects/${flags.project}/deployments/${data.deployment.number}/output`
     readEventSource(deploymentUrl, discoConfig, {

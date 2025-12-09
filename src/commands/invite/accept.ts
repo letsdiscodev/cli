@@ -3,6 +3,19 @@ import fetch from 'node-fetch'
 
 import {addDisco, isDiscoAlreadyInConfig} from '../../config.js'
 
+export interface InviteAcceptResponse {
+  apiKey: {
+    name: string
+    privateKey: string
+    publicKey: string
+  }
+  meta: {
+    version: string
+    discoHost: null | string
+    registryHost: null | string
+  }
+}
+
 export default class InvitesAccept extends Command {
   static override args = {
     url: Args.string({description: 'invite url', required: true}),
@@ -33,10 +46,15 @@ export default class InvitesAccept extends Command {
     }
 
     let showOnly = flags['show-only']
-    const data = (await res.json()) as any
+    const data = (await res.json()) as InviteAcceptResponse
+    const {discoHost} = data.meta
 
-    if (isDiscoAlreadyInConfig(data.meta.discoHost)) {
-      this.log(`server ${data.meta.discoHost} already in config, here's your API key:`)
+    if (!discoHost) {
+      throw new Error('Server did not return a disco host')
+    }
+
+    if (isDiscoAlreadyInConfig(discoHost)) {
+      this.log(`server ${discoHost} already in config, here's your API key:`)
       showOnly = true
     }
 
@@ -44,9 +62,9 @@ export default class InvitesAccept extends Command {
       this.log('')
       this.log(`Private Key: ${data.apiKey.privateKey}`)
       this.log(`Public Key:  ${data.apiKey.publicKey}`)
-      this.log(`Host:        ${data.meta.discoHost}`)
+      this.log(`Host:        ${discoHost}`)
     } else {
-      addDisco({name: data.meta.discoHost, host: data.meta.discoHost, apiKey: data.apiKey.privateKey})
+      addDisco({name: discoHost, host: discoHost, apiKey: data.apiKey.privateKey})
     }
   }
 }

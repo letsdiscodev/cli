@@ -1,8 +1,46 @@
+import {createRequire} from 'node:module'
+
 import {Command, Flags} from '@oclif/core'
-import {getDisco} from '../../config.js'
-import {request, readEventSource} from '../../auth-request.js'
 import {compare} from 'compare-versions'
-import cliui from 'cliui'
+
+import {request, readEventSource} from '../../auth-request.js'
+import {getDisco} from '../../config.js'
+import {MetaResponse} from './info.js'
+
+const require = createRequire(import.meta.url)
+const cliui = require('cliui')
+
+interface ContainerStat {
+  name: string
+  cpu_stats: {
+    cpu_usage: { total_usage: number }
+    system_cpu_usage: number
+    online_cpus: number
+  }
+  precpu_stats: {
+    cpu_usage: { total_usage: number }
+    system_cpu_usage: number
+  }
+  memory_stats: {
+    usage: number
+    limit: number
+  }
+}
+
+interface StatsResponse {
+  stats: ContainerStat[]
+  df?: {
+    used: number
+    available: number
+  }
+}
+
+interface FormattedStat {
+  name: string
+  cpuPercent: number
+  memoryMB: string
+  memoryPercent: string
+}
 
 export default class MetaStats extends Command {
   static description = 'fetch stats about the server'
@@ -20,7 +58,7 @@ export default class MetaStats extends Command {
     // first get the meta version and semver compare it to 0.19.0
     let url = `https://${discoConfig.host}/api/disco/meta`
     const res = await request({method: 'GET', url, discoConfig})
-    const data = (await res.json()) as any
+    const data = (await res.json()) as MetaResponse
     if (compare(data.version, '0.19.0', '<')) {
       // this error will also exit.
       this.error('Stats are not available for this version of Disco, please upgrade using `disco meta:upgrade`')
@@ -37,9 +75,9 @@ export default class MetaStats extends Command {
     })
   }
 
-  private formatAndPrintStats(responseBody: any) {
+  private formatAndPrintStats(responseBody: StatsResponse) {
     // Process each container's stats
-    const out = responseBody.stats.map((stat: any) => {
+    const out: FormattedStat[] = responseBody.stats.map((stat) => {
       // Calculate CPU percentage
       const cpuDelta = stat.cpu_stats.cpu_usage.total_usage - stat.precpu_stats.cpu_usage.total_usage
       const systemDelta = stat.cpu_stats.system_cpu_usage - stat.precpu_stats.system_cpu_usage
@@ -50,7 +88,8 @@ export default class MetaStats extends Command {
       const memoryPercent = ((stat.memory_stats.usage / stat.memory_stats.limit) * 100).toFixed(1)
 
       // Extract container name (removing path-like prefixes)
-      const name = stat.name.match(/^\/([^.]+)/)[1]
+      const match = stat.name.match(/^\/([^.]+)/)
+      const name = match ? match[1] : stat.name
       return {
         name,
         cpuPercent,
@@ -60,9 +99,9 @@ export default class MetaStats extends Command {
     })
 
     // sort by name
-    out.sort((a: any, b: any) => a.name.localeCompare(b.name))
+    out.sort((a, b) => a.name.localeCompare(b.name))
 
-    const ui = (cliui as any)({})
+    const ui = cliui({})
 
     ui.div(
       {
@@ -106,6 +145,7 @@ export default class MetaStats extends Command {
       this.log(`Disk usage: ${used}GB used, ${available}GB available.`)
       this.log('')
     }
+
     this.log('Press Ctrl+C to exit')
   }
 }

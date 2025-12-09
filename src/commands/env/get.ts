@@ -36,7 +36,7 @@ export default class EnvGet extends Command {
       return
     }
 
-    const data: EnvVarResponse = (await res.json()) as any
+    const data = (await res.json()) as EnvVarResponse
     this.log(data.envVariable.value)
   }
 }

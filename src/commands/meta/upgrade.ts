@@ -1,16 +1,18 @@
 import {Command, Flags} from '@oclif/core'
-import {getDisco} from '../../config.js'
+
 import {request} from '../../auth-request.js'
+import {DiscoConfig, getDisco} from '../../config.js'
+import {MetaResponse} from './info.js'
 
 interface UpgradeParams {
   pull: boolean
   image?: string
 }
 
-async function getTheCurrentVersion(discoConfig: any) {
+async function getTheCurrentVersion(discoConfig: DiscoConfig) {
   const url = `https://${discoConfig.host}/api/disco/meta`
   const res = await request({method: 'GET', url, discoConfig})
-  const data = (await res.json()) as any
+  const data = (await res.json()) as MetaResponse
   return data.version
 }
 
