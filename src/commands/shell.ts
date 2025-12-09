@@ -14,8 +14,6 @@ export default class Shell extends Command {
     '<%= config.bin %> <%= command.id %> --project mysite --service worker',
   ]
 
-  static hidden = true
-
   static override flags = {
     project: Flags.string({ required: true, description: 'project name' }),
     service: Flags.string({ required: false, description: 'service name (defaults to web or first non-static service)' }),
