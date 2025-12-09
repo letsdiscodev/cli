@@ -1,7 +1,7 @@
 {
   "name": "disco",
   "description": "deploy and manage your web projects",
-  "version": "0.5.50",
+  "version": "0.5.51",
   "author": "The Disco Team",
   "bin": {
     "disco": "./bin/run.js"
@@ -26,7 +26,8 @@
     "node-ssh": "^13.2.0",
     "open": "^10.1.0",
     "tunnel-ssh": "^5.1.2",
-    "undici": "^7.7.0"
+    "undici": "^7.7.0",
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "@oclif/prettier-config": "^0.2.1",
@@ -35,6 +36,7 @@
     "@types/mocha": "^10",
     "@types/node": "^18",
     "@types/ssh2": "^1.15.0",
+    "@types/ws": "^8.18.1",
     "chai": "^4",
     "eslint": "^8",
     "eslint-config-oclif": "^5",
