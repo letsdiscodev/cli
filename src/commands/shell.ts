@@ -1,9 +1,17 @@
 import { Command, Flags } from '@oclif/core'
 import { compare } from 'compare-versions'
-import WebSocket from 'ws'
+import WS from 'ws'
 
 import { request } from '../auth-request.js'
 import { getDisco } from '../config.js'
+
+function restoreTerminal(): void {
+  if (process.stdin.isTTY) {
+    process.stdin.setRawMode(false)
+  }
+
+  process.stdin.pause()
+}
 
 export default class Shell extends Command {
 
@@ -39,14 +47,7 @@ export default class Shell extends Command {
     // Connect directly to WebSocket endpoint
     const wsUrl = `wss://${discoConfig.host}/api/projects/${flags.project}/shell`
 
-    const ws = new WebSocket(wsUrl)
-
-    const restoreTerminal = () => {
-      if (process.stdin.isTTY) {
-        process.stdin.setRawMode(false)
-      }
-      process.stdin.pause()
-    }
+    const ws = new WS(wsUrl)
 
     ws.on('open', () => {
       // Send API key and optional service as first message for authentication
@@ -54,10 +55,11 @@ export default class Shell extends Command {
       if (flags.service) {
         authMessage.service = flags.service
       }
+
       ws.send(JSON.stringify(authMessage))
     })
 
-    ws.on('message', (data: WebSocket.RawData, isBinary: boolean) => {
+    ws.on('message', (data: WS.RawData, isBinary: boolean) => {
       if (isBinary) {
         // Binary data = terminal output
         process.stdout.write(data as Buffer)
@@ -70,6 +72,7 @@ export default class Shell extends Command {
             if (process.stdin.isTTY) {
               process.stdin.setRawMode(true)
             }
+
             process.stdin.resume()
 
             // Send initial terminal size
@@ -83,7 +86,7 @@ export default class Shell extends Command {
 
             // Handle terminal resize
             process.stdout.on('resize', () => {
-              if (process.stdout.isTTY && ws.readyState === WebSocket.OPEN) {
+              if (process.stdout.isTTY && ws.readyState === WS.OPEN) {
                 ws.send(JSON.stringify({
                   type: 'resize',
                   cols: process.stdout.columns,
@@ -94,7 +97,7 @@ export default class Shell extends Command {
 
             // Forward stdin to WebSocket as binary
             process.stdin.on('data', (chunk: Buffer) => {
-              if (ws.readyState === WebSocket.OPEN) {
+              if (ws.readyState === WS.OPEN) {
                 ws.send(chunk)
               }
             })
@@ -108,15 +111,20 @@ export default class Shell extends Command {
 
     ws.on('close', (code, reason) => {
       restoreTerminal()
+
       if (code !== 1000) {
         this.error(`Connection closed: ${code} ${reason.toString()}`)
       }
-      process.exit(0)
     })
 
     ws.on('error', (err) => {
       restoreTerminal()
       this.error(`WebSocket error: ${err.message}`)
+    })
+
+    // Keep the process running until WebSocket closes
+    await new Promise<void>((resolve) => {
+      ws.on('close', () => resolve())
     })
   }
 }
