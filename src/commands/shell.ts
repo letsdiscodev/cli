@@ -1,7 +1,7 @@
 import { Command, Flags } from '@oclif/core'
 
 import { getDisco } from '../config.js'
-import { checkShellSupport, runInteractiveShell } from '../shell-client.js'
+import { checkShellSupport, runShell } from '../shell-client.js'
 
 export default class Shell extends Command {
 
@@ -33,11 +33,10 @@ export default class Shell extends Command {
     }
 
     try {
-      await runInteractiveShell({
+      await runShell({
         project: flags.project,
         discoConfig,
         service: flags.service,
-        interactive: true,
       })
     } catch (error) {
       this.error((error as Error).message)

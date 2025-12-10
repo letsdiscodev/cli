@@ -9,12 +9,10 @@ export interface ShellOptions {
   discoConfig: DiscoConfig
   service?: string
   command?: string
-  interactive?: boolean
 }
 
 export interface ShellResult {
   exitCode: number
-  output: string
 }
 
 export async function checkShellSupport(discoConfig: DiscoConfig): Promise<{ supported: boolean; version: string }> {
@@ -27,26 +25,21 @@ export async function checkShellSupport(discoConfig: DiscoConfig): Promise<{ sup
   }
 }
 
-export function runCommandViaShell(options: ShellOptions): Promise<ShellResult> {
+function restoreTerminal(): void {
+  if (process.stdin.isTTY) {
+    process.stdin.setRawMode(false)
+  }
+
+  process.stdin.pause()
+}
+
+export function runShell(options: ShellOptions): Promise<ShellResult> {
   const { project, discoConfig, service, command } = options
 
   return new Promise((resolve, reject) => {
     const wsUrl = `wss://${discoConfig.host}/api/projects/${project}/shell`
     const ws = new WS(wsUrl)
-    let output = ''
     let exitCode = 0
-
-    // Handler for forwarding stdin - defined here so we can remove it on close
-    const stdinHandler = (chunk: Buffer) => {
-      if (ws.readyState === WS.OPEN) {
-        ws.send(chunk)
-      }
-    }
-
-    const cleanup = () => {
-      process.stdin.removeListener('data', stdinHandler)
-      process.stdin.pause()
-    }
 
     ws.on('open', () => {
       const authMessage: { token: string; service?: string; command?: string } = { token: discoConfig.apiKey }
@@ -57,75 +50,6 @@ export function runCommandViaShell(options: ShellOptions): Promise<ShellResult> 
 
       if (command) {
         authMessage.command = command
-      }
-
-      ws.send(JSON.stringify(authMessage))
-    })
-
-    ws.on('message', (data: WS.RawData, isBinary: boolean) => {
-      if (isBinary) {
-        const chunk = (data as Buffer).toString()
-        output += chunk
-        process.stdout.write(chunk)
-      } else {
-        try {
-          const message = JSON.parse(data.toString())
-          if (message.type === 'connected') {
-            // Forward stdin in case the command needs input (e.g. accidentally ran python REPL)
-            // This allows user to type 'exit' or Ctrl+C to escape
-            process.stdin.resume()
-            process.stdin.on('data', stdinHandler)
-          } else if (message.type === 'ping' && ws.readyState === WS.OPEN) {
-            ws.send(JSON.stringify({ type: 'pong' }))
-          } else if (message.type === 'exit') {
-            exitCode = message.code ?? 0
-          }
-        } catch {
-          // Not JSON, treat as text output
-          const text = data.toString()
-          output += text
-          process.stdout.write(text)
-        }
-      }
-    })
-
-    ws.on('close', (code, reason) => {
-      cleanup()
-
-      if (code === 1000) {
-        resolve({ exitCode, output })
-      } else {
-        reject(new Error(`Connection closed: ${code} ${reason.toString()}`))
-      }
-    })
-
-    ws.on('error', (err) => {
-      cleanup()
-      reject(new Error(`WebSocket error: ${err.message}`))
-    })
-  })
-}
-
-function restoreTerminal(): void {
-  if (process.stdin.isTTY) {
-    process.stdin.setRawMode(false)
-  }
-
-  process.stdin.pause()
-}
-
-export function runInteractiveShell(options: ShellOptions): Promise<void> {
-  const { project, discoConfig, service } = options
-
-  return new Promise((resolve, reject) => {
-    const wsUrl = `wss://${discoConfig.host}/api/projects/${project}/shell`
-    const ws = new WS(wsUrl)
-
-    ws.on('open', () => {
-      const authMessage: { token: string; service?: string } = { token: discoConfig.apiKey }
-
-      if (service) {
-        authMessage.service = service
       }
 
       ws.send(JSON.stringify(authMessage))
@@ -169,6 +93,8 @@ export function runInteractiveShell(options: ShellOptions): Promise<void> {
             })
           } else if (message.type === 'ping' && ws.readyState === WS.OPEN) {
             ws.send(JSON.stringify({ type: 'pong' }))
+          } else if (message.type === 'exit') {
+            exitCode = message.code ?? 0
           }
         } catch {
           process.stdout.write(data.toString())
@@ -180,7 +106,7 @@ export function runInteractiveShell(options: ShellOptions): Promise<void> {
       restoreTerminal()
 
       if (code === 1000) {
-        resolve()
+        resolve({ exitCode })
       } else {
         reject(new Error(`Connection closed: ${code} ${reason.toString()}`))
       }

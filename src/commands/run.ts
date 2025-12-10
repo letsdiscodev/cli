@@ -2,7 +2,7 @@ import {Args, Command, Flags} from '@oclif/core'
 
 import {getDisco} from '../config.js'
 import {request, readEventSource} from '../auth-request.js'
-import {checkShellSupport, runCommandViaShell} from '../shell-client.js'
+import {checkShellSupport, runShell} from '../shell-client.js'
 
 interface RunResponse {
   run: {
@@ -37,12 +37,13 @@ export default class Run extends Command {
     if (shellSupported && args.command) {
       // Use websocket shell for running commands
       try {
-        const result = await runCommandViaShell({
+        const result = await runShell({
           project: flags.project,
           discoConfig,
           service: flags.service,
           command: args.command,
         })
+
         if (result.exitCode !== 0) {
           this.exit(result.exitCode)
         }
