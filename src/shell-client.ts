@@ -36,6 +36,18 @@ export function runCommandViaShell(options: ShellOptions): Promise<ShellResult> 
     let output = ''
     let exitCode = 0
 
+    // Handler for forwarding stdin - defined here so we can remove it on close
+    const stdinHandler = (chunk: Buffer) => {
+      if (ws.readyState === WS.OPEN) {
+        ws.send(chunk)
+      }
+    }
+
+    const cleanup = () => {
+      process.stdin.removeListener('data', stdinHandler)
+      process.stdin.pause()
+    }
+
     ws.on('open', () => {
       const authMessage: { token: string; service?: string; command?: string } = { token: discoConfig.apiKey }
 
@@ -59,7 +71,10 @@ export function runCommandViaShell(options: ShellOptions): Promise<ShellResult> 
         try {
           const message = JSON.parse(data.toString())
           if (message.type === 'connected') {
-            // Successfully authenticated - command mode doesn't need raw terminal
+            // Forward stdin in case the command needs input (e.g. accidentally ran python REPL)
+            // This allows user to type 'exit' or Ctrl+C to escape
+            process.stdin.resume()
+            process.stdin.on('data', stdinHandler)
           } else if (message.type === 'ping' && ws.readyState === WS.OPEN) {
             ws.send(JSON.stringify({ type: 'pong' }))
           } else if (message.type === 'exit') {
@@ -75,6 +90,8 @@ export function runCommandViaShell(options: ShellOptions): Promise<ShellResult> 
     })
 
     ws.on('close', (code, reason) => {
+      cleanup()
+
       if (code === 1000) {
         resolve({ exitCode, output })
       } else {
@@ -83,6 +100,7 @@ export function runCommandViaShell(options: ShellOptions): Promise<ShellResult> 
     })
 
     ws.on('error', (err) => {
+      cleanup()
       reject(new Error(`WebSocket error: ${err.message}`))
     })
   })
