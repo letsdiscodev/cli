@@ -101,6 +101,11 @@ export default class Shell extends Command {
                 ws.send(chunk)
               }
             })
+          } else if (message.type === 'ping') {
+            // Respond to server heartbeat
+            if (ws.readyState === WS.OPEN) {
+              ws.send(JSON.stringify({ type: 'pong' }))
+            }
           }
         } catch {
           // Not JSON, treat as text output
