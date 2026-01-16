@@ -39,7 +39,7 @@ export function runShell(options: ShellOptions): Promise<ShellResult> {
   return new Promise((resolve, reject) => {
     const wsUrl = `wss://${discoConfig.host}/api/projects/${project}/run`
     const ws = new WS(wsUrl)
-    let exitCode = 0
+    let exitCode = -1;
 
     ws.on('open', () => {
       const authMessage: { token: string; service?: string; command?: string } = { token: discoConfig.apiKey }
@@ -94,7 +94,7 @@ export function runShell(options: ShellOptions): Promise<ShellResult> {
           } else if (message.type === 'ping' && ws.readyState === WS.OPEN) {
             ws.send(JSON.stringify({ type: 'pong' }))
           } else if (message.type === 'exit') {
-            exitCode = message.code ?? 0
+            exitCode = message.code ?? -1
           }
         } catch {
           process.stdout.write(data.toString())

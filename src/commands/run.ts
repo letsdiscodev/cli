@@ -45,7 +45,7 @@ export default class Run extends Command {
         })
 
         if (result.exitCode !== 0) {
-          this.exit(result.exitCode)
+          process.exitCode = result.exitCode;
         }
       } catch (error) {
         this.error((error as Error).message)
