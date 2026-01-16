@@ -12,7 +12,7 @@ interface RunResponse {
 
 export default class Run extends Command {
   static override args = {
-    command: Args.string({description: 'command to run'}),
+    command: Args.string({description: 'command to run', required: true}),
   }
 
   static override description = 'remotely run a command'
