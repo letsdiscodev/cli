@@ -37,7 +37,7 @@ export function runShell(options: ShellOptions): Promise<ShellResult> {
   const { project, discoConfig, service, command } = options
 
   return new Promise((resolve, reject) => {
-    const wsUrl = `wss://${discoConfig.host}/api/projects/${project}/shell`
+    const wsUrl = `wss://${discoConfig.host}/api/projects/${project}/run`
     const ws = new WS(wsUrl)
     let exitCode = 0
 
