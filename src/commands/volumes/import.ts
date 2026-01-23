@@ -55,7 +55,7 @@ export default class VolumesImport extends Command {
       this.error(`Error reading from stdin: ${err.message}`)
     })
 
-    let extraHeaders: Record<string, string> = {}
+    const extraHeaders: Record<string, string> = {}
 
     if (flags.input) {
       // if we are given the file, get its actual file size, and then

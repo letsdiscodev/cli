@@ -106,6 +106,7 @@ export default class MetaStats extends Command {
       this.log(`Disk usage: ${used}GB used, ${available}GB available.`)
       this.log('')
     }
+
     this.log('Press Ctrl+C to exit')
   }
 }

@@ -60,8 +60,9 @@ export default class NodesAdd extends Command {
 
     if (registryHost === null) {
       this.log('Image registry not configured')
-      this.log('You can install the addon by using the command disco registry:addon:install. For example:')
-      this.log(`disco registry:addon:install --domain registry.example.com --disco ${discoConfig.name}`)
+      this.log('See disco registries command. For example:')
+      this.log(`disco registries:login ghcr.io --username myuser --disco ${discoConfig.name}`)
+      this.log(`disco registries:set ghcr.io/myuser --disco ${discoConfig.name}`)
       return
     }
 
