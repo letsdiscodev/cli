@@ -13,3 +13,4 @@ yarn.lock
 pnpm-lock.yaml
 
 .env
+tsconfig.tsbuildinfo
