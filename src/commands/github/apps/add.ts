@@ -12,6 +12,7 @@ export default class GithubAppsAdd extends Command {
   static flags = {
     organization: Flags.string({required: false}),
     disco: Flags.string({required: false}),
+    'non-interactive': Flags.boolean({default: false, description: 'just print the URL without prompts'}),
   }
 
   public async run(): Promise<void> {
@@ -24,6 +25,11 @@ export default class GithubAppsAdd extends Command {
     const url = `https://${discoConfig.host}/api/github-apps/create`
     const res = await request({method: 'POST', url, discoConfig, body, expectedStatuses: [201]})
     const respBody = (await res.json()) as any
+
+    if (flags['non-interactive']) {
+      this.log(respBody.pendingApp.url)
+      return
+    }
 
     // thanks @robsimmons for this excellent suggestion!
     this.log('')
