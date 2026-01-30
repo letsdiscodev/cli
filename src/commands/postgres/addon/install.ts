@@ -1,6 +1,16 @@
 import {Command, Flags} from '@oclif/core'
+
+import {readEventSource, request} from '../../../auth-request.js'
 import {getDisco} from '../../../config.js'
-import {request, readEventSource} from '../../../auth-request.js'
+
+export interface ProjectCreateResponse {
+  project: {
+    name: string
+  }
+  deployment: {
+    number: number
+  } | null
+}
 
 export default class PostgresAddonInstall extends Command {
   static description = 'install Postgres addon'
@@ -22,7 +32,7 @@ export default class PostgresAddonInstall extends Command {
     }
 
     const res = await request({method: 'POST', url, discoConfig, body, expectedStatuses: [201]})
-    const data = (await res.json()) as any
+    const data = (await res.json()) as ProjectCreateResponse
     if (data.deployment) {
       const url = `https://${discoConfig.host}/api/projects/${project}/deployments/${data.deployment.number}/output`
 

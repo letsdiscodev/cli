@@ -7,6 +7,12 @@ interface EnvVarRequestBody {
   envVariables: {name: string; value: string}[]
 }
 
+export interface EnvSetResponse {
+  deployment: {
+    number: number
+  } | null
+}
+
 export default class EnvSet extends Command {
   static override args = {
     variables: Args.string({description: 'variables to set'}),
@@ -49,14 +55,16 @@ export default class EnvSet extends Command {
     }
 
     const res = await request({method: 'POST', url, discoConfig, body})
-    const data = (await res.json()) as any
-    // stream deployment
-    const deploymentUrl = `https://${discoConfig.host}/api/projects/${flags.project}/deployments/${data.deployment.number}/output`
-    readEventSource(deploymentUrl, discoConfig, {
-      onMessage(event: MessageEvent) {
-        const output = JSON.parse(event.data)
-        process.stdout.write(output.text)
-      },
-    })
+    const data = (await res.json()) as EnvSetResponse
+    if (data.deployment) {
+      // stream deployment
+      const deploymentUrl = `https://${discoConfig.host}/api/projects/${flags.project}/deployments/${data.deployment.number}/output`
+      readEventSource(deploymentUrl, discoConfig, {
+        onMessage(event: MessageEvent) {
+          const output = JSON.parse(event.data)
+          process.stdout.write(output.text)
+        },
+      })
+    }
   }
 }

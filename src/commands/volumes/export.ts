@@ -30,7 +30,7 @@ export default class VolumesExport extends Command {
   }
 
   private async confirmAction(): Promise<boolean> {
-    return await confirm({
+    return confirm({
       message: 'Binary data will be output to your terminal. Continue?',
       default: false,
     })

@@ -3,6 +3,13 @@ import { Args, Command, Flags } from '@oclif/core'
 import { request } from '../../auth-request.js'
 import { getDisco } from '../../config.js'
 
+export interface InviteCreateResponse {
+  apiKeyInvite: {
+    url: string
+    expires: string
+  }
+}
+
 export default class InvitesCreate extends Command {
   static override args = {
     name: Args.string({ description: 'api key invitee name', required: true }),
@@ -26,7 +33,7 @@ export default class InvitesCreate extends Command {
       name: args.name,
     }
     const res = await request({ method: 'POST', url, discoConfig, body, expectedStatuses: [201] })
-    const data = (await res.json()) as any
+    const data = (await res.json()) as InviteCreateResponse
     const inviteUrl = data.apiKeyInvite.url
 
     // Web dashboard URL (inviteUrl is not encoded - the dashboard expects the raw URL)

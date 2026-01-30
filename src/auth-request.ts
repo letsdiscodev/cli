@@ -1,4 +1,4 @@
-import {EventSource, FetchLike} from 'eventsource'
+import {EventSource} from 'eventsource'
 import fetch, {RequestInit} from 'node-fetch'
 import {fetch as fetchNative} from 'node-fetch-native/proxy'
 

@@ -1,6 +1,13 @@
-import {Command, Args, Flags} from '@oclif/core'
-import {getDisco, setHost} from '../../config.js'
+import {Args, Command, Flags} from '@oclif/core'
+
 import {request} from '../../auth-request.js'
+import {getDisco, setHost} from '../../config.js'
+
+export interface SetHostResponse {
+  version: string
+  discoHost: string
+  registryHost: null | string
+}
 
 export default class MetaHost extends Command {
   static description = 'set a host for the server'
@@ -23,7 +30,7 @@ export default class MetaHost extends Command {
 
     request({method: 'POST', url, discoConfig, body: {host: args.domain}})
       .then(async (res) => {
-        const data = (await res.json()) as any
+        const data = (await res.json()) as SetHostResponse
         this.log(`Host set to ${args.domain}`)
         setHost(discoConfig.name, data.discoHost)
       })

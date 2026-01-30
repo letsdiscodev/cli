@@ -3,6 +3,15 @@ import {Command, Flags} from '@oclif/core'
 import {getDisco} from '../../config.js'
 import {request} from '../../auth-request.js'
 
+export interface EnvVariableItem {
+  name: string
+  value: string
+}
+
+export interface EnvVariablesResponse {
+  envVariables: EnvVariableItem[]
+}
+
 export default class EnvList extends Command {
   static override description = 'list the env vars'
 
@@ -24,7 +33,7 @@ export default class EnvList extends Command {
       return
     }
 
-    const data = (await res.json()) as any
+    const data = (await res.json()) as EnvVariablesResponse
     for (const variable of data.envVariables) {
       this.log(`${variable.name}=${variable.value}`)
     }
