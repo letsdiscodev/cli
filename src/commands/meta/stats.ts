@@ -126,10 +126,10 @@ export default class MetaStats extends Command {
         text: 'CPU %',
       },
       {
-        text: 'Memory',
+        text: 'RAM',
       },
       {
-        text: 'Memory %',
+        text: 'RAM %',
       },
     )
     for (const o of out) {
