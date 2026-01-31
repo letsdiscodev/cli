@@ -22,13 +22,9 @@ jobs:
           version="${GITHUB_REF_NAME#v}"
           echo "version=$version" >> $GITHUB_OUTPUT
 
-      - name: Verify package.json version matches tag
+      - name: Update package.json version to match tag
         run: |
-          package_version=$(node -p "require('./package.json').version")
-          tag_version="${{ steps.version.outputs.version }}"
-          if [ "$package_version" != "$tag_version" ]; then
-            echo "::warning::package.json version ($package_version) does not match tag ($tag_version)"
-          fi
+          npm version ${{ steps.version.outputs.version }} --no-git-tag-version --allow-same-version
 
       - name: Install dependencies
         run: npm ci
