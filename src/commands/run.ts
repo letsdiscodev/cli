@@ -67,7 +67,7 @@ export default class Run extends Command {
           const message = JSON.parse(event.data)
           process.stdout.write(message.text)
         },
-      })
+      }).done
     }
   }
 }

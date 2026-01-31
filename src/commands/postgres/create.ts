@@ -64,7 +64,7 @@ export default class PostgresCreate extends Command {
             onMessage(event: MessageEvent) {
               process.stdout.write(JSON.parse(event.data).text)
             },
-          })
+          }).done
         }
 
         instances = []
@@ -102,7 +102,7 @@ export default class PostgresCreate extends Command {
         onMessage(event: MessageEvent) {
           process.stdout.write(JSON.parse(event.data).text)
         },
-      })
+      }).done
       instanceName = respBody.instance.name
     } else {
       instances.sort((a, b) => new Date(a.created).valueOf() - new Date(b.created).valueOf())

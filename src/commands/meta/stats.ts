@@ -2,8 +2,6 @@ import {createRequire} from 'node:module'
 
 import {Command, Flags} from '@oclif/core'
 import {compare} from 'compare-versions'
-import {EventSource} from 'eventsource'
-import {fetch as fetchNative} from 'node-fetch-native/proxy'
 
 import {request, readEventSource} from '../../auth-request.js'
 import {getDisco} from '../../config.js'
@@ -73,27 +71,12 @@ export default class MetaStats extends Command {
     // If --json flag is used, fetch once and return
     if (flags.json) {
       return new Promise((resolve) => {
-        // this is implemented as a custom EventSource (not using `readEventSource`)
-        // since (as far as I can remember??) the EventSource lib we use doesn't really
-        // expose close...?? or just our own readEventSource isn't flexible enough
-        // to also return a handler that would let you close it...??
-        // in any case, it's a bit manual below, but it does work - it connects,
-        // streams a single 'frame' of stats, and returns it in json
-        const es = new EventSource(url, {
-          fetch: (input, init) =>
-            fetchNative(input, {
-              ...init,
-              headers: {
-                ...init?.headers,
-                Accept: 'text/event-stream',
-                Authorization: 'Basic ' + Buffer.from(`${discoConfig.apiKey}:`).toString('base64'),
-              },
-            }),
-        })
-        es.addEventListener('stats', (event: MessageEvent) => {
-          const statsData = JSON.parse(event.data) as StatsResponse
-          es.close()
-          resolve(statsData)
+        const { eventSource } = readEventSource(url, discoConfig, {
+          onMessage: (event: MessageEvent) => {
+            const statsData = JSON.parse(event.data) as StatsResponse
+            eventSource.close()
+            resolve(statsData)
+          },
         })
       })
     }

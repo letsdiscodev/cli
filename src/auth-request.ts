@@ -13,7 +13,7 @@ interface Handlers {
   onMessage: (event: MessageEvent) => void
 }
 
-export function readEventSource(url: string, discoConfig: DiscoConfig, handlers: Handlers): Promise<void> {
+export function readEventSource(url: string, discoConfig: DiscoConfig, handlers: Handlers): { eventSource: EventSource, done: Promise<void> } {
   const es = new EventSource(url, {
     fetch: (input, init) =>
       fetchNative(input, {
@@ -36,12 +36,14 @@ export function readEventSource(url: string, discoConfig: DiscoConfig, handlers:
   es.addEventListener('stats', handlers.onMessage)
 
   // sending 'end' is our way of signaling that we want to close the connection
-  return new Promise((resolve) => {
+  const done = new Promise<void>((resolve) => {
     es.addEventListener('end', () => {
       es.close()
       resolve()
     })
   })
+
+  return { eventSource: es, done }
 }
 
 export function request({
