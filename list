@@ -1,8 +1,0 @@
-manage discos
-
-USAGE
-  $ disco discos:COMMAND
-
-COMMANDS
-  discos:list  list the discos
-

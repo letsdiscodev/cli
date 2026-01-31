@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Get version from tag
+        id: version
+        run: |
+          # Strip 'v' prefix from tag
+          version="${GITHUB_REF_NAME#v}"
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Verify package.json version matches tag
+        run: |
+          package_version=$(node -p "require('./package.json').version")
+          tag_version="${{ steps.version.outputs.version }}"
+          if [ "$package_version" != "$tag_version" ]; then
+            echo "::warning::package.json version ($package_version) does not match tag ($tag_version)"
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Pack tarballs
+        run: npx oclif pack tarballs --no-xz
+
+      - name: Upload tarballs to S3
+        run: npx oclif upload tarballs --no-xz
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Promote release
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          hash=$(ls dist | grep "disco-v${version}-" | head -1 | cut -d'-' -f3)
+          npx oclif promote --sha "$hash" --version "$version" --no-xz
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: v${{ steps.version.outputs.version }}
+          tag: ${{ github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          generateReleaseNotes: true

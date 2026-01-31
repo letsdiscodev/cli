@@ -1,86 +1,79 @@
 #!/bin/bash
 
-# see RELEASE.md !!
-# ---
+# Creates and pushes a version tag to trigger the release workflow.
+#
+# Usage:
+#   ./release.sh           # auto-bump patch (v1.2.3 -> v1.2.4)
+#   ./release.sh v1.3.0    # use specific version
+#   ./release.sh minor     # bump minor (v1.2.3 -> v1.3.0)
+#   ./release.sh major     # bump major (v1.2.3 -> v2.0.0)
 
-# exit on error
 set -e
-# print every command being run
-set -x
 
-# curl + jq package.json to get version number from repo
-# https://raw.githubusercontent.com/letsdiscodev/cli/main/package.json
-# store version number in variable
-version_from_repo=$(curl -s https://raw.githubusercontent.com/letsdiscodev/cli/main/package.json | jq -r '.version')
-version_from_package=$(cat package.json | jq -r '.version')
-# if the versions are the same, fail/exit/quit.
-if [ "$version_from_repo" = "$version_from_package" ]; then
-  echo "The version in package.json is the same as the version in the repo. Please update the version in package.json before running this script"
+# Get the latest tag
+latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+latest_version="${latest_tag#v}"
+
+# Parse version components
+IFS='.' read -r major minor patch <<< "$latest_version"
+
+# Determine the new version
+if [ -n "$1" ]; then
+  case "$1" in
+    major)
+      new_version="$((major + 1)).0.0"
+      ;;
+    minor)
+      new_version="${major}.$((minor + 1)).0"
+      ;;
+    patch)
+      new_version="${major}.${minor}.$((patch + 1))"
+      ;;
+    v*)
+      new_version="${1#v}"
+      ;;
+    *)
+      new_version="$1"
+      ;;
+  esac
+else
+  # Default: check package.json, use it if higher, otherwise bump patch
+  package_version=$(node -p "require('./package.json').version")
+
+  # Compare versions (simple string compare works for semver)
+  if [ "$(printf '%s\n' "$latest_version" "$package_version" | sort -V | tail -n1)" = "$package_version" ] && [ "$package_version" != "$latest_version" ]; then
+    new_version="$package_version"
+    echo "Using version from package.json: $new_version"
+  else
+    new_version="${major}.${minor}.$((patch + 1))"
+    echo "Auto-bumping patch: $latest_version -> $new_version"
+  fi
+fi
+
+new_tag="v$new_version"
+
+# Check if tag already exists
+if git rev-parse "$new_tag" >/dev/null 2>&1; then
+  echo "Error: Tag $new_tag already exists"
   exit 1
 fi
 
-# fail if git status shows changes not staged for commit
-if [[ `git status --porcelain` ]]; then
-  echo "There are changes not staged for commit. Please commit or stash them before running this script"
-  exit 1
-fi
-
-if [ -z "${AWS_ACCESS_KEY_ID}" ]; then
-  # fail
-  echo "AWS_ACCESS_KEY_ID is not set Please set it before running this script"
-  exit 1
-fi
-
-if [ -z "${AWS_SECRET_ACCESS_KEY}" ]; then
-  # fail
-  echo "AWS_SECRET_ACCESS_KEY is not set Please set it before running this script"
-  exit 1
-fi
-
-if [ -z "${AWS_CLOUDFRONT_DISTRIBUTION_ID}" ]; then
-  # fail
-  echo "AWS_CLOUDFRONT_DISTRIBUTION_ID is not set Please set it before running this script"
-  exit 1
-fi
-
-# get the latest release pushed to the repo
-# watch out as it has a 'v' at the beginning
-# latest_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
-
-# get the version by cat'ing package.json into jq and extracting the version
-version=$(cat package.json | jq -r '.version')
-
-# check if the latest release is the same as the version in package.json
-# don't use right now as this script is not running as part of the github release workflow
-# if [ "$latest_release" = "v$version" ]; then
-#   echo "The latest release is the same as the version in package.json. Please update the version in package.json before running this script"
-#   exit 1
-# fi
-
-
-# ---
-
-rm -rf dist
-rm -rf tmp
-
-npm ci
-
-npm run build
-
-oclif pack tarballs --no-xz
-
-oclif upload tarballs --no-xz
-
-# promote tarballs
-
-# get the hash by calling python
-hash=$(export PACKAGE_VERSION=$version && python3 -c "from pathlib import Path; import os; print(str(list(Path('./dist').glob('disco-v' + os.environ['PACKAGE_VERSION'] + '*'))[0]).split('-')[2])")
-
-oclif promote --sha $hash --version $version --no-xz
-
-aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
-
-echo "done"
+# Confirm with user
 echo ""
-echo "***** * ** * * DONT FORGET TO GIT PUSH * * * ** * ******* *****"
+echo "This will create and push tag: $new_tag"
+echo "GitHub Actions will then build and release."
+read -p "Continue? [y/N] " -n 1 -r
 echo ""
+
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+  echo "Aborted."
+  exit 1
+fi
+
+# Create and push the tag
+git tag "$new_tag"
+git push origin "$new_tag"
+
+echo ""
+echo "Tag $new_tag pushed. GitHub Actions will handle the release."
+echo "Watch progress at: https://github.com/letsdiscodev/cli/actions"
