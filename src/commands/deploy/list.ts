@@ -17,6 +17,8 @@ export interface DeploymentsResponse {
 export default class DeployList extends Command {
   static override description = 'list the deployments for a project'
 
+  static override enableJsonFlag = true
+
   static override examples = ['<%= config.bin %> <%= command.id %> --project mysite']
 
   static override flags = {
@@ -24,7 +26,7 @@ export default class DeployList extends Command {
     disco: Flags.string({required: false}),
   }
 
-  public async run(): Promise<void> {
+  public async run(): Promise<DeploymentsResponse> {
     const {flags} = await this.parse(DeployList)
 
     const discoConfig = getDisco(flags.disco || null)
@@ -34,5 +36,7 @@ export default class DeployList extends Command {
     for (const deployment of data.deployments) {
       this.log(`${deployment.created}\t${deployment.number}\t${deployment.status}`)
     }
+
+    return data
   }
 }

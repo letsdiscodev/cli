@@ -14,13 +14,15 @@ export interface GithubReposResponse {
 export default class GithubReposList extends Command {
   static description = 'list Github repos accessible thoughs Github Apps'
 
+  static enableJsonFlag = true
+
   static examples = ['<%= config.bin %> <%= command.id %>']
 
   static flags = {
     disco: Flags.string({required: false}),
   }
 
-  public async run(): Promise<void> {
+  public async run(): Promise<GithubReposResponse> {
     const {flags} = await this.parse(GithubReposList)
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/github-app-repos`
@@ -30,5 +32,7 @@ export default class GithubReposList extends Command {
     for (const repo of data.repos) {
       this.log(repo.fullName)
     }
+
+    return data
   }
 }

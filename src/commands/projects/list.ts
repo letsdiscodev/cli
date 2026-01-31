@@ -13,13 +13,15 @@ interface Project {
 export default class ProjectsList extends Command {
   static description = 'list projects'
 
+  static enableJsonFlag = true
+
   static examples = ['<%= config.bin %> <%= command.id %>']
 
   static flags = {
     disco: Flags.string({required: false}),
   }
 
-  public async run(): Promise<void> {
+  public async run(): Promise<{projects: Project[]}> {
     const {flags} = await this.parse(ProjectsList)
 
     const discoConfig = getDisco(flags.disco || null)
@@ -31,5 +33,7 @@ export default class ProjectsList extends Command {
       const githubRepoPart = project.github ? ` (${project.github.fullName}${branchPart})` : ''
       this.log(`${project.name}${githubRepoPart}`)
     }
+
+    return respBody
   }
 }

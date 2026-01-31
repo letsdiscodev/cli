@@ -10,6 +10,8 @@ interface VolumesResponse {
 export default class VolumesList extends Command {
   static override description = "list all project's volumes"
 
+  static override enableJsonFlag = true
+
   static override examples = ['<%= config.bin %> <%= command.id %> --project mysite']
 
   static override flags = {
@@ -17,7 +19,7 @@ export default class VolumesList extends Command {
     disco: Flags.string({required: false}),
   }
 
-  public async run(): Promise<void> {
+  public async run(): Promise<VolumesResponse> {
     const {flags} = await this.parse(VolumesList)
 
     const discoConfig = getDisco(flags.disco || null)
@@ -27,5 +29,7 @@ export default class VolumesList extends Command {
     for (const volume of data.volumes) {
       this.log(volume.name)
     }
+
+    return data
   }
 }

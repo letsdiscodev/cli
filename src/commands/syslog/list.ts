@@ -10,13 +10,15 @@ export interface SyslogResponse {
 export default class SyslogList extends Command {
   static override description = 'see list of all log destinations'
 
+  static override enableJsonFlag = true
+
   static override examples = ['<%= config.bin %> <%= command.id %>']
 
   static override flags = {
     disco: Flags.string({required: false}),
   }
 
-  public async run(): Promise<void> {
+  public async run(): Promise<SyslogResponse> {
     const {flags} = await this.parse(SyslogList)
 
     const discoConfig = getDisco(flags.disco || null)
@@ -25,12 +27,14 @@ export default class SyslogList extends Command {
     const data = (await res.json()) as SyslogResponse
 
     if (data.urls.length > 0) {
-      console.log('Current Syslog URLs:')
-      for (const url of data.urls) {
-        console.log(url)
+      this.log('Current Syslog URLs:')
+      for (const syslogUrl of data.urls) {
+        this.log(syslogUrl)
       }
     } else {
-      console.log('There is currently no Syslog URL set.')
+      this.log('There is currently no Syslog URL set.')
     }
+
+    return data
   }
 }

@@ -6,7 +6,7 @@ import {request} from '../../auth-request.js'
 interface EnvVarResponse {
   envVariable: {
     value: string
-  }
+  } | null
 }
 
 export default class EnvGet extends Command {
@@ -16,6 +16,8 @@ export default class EnvGet extends Command {
 
   static override description = 'read one environment variable'
 
+  static override enableJsonFlag = true
+
   static override examples = ['<%= config.bin %> <%= command.id %> --project mysite API_KEY']
 
   static override flags = {
@@ -23,7 +25,7 @@ export default class EnvGet extends Command {
     disco: Flags.string({required: false}),
   }
 
-  public async run(): Promise<void> {
+  public async run(): Promise<EnvVarResponse> {
     const {args, flags} = await this.parse(EnvGet)
 
     const discoConfig = getDisco(flags.disco || null)
@@ -33,10 +35,12 @@ export default class EnvGet extends Command {
     // env var not found
     if (res.status === 404) {
       this.log('')
-      return
+      return {envVariable: null}
     }
 
     const data = (await res.json()) as EnvVarResponse
-    this.log(data.envVariable.value)
+    this.log(data.envVariable!.value)
+
+    return data
   }
 }

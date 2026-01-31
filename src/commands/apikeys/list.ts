@@ -17,13 +17,15 @@ export interface ApiKeysResponse {
 export default class ApikeysList extends Command {
   static override description = 'list all api keys'
 
+  static override enableJsonFlag = true
+
   static override examples = ['<%= config.bin %> <%= command.id %>']
 
   static override flags = {
     disco: Flags.string({required: false}),
   }
 
-  public async run(): Promise<void> {
+  public async run(): Promise<ApiKeysResponse> {
     const {flags} = await this.parse(ApikeysList)
     const discoConfig = getDisco(flags.disco || null)
 
@@ -35,5 +37,7 @@ export default class ApikeysList extends Command {
       const lastUsed = key.lastUsed === null ? 'never' : key.lastUsed
       this.log(`${key.publicKey} ${key.privateKey} ${key.name} (last used: ${lastUsed})`)
     }
+
+    return data
   }
 }
