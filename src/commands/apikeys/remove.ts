@@ -10,7 +10,7 @@ export default class ApikeysRemove extends Command {
 
   static override description = 'remove an api key'
 
-  static override examples = ['<%= config.bin %> <%= command.id %> API_KEY']
+  static override examples = ['<%= config.bin %> <%= command.id %> PUBLIC_KEY']
 
   static override flags = {
     disco: Flags.string({required: false}),
