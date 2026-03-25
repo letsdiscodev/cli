@@ -7,6 +7,7 @@ import {request, readEventSource} from '../auth-request.js'
 interface DeployRequest {
   commit?: string
   discoFile?: string
+  noCache?: boolean
 }
 
 export interface DeployResponse {
@@ -29,6 +30,7 @@ export default class Deploy extends Command {
     // TODO file seems to not work right now - re-test once daemon is fixed?
     file: Flags.string({required: false}),
     disco: Flags.string({required: false}),
+    'no-cache': Flags.boolean({required: false, default: false, description: 'Build without using Docker cache'}),
   }
 
   public async run(): Promise<void> {
@@ -44,6 +46,10 @@ export default class Deploy extends Command {
 
     if (discoFile) {
       reqBody.discoFile = discoFile
+    }
+
+    if (flags['no-cache']) {
+      reqBody.noCache = true
     }
 
     const res = await request({method: 'POST', url, body: reqBody, discoConfig, expectedStatuses: [201]})
