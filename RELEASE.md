@@ -1,3 +1,13 @@
+### Before tagging a release
+
+Refresh the bundled `llms.txt` snapshot used by `disco llm`:
+
+```bash
+npm run sync:llms-narrative
+```
+
+If `git diff src/llm/narrative.ts` shows changes, commit them before tagging.
+
 ### How to release
 
 **Option 1: Auto-bump patch**
