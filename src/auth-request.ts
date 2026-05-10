@@ -71,7 +71,7 @@ export function request({
     },
   }
 
-  if (method === 'POST') {
+  if (method === 'POST' || method === 'PATCH') {
     params.headers = {
       ...params.headers,
       'Content-Type': 'application/json',
