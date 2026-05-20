@@ -4,7 +4,7 @@ import {getDisco} from '../../config.js'
 import {request, readEventSource} from '../../auth-request.js'
 
 interface EnvVarRequestBody {
-  envVariables: {name: string; value: string}[]
+  envVariables: {name: string; value: null | string}[]
 }
 
 export interface EnvSetResponse {
@@ -30,6 +30,10 @@ export default class EnvSet extends Command {
 
   static override flags = {
     project: Flags.string({required: true}),
+    remove: Flags.string({
+      multiple: true,
+      description: 'env var name(s) to delete as part of this call',
+    }),
     disco: Flags.string({required: false}),
   }
 
@@ -52,6 +56,10 @@ export default class EnvSet extends Command {
       }
 
       body.envVariables.push({name: varName, value})
+    }
+
+    for (const name of flags.remove || []) {
+      body.envVariables.push({name, value: null})
     }
 
     const res = await request({method: 'POST', url, discoConfig, body})

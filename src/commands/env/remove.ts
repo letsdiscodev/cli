@@ -11,12 +11,18 @@ export interface EnvRemoveResponse {
 
 export default class EnvRemove extends Command {
   static override args = {
-    envVar: Args.string({description: 'variable to remove'}),
+    envVars: Args.string({description: 'variable(s) to remove'}),
   }
 
-  static override description = 'remove the env var'
+  // set to be able to receive variable number of arguments
+  static strict = false
 
-  static override examples = ['<%= config.bin %> <%= command.id %> --project mysite API_KEY']
+  static override description = 'remove env vars'
+
+  static override examples = [
+    '<%= config.bin %> <%= command.id %> --project mysite API_KEY',
+    '<%= config.bin %> <%= command.id %> --project mysite API_KEY OTHER_KEY OLD_KEY',
+  ]
 
   static override flags = {
     project: Flags.string({required: true}),
@@ -24,12 +30,20 @@ export default class EnvRemove extends Command {
   }
 
   public async run(): Promise<void> {
-    const {args, flags} = await this.parse(EnvRemove)
+    const {argv, flags} = await this.parse(EnvRemove)
 
+    if (argv.length === 0) {
+      this.error('No env variables specified')
+    }
+
+    const names = argv as string[]
     const discoConfig = getDisco(flags.disco || null)
-    this.log(`Removing env variable for ${flags.project}: ${args.envVar}`)
-    const url = `https://${discoConfig.host}/api/projects/${flags.project}/env/${args.envVar}`
-    const res = await request({method: 'DELETE', url, discoConfig})
+    this.log(`Removing env variables for ${flags.project}: ${names.join(', ')}`)
+    const url = `https://${discoConfig.host}/api/projects/${flags.project}/env`
+    const body = {
+      envVariables: names.map((name) => ({name, value: null})),
+    }
+    const res = await request({method: 'POST', url, discoConfig, body})
     const data = (await res.json()) as EnvRemoveResponse
     if (data.deployment) {
       // stream deployment
