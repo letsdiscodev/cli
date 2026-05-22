@@ -135,7 +135,8 @@
     "posttest": "npm run lint",
     "prepack": "oclif manifest",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
-    "readme": "node scripts/generate-readme.js"
+    "readme": "node scripts/generate-readme.js",
+    "sync:llms-narrative": "node scripts/sync-llms-narrative.js"
   },
   "types": "dist/index.d.ts"
 }
