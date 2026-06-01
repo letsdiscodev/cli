@@ -39,7 +39,7 @@ export function runShell(options: ShellOptions): Promise<ShellResult> {
   return new Promise((resolve, reject) => {
     const wsUrl = `wss://${discoConfig.host}/api/projects/${project}/run`
     const ws = new WS(wsUrl)
-    let exitCode = -1;
+    let exitCode: number | null = null;
 
     ws.on('open', () => {
       const authMessage: { token: string; service?: string; command?: string } = { token: discoConfig.apiKey }
@@ -94,7 +94,9 @@ export function runShell(options: ShellOptions): Promise<ShellResult> {
           } else if (message.type === 'ping' && ws.readyState === WS.OPEN) {
             ws.send(JSON.stringify({ type: 'pong' }))
           } else if (message.type === 'exit') {
-            exitCode = message.code ?? -1
+            if (typeof message.code === 'number') {
+              exitCode = message.code
+            }
           }
         } catch {
           process.stdout.write(data.toString())
@@ -105,8 +107,10 @@ export function runShell(options: ShellOptions): Promise<ShellResult> {
     ws.on('close', (code, reason) => {
       restoreTerminal()
 
-      if (code === 1000) {
+      if (code === 1000 && exitCode !== null) {
         resolve({ exitCode })
+      } else if (code === 1000) {
+        reject(new Error('Command session closed without reporting an exit code'))
       } else {
         reject(new Error(`Connection closed: ${code} ${reason.toString()}`))
       }
