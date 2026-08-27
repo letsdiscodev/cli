@@ -41,6 +41,11 @@ export default class Init extends Command {
       char: 'i',
       description: 'SSH key to use for authentication',
     }),
+    option: Flags.string({
+      char: 'o',
+      multiple: true,
+      description: 'install option, as key=value (repeatable)',
+    }),
   }
 
   // FIXME deal with the 'complexity' eslint warning..?
@@ -53,7 +58,9 @@ export default class Init extends Command {
       'local-image': imageFlag,
       'advertise-addr': advertiseAddrFlag,
       'identity-file': identityFile,
+      option: optionFlags,
     } = flags
+    const options = parseOptions(optionFlags ?? [], (message) => this.error(message))
     const image = imageFlag === undefined ? `letsdiscodev/daemon:${version}` : imageFlag
     const [argUsername, sshHost] = args.sshString.split('@')
 
@@ -152,6 +159,7 @@ export default class Init extends Command {
       advertiseAddr,
       cloudflareTunnel: flags['cloudflare-tunnel'],
       image,
+      options,
       verbose,
       progressBar,
     })
@@ -375,12 +383,36 @@ async function installDocker({
   }
 }
 
+function parseOptions(values: string[], fail: (message: string) => never): Record<string, string> {
+  const options: Record<string, string> = {}
+  for (const value of values) {
+    const index = value.indexOf('=')
+    if (index < 1) {
+      fail(`invalid option "${value}", expected key=value`)
+    }
+
+    const key = value.slice(0, index)
+    if (key in options) {
+      fail(`option "${key}" given more than once`)
+    }
+
+    options[key] = value.slice(index + 1)
+  }
+
+  return options
+}
+
+function shellQuote(value: string): string {
+  return `'${value.replaceAll("'", String.raw`'\''`)}'`
+}
+
 async function initDisco({
   ssh,
   host,
   advertiseAddr,
   cloudflareTunnel,
   image,
+  options,
   verbose,
   progressBar,
 }: {
@@ -389,6 +421,7 @@ async function initDisco({
   advertiseAddr: string
   cloudflareTunnel: string | undefined
   image: string
+  options: Record<string, string>
   verbose: boolean
   progressBar: SingleBar | undefined
 }): Promise<string> {
@@ -406,6 +439,9 @@ async function initDisco({
     '--env HOST_HOME=$HOME ' +
     `--env DISCO_IMAGE=${image} ` +
     (cloudflareTunnel === undefined ? '' : `--env CLOUDFLARE_TUNNEL_TOKEN=${cloudflareTunnel} `) +
+    (Object.keys(options).length === 0
+      ? ''
+      : `--env DISCO_INIT_OPTIONS=${shellQuote(JSON.stringify(options))} `) +
     `${image} ` +
     'disco_init'
   const output = await runSshCommand({ssh, command, verbose, progressBar})
