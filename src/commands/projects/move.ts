@@ -11,7 +11,7 @@ interface ProjectExport {
   branch: null | string
   domains: string[]
   envVariables: {name: string; value: string}[]
-  caddy: {name: string; crt: string; key: string; meta: string}[]
+  caddy: {name: string; issuer: string; crt: string; key: string; meta: string}[]
   deployment: {commit: string; number: number} | null
   scale: Record<string, number>
   volumes: string[]

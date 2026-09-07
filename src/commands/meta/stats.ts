@@ -72,7 +72,7 @@ export default class MetaStats extends Command {
     if (flags.json) {
       return new Promise((resolve) => {
         const { eventSource } = readEventSource(url, discoConfig, {
-          onMessage: (event: MessageEvent) => {
+          onMessage(event: MessageEvent) {
             const statsData = JSON.parse(event.data) as StatsResponse
             eventSource.close()
             resolve(statsData)
