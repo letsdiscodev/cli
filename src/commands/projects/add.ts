@@ -22,6 +22,7 @@ for most projects, you will need to pass a name, a domain name and a github repo
   static examples = [
     '<%= config.bin %> <%= command.id %> --name myblog --domain blog.example.com --github myuser/myblog',
     '<%= config.bin %> <%= command.id %> --name myblog --domain blog.example.com --github myuser/myblog API_KEY=09asf07gaq0 OTHER_ENV_VAR=true',
+    '<%= config.bin %> <%= command.id %> --name myblog --domain blog.example.com',
   ]
 
   static flags = {
@@ -31,9 +32,10 @@ for most projects, you will need to pass a name, a domain name and a github repo
       description: 'domain name where the app will be served, e.g. www.example.com',
     }),
     github: Flags.string({
-      required: true,
+      required: false,
       description:
-        'full name of the Github repository, including user or organization and repository name, e.g. myuser/myproject',
+        'full name of the Github repository, including user or organization and repository name, e.g. myuser/myproject. ' +
+        'Without it, deploy the project with "disco deploy --dir"',
     }),
     branch: Flags.string({
       required: false,
@@ -56,7 +58,7 @@ for most projects, you will need to pass a name, a domain name and a github repo
 
     const discoConfig = getDisco(flags.disco || null)
 
-    if (!flags.deployPublicRepo && !(await isGithubRepoAuthorized(discoConfig, flags.github))) {
+    if (flags.github !== undefined && !flags.deployPublicRepo && !(await isGithubRepoAuthorized(discoConfig, flags.github))) {
       this.error(`disco does not have access to this GitHub repository.
 
 Either set up GitHub access by running "disco github:apps:add"

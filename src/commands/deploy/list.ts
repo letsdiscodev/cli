@@ -8,6 +8,8 @@ export interface DeploymentItem {
   created: string
   status: string
   commitHash: null | string
+  // GITHUB, FILES or ENV_VAR
+  type: string
 }
 
 export interface DeploymentsResponse {

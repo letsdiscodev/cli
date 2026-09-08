@@ -23,6 +23,7 @@
     "node-fetch-native": "^1.6.7",
     "node-ssh": "^13.2.1",
     "open": "^10.2.0",
+    "tar": "^7.4.3",
     "tunnel-ssh": "^5.2.0",
     "ws": "^8.19.0"
   },
@@ -35,7 +36,6 @@
     "@types/node": "^18",
     "@types/ssh2": "^1.15.5",
     "@types/ws": "^8.18.1",
-    "undici": "^7.19.2",
     "chai": "^4",
     "eslint": "^8",
     "eslint-config-oclif": "^5",
@@ -45,7 +45,8 @@
     "oclif": "^4",
     "shx": "^0.4.0",
     "ts-node": "^10",
-    "typescript": "^5"
+    "typescript": "^5",
+    "undici": "^7.19.2"
   },
   "engines": {
     "node": ">=18.0.0"
