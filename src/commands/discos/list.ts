@@ -13,6 +13,7 @@ export default class DiscosList extends Command {
   static override examples = ['<%= config.bin %> <%= command.id %>']
 
   public async run(): Promise<DiscosResponse> {
+    await this.parse(DiscosList)
     const config = getConfig()
     const discos = Object.keys(config.discos)
 
