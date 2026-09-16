@@ -48,8 +48,8 @@ export default class Init extends Command {
     }),
   }
 
-  // FIXME deal with the 'complexity' eslint warning..?
-  /* eslint-disable complexity */
+  // one long method: the whole init flow, step by step. splitting it would not make it clearer.
+  // eslint-disable-next-line complexity
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(Init)
     const {
