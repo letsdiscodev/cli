@@ -42,6 +42,8 @@ export default class InvitesCreate extends Command {
     // Try to shorten the URL
     let finalUrl = dashboardUrl
     try {
+      // global fetch works without a flag on node 18+, and the release tarballs bundle node 22
+      // eslint-disable-next-line n/no-unsupported-features/node-builtins
       const shortUrlRes = await fetch('https://backend.disco.cloud/api/short-urls', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

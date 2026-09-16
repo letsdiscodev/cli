@@ -46,6 +46,7 @@
     "oclif": "^4",
     "shx": "^0.4.0",
     "ts-node": "^10",
+    "tsx": "^4.23.13",
     "typescript": "^5",
     "undici": "^7.19.2"
   },
@@ -140,5 +141,10 @@
     "readme": "node scripts/generate-readme.js",
     "prepare": "husky"
   },
-  "types": "dist/index.d.ts"
+  "types": "dist/index.d.ts",
+  "overrides": {
+    "eslint-plugin-n": "^17",
+    "@typescript-eslint/parser": "^8",
+    "@typescript-eslint/eslint-plugin": "^8"
+  }
 }

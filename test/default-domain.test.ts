@@ -269,16 +269,14 @@ const taken = (msg: string) => JSON.stringify({detail: [{type: 'value_error', lo
 
 describe('isDomainTaken', () => {
   it('recognises the daemon answers for a taken domain', () => {
-    expect(isDomainTaken(taken('Value error, Domain already taken by a project'))).to.be.true
-    expect(isDomainTaken(taken('Value error, Domain already taken by Disco'))).to.be.true
+    expect(isDomainTaken(taken('Value error, Domain already taken by a project'))).to.equal(true)
+    expect(isDomainTaken(taken('Value error, Domain already taken by Disco'))).to.equal(true)
   })
   it('does not treat other 422s as taken', () => {
-    expect(isDomainTaken(JSON.stringify({detail: [{loc: ['body', 'name'], msg: 'String should match pattern'}]}))).to.be
-      .false
-    expect(isDomainTaken(JSON.stringify({detail: [{loc: ['body', 'domain'], msg: 'String should match pattern'}]}))).to
-      .be.false
-    expect(isDomainTaken('not json')).to.be.false
-    expect(isDomainTaken('{}')).to.be.false
-    expect(isDomainTaken('')).to.be.false
+    expect(isDomainTaken(JSON.stringify({detail: [{loc: ['body', 'name'], msg: 'String should match pattern'}]}))).to.equal(false)
+    expect(isDomainTaken(JSON.stringify({detail: [{loc: ['body', 'domain'], msg: 'String should match pattern'}]}))).to.equal(false)
+    expect(isDomainTaken('not json')).to.equal(false)
+    expect(isDomainTaken('{}')).to.equal(false)
+    expect(isDomainTaken('')).to.equal(false)
   })
 })
