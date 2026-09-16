@@ -60,6 +60,8 @@ describe('hostnameLabel', () => {
   })
   it('collapses repeated hyphens', () => {
     expect(hostnameLabel('a--b')).to.equal('a-b')
+    expect(hostnameLabel('a--')).to.equal('a')
+    expect(hostnameLabel('--a--b--')).to.equal('a-b')
     expect(hostnameLabel('a---b--c')).to.equal('a-b-c')
   })
   it('keeps exactly 63 characters', () => {
