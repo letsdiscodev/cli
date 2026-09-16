@@ -87,6 +87,7 @@ We welcome contributions of all kinds! Whether it's reporting a bug, suggesting 
 
 *   **Bugs & Feature Requests**: Please open an issue on the [GitHub issue tracker](https://github.com/letsdiscodev/cli/issues).
 *   **Discussions**: Join our community on [Discord](https://discord.gg/7J4vb5uUwU) to chat with the team and other users.
+*   **Development**: `npm install` sets up a git pre-commit hook (husky) that runs `npm test` (mocha, then eslint) before every commit. `npm run build` compiles to `dist/`, `./bin/dev.js <command>` runs the CLI from source.
 
 ## License
 

@@ -41,6 +41,7 @@
     "eslint-config-oclif": "^5",
     "eslint-config-oclif-typescript": "^3",
     "eslint-config-prettier": "^9",
+    "husky": "^9.1.7",
     "mocha": "^10",
     "oclif": "^4",
     "shx": "^0.4.0",
@@ -136,7 +137,8 @@
     "posttest": "npm run lint",
     "prepack": "oclif manifest",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
-    "readme": "node scripts/generate-readme.js"
+    "readme": "node scripts/generate-readme.js",
+    "prepare": "husky"
   },
   "types": "dist/index.d.ts"
 }
