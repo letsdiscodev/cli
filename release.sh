@@ -52,6 +52,19 @@ fi
 
 new_tag="v$new_version"
 
+# the tag must point at a tested, committed, pushed tree. the pre-commit hook is not
+# guaranteed to exist on every clone, so run the suite here too (mocha, then eslint).
+if [ -n "$(git status --porcelain)" ]; then
+  echo "Error: working tree not clean, commit or stash first"
+  exit 1
+fi
+if ! git merge-base --is-ancestor HEAD "origin/$(git rev-parse --abbrev-ref HEAD)" 2>/dev/null; then
+  echo "Error: HEAD is not pushed to origin, push first"
+  exit 1
+fi
+echo "Running npm test before tagging..."
+npm test || { echo "Error: tests or lint failed, not releasing"; exit 1; }
+
 # Check if tag already exists
 if git rev-parse "$new_tag" >/dev/null 2>&1; then
   echo "Error: Tag $new_tag already exists"
