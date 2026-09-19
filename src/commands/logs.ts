@@ -36,8 +36,9 @@ export default class Logs extends Command {
     readEventSource(url, discoConfig, {
       onMessage: (event: MessageEvent) => {
         const logItem = JSON.parse(event.data)
-        const container = logItem.container.slice(1)
-        const {message, timestamp} = logItem
+        // the daemon sends the container name as is since 0.34.0 (logspout used
+        // to send it with docker's leading slash, which was dropped here)
+        const {container, message, timestamp} = logItem
         this.log(`${container} ${timestamp} ${message}`)
       },
     })
