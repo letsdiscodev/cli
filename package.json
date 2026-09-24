@@ -71,7 +71,8 @@
     "bin": "disco",
     "dirname": "disco",
     "hooks": {
-      "postrun": "./dist/hooks/postrun/update-reminders"
+      "postrun": "./dist/hooks/postrun/update-reminders",
+      "update": "./dist/hooks/update/refresh-autocomplete"
     },
     "commands": "./dist/commands",
     "plugins": [
