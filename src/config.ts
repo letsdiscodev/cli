@@ -69,14 +69,22 @@ export function getApiKey(disco: null | string = null): string {
   return discoConfig.apiKey
 }
 
+// the entry keeps its name, unless it was named after the old host: then it
+// follows the host, so `--disco <host>` keeps working
 export function setHost(name: string, host: string): DiscoConfig {
   const config = getConfig()
-  if (name === config.discos[name].host) {
-    config.discos[host] = config.discos[name]
-    config.discos[host].name = host
+  const disco = config.discos[name]
+  if (disco === undefined) {
+    throw new Error(`disco "${name}" not in config`)
+  }
+
+  const namedAfterHost = name === disco.host
+  disco.host = host
+  if (namedAfterHost && name !== host) {
     delete config.discos[name]
+    disco.name = host
+    config.discos[host] = disco
     name = host
-    config.discos[name].host = host
   }
 
   saveConfig(config)

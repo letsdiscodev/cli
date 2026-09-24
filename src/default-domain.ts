@@ -61,7 +61,7 @@ function normalizeSet(addresses: string[]): string[] {
   return [...new Set(addresses.map((a) => a.trim().toLowerCase()))].sort()
 }
 
-function sameSet(x: string[], y: string[]): boolean {
+export function sameSet(x: string[], y: string[]): boolean {
   const a = normalizeSet(x)
   const b = normalizeSet(y)
   return a.length === b.length && a.every((v, i) => v === b[i])
@@ -141,7 +141,7 @@ export async function createWithFreeDomain<T>({
   throw new DefaultDomainError(name, `all of ${candidates[0]} .. ${candidates.at(-1)} are taken`)
 }
 
-function errorCode(error: unknown): string {
+export function errorCode(error: unknown): string {
   if (error && typeof error === 'object' && 'code' in error && typeof error.code === 'string') {
     return error.code
   }
