@@ -7,7 +7,7 @@ import * as tar from 'tar'
 
 import {getDisco, DiscoConfig} from '../config.js'
 import {request, readEventSource} from '../auth-request.js'
-import {isIgnored, loadDockerignore} from '../dockerignore.js'
+import {loadUploadFilter} from '../upload-filter.js'
 import {missingDiscoJsonMessage} from '../project-checks.js'
 
 interface DeployRequest {
@@ -39,7 +39,7 @@ export default class Deploy extends Command {
       required: false,
       description:
         'send the files of this directory and deploy them. ' +
-        'The directory must contain disco.json; .dockerignore is honored, .git is never sent',
+        'The directory must contain disco.json. Files listed in its .dockerignore are not sent, nor those in its .gitignore, nor .git',
     }),
     disco: Flags.string({required: false}),
   }
@@ -86,7 +86,7 @@ export default class Deploy extends Command {
       this.error(missingDiscoJsonMessage(directory))
     }
 
-    const patterns = loadDockerignore(directory)
+    const uploadFilter = loadUploadFilter(directory)
     const archivePath = path.join(os.tmpdir(), `disco-deploy-${crypto.randomBytes(4).toString('hex')}.tar.gz`)
     try {
       let fileCount = 0
@@ -102,7 +102,7 @@ export default class Deploy extends Command {
               return true
             }
 
-            if (isIgnored(patterns, relativePath)) {
+            if (uploadFilter.ignores(relativePath, stat instanceof fs.Stats && stat.isDirectory())) {
               return false
             }
 
@@ -116,7 +116,8 @@ export default class Deploy extends Command {
         ['.'],
       )
       const {size} = fs.statSync(archivePath)
-      this.log(`Sending ${fileCount} file(s) from ${directory}, ${formatSize(size)} compressed`)
+      const skipping = uploadFilter.ruleFiles.length > 0 ? ` (skipping what ${uploadFilter.ruleFiles.join(' and ')} list)` : ''
+      this.log(`Sending ${fileCount} file(s) from ${directory}${skipping}, ${formatSize(size)} compressed`)
 
       const url = `https://${discoConfig.host}/api/projects/${project}/files`
       const res = await net.request({
