@@ -109,7 +109,7 @@ or edit your GitHub repo permissions by running "disco github:apps:manage <your 
       }
 
       data = result.data
-      domain = flags.domain
+      // the user chose the domain, no need to repeat it
     } else {
       try {
         const candidate = await chooseDefaultDomain({name: flags.name, host: discoConfig.host, resolve: resolvePublic})
