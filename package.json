@@ -70,6 +70,9 @@
   "oclif": {
     "bin": "disco",
     "dirname": "disco",
+    "hooks": {
+      "postrun": "./dist/hooks/postrun/update-reminders"
+    },
     "commands": "./dist/commands",
     "plugins": [
       "@oclif/plugin-autocomplete",

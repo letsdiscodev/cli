@@ -5,7 +5,7 @@ import {ux} from '@oclif/core'
 
 // DISCO_CONFIG_PATH overrides the default ~/.disco/config.json (tests, ci, several configs)
 const configPath = () => process.env.DISCO_CONFIG_PATH || `${os.homedir()}/.disco/config.json`
-const configFolder = () => path.dirname(configPath())
+export const configFolder = () => path.dirname(configPath())
 
 export interface DiscoConfig {
   apiKey: string
