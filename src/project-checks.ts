@@ -8,7 +8,7 @@ export const EXAMPLE_REPO = 'https://github.com/letsdiscodev/example-flask-site'
 export function missingDiscoJsonMessage(where: string): string {
   return (
     `No disco.json in ${where}.\n` +
-    'A project needs a disco.json at its root (and usually a Dockerfile) so disco knows what to run.\n' +
+    'A project needs a disco.json at its root (and usually a Dockerfile) so Disco knows what to run.\n' +
     `Docs: ${DISCO_JSON_DOCS}\n` +
     `A working example to copy from: ${EXAMPLE_REPO}`
   )

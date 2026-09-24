@@ -20,6 +20,9 @@ export interface DeployResponse {
   }
 }
 
+// the network, swappable in tests
+export const net = {readEventSource, request}
+
 export default class Deploy extends Command {
   static override description = 'deploy a project: a commit of its repository, or the files of a directory'
 
@@ -50,7 +53,7 @@ export default class Deploy extends Command {
       : await this.deployCommit(discoConfig, flags.project, flags.commit)
 
     const deploymentUrl = `https://${discoConfig.host}/api/projects/${flags.project}/deployments/${deployment.number}/output`
-    readEventSource(deploymentUrl, discoConfig, {
+    net.readEventSource(deploymentUrl, discoConfig, {
       onMessage(event: MessageEvent) {
         const message = JSON.parse(event.data)
         process.stdout.write(message.text)
@@ -69,7 +72,7 @@ export default class Deploy extends Command {
       reqBody.commit = commit
     }
 
-    const res = await request({method: 'POST', url, body: reqBody, discoConfig, expectedStatuses: [201]})
+    const res = await net.request({method: 'POST', url, body: reqBody, discoConfig, expectedStatuses: [201]})
     const data = (await res.json()) as DeployResponse
     return data.deployment
   }
@@ -116,7 +119,7 @@ export default class Deploy extends Command {
       this.log(`Sending ${fileCount} file(s) from ${directory}, ${formatSize(size)} compressed`)
 
       const url = `https://${discoConfig.host}/api/projects/${project}/files`
-      const res = await request({
+      const res = await net.request({
         method: 'POST',
         url,
         discoConfig,

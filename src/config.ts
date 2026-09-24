@@ -1,10 +1,11 @@
 import * as fs from 'node:fs'
 import * as os from 'node:os'
+import * as path from 'node:path'
 import {ux} from '@oclif/core'
 
-const HOME_DIR = os.homedir()
-const CONFIG_PATH = `${HOME_DIR}/.disco/config.json`
-const CONFIG_FOLDER = `${HOME_DIR}/.disco`
+// DISCO_CONFIG_PATH overrides the default ~/.disco/config.json (tests, ci, several configs)
+const configPath = () => process.env.DISCO_CONFIG_PATH || `${os.homedir()}/.disco/config.json`
+const configFolder = () => path.dirname(configPath())
 
 export interface DiscoConfig {
   apiKey: string
@@ -83,11 +84,11 @@ export function setHost(name: string, host: string): DiscoConfig {
 }
 
 export function getConfig(): {discos: HostDiscoConfig} {
-  if (!fs.existsSync(CONFIG_PATH)) {
+  if (!fs.existsSync(configPath())) {
     return {discos: {}}
   }
 
-  const configData = fs.readFileSync(CONFIG_PATH, 'utf8')
+  const configData = fs.readFileSync(configPath(), 'utf8')
   try {
     return JSON.parse(configData)
   } catch (error) {
@@ -96,10 +97,10 @@ export function getConfig(): {discos: HostDiscoConfig} {
 }
 
 export function saveConfig(config: {discos: HostDiscoConfig}): void {
-  if (!fs.existsSync(CONFIG_FOLDER)) {
-    fs.mkdirSync(CONFIG_FOLDER, {recursive: true})
+  if (!fs.existsSync(configFolder())) {
+    fs.mkdirSync(configFolder(), {recursive: true})
   }
 
   const configData = JSON.stringify(config, null, 4)
-  fs.writeFileSync(CONFIG_PATH, configData, 'utf8')
+  fs.writeFileSync(configPath(), configData, 'utf8')
 }
