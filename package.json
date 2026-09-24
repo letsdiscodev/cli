@@ -72,7 +72,8 @@
     "dirname": "disco",
     "hooks": {
       "postrun": "./dist/hooks/postrun/update-reminders",
-      "update": "./dist/hooks/update/refresh-autocomplete"
+      "update": "./dist/hooks/update/refresh-autocomplete",
+      "finally": "./dist/hooks/finally/agent-hint"
     },
     "commands": "./dist/commands",
     "plugins": [
