@@ -8,6 +8,7 @@ import * as tar from 'tar'
 import {getDisco, DiscoConfig} from '../config.js'
 import {request, readEventSource} from '../auth-request.js'
 import {isIgnored, loadDockerignore} from '../dockerignore.js'
+import {missingDiscoJsonMessage} from '../project-checks.js'
 
 interface DeployRequest {
   commit?: string
@@ -79,7 +80,7 @@ export default class Deploy extends Command {
     directory: string,
   ): Promise<DeployResponse['deployment']> {
     if (!fs.existsSync(path.join(directory, 'disco.json'))) {
-      this.error(`No disco.json in ${directory}`)
+      this.error(missingDiscoJsonMessage(directory))
     }
 
     const patterns = loadDockerignore(directory)
