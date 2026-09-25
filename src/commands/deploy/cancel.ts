@@ -45,7 +45,7 @@ export default class DeployCancel extends Command {
     }
 
     for (const deployment of respBody.cancelledDeployments) {
-      this.log(`Deployment ${deployment.number} cancelled`)
+      this.log(`Cancelling deployment ${deployment.number}`)
     }
 
     return respBody

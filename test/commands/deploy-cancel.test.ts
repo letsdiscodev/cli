@@ -47,7 +47,7 @@ describe('deploy:cancel', () => {
     .command(['deploy:cancel', '--project', 'app', '--deployment', '4', '--disco', 'fake'])
     .it('cancels one deployment by number', (ctx) => {
       expect(calls).to.deep.equal(['DELETE https://fake.test/api/projects/app/deployments/4'])
-      expect(ctx.stdout).to.equal('Deployment 4 cancelled\n')
+      expect(ctx.stdout).to.equal('Cancelling deployment 4\n')
     })
 
   run(422, {detail: 'Cannot cancel deployment 4, status COMPLETE not one of QUEUED, PREPARING, REPLACING'})
