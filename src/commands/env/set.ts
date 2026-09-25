@@ -3,6 +3,9 @@ import {Args, Command, Flags} from '@oclif/core'
 import {getDisco} from '../../config.js'
 import {request, readEventSource} from '../../auth-request.js'
 
+// the network, swappable in tests
+export const net = {readEventSource, request}
+
 interface EnvVarRequestBody {
   envVariables: {name: string; value: null | string}[]
 }
@@ -23,6 +26,8 @@ export default class EnvSet extends Command {
 
   static override description = 'set env vars'
 
+  static override enableJsonFlag = true
+
   static override examples = [
     '<%= config.bin %> <%= command.id %> API_KEY=0x97BCD3',
     '<%= config.bin %> <%= command.id %> API_KEY=0x97BCD3 OTHER_API_KEY=sk_f98a7f97as896',
@@ -37,7 +42,7 @@ export default class EnvSet extends Command {
     disco: Flags.string({required: false}),
   }
 
-  public async run(): Promise<void> {
+  public async run(): Promise<EnvSetResponse> {
     const {argv, flags} = await this.parse(EnvSet)
 
     const discoConfig = getDisco(flags.disco || null)
@@ -62,17 +67,24 @@ export default class EnvSet extends Command {
       body.envVariables.push({name, value: null})
     }
 
-    const res = await request({method: 'POST', url, discoConfig, body})
+    const res = await net.request({method: 'POST', url, discoConfig, body})
     const data = (await res.json()) as EnvSetResponse
+    // --json returns the number right away, "disco deploy:output" follows the deployment
+    if (this.jsonEnabled()) {
+      return {deployment: data.deployment}
+    }
+
     if (data.deployment) {
       // stream deployment
       const deploymentUrl = `https://${discoConfig.host}/api/projects/${flags.project}/deployments/${data.deployment.number}/output`
-      readEventSource(deploymentUrl, discoConfig, {
+      net.readEventSource(deploymentUrl, discoConfig, {
         onMessage(event: MessageEvent) {
           const output = JSON.parse(event.data)
           process.stdout.write(output.text)
         },
       })
     }
+
+    return {deployment: data.deployment}
   }
 }

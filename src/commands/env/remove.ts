@@ -3,6 +3,9 @@ import {Args, Command, Flags} from '@oclif/core'
 import {getDisco} from '../../config.js'
 import {request, readEventSource} from '../../auth-request.js'
 
+// the network, swappable in tests
+export const net = {readEventSource, request}
+
 export interface EnvRemoveResponse {
   deployment: {
     number: number
@@ -19,6 +22,8 @@ export default class EnvRemove extends Command {
 
   static override description = 'remove env vars'
 
+  static override enableJsonFlag = true
+
   static override examples = [
     '<%= config.bin %> <%= command.id %> --project mysite API_KEY',
     '<%= config.bin %> <%= command.id %> --project mysite API_KEY OTHER_KEY OLD_KEY',
@@ -29,7 +34,7 @@ export default class EnvRemove extends Command {
     disco: Flags.string({required: false}),
   }
 
-  public async run(): Promise<void> {
+  public async run(): Promise<EnvRemoveResponse> {
     const {argv, flags} = await this.parse(EnvRemove)
 
     if (argv.length === 0) {
@@ -43,17 +48,24 @@ export default class EnvRemove extends Command {
     const body = {
       envVariables: names.map((name) => ({name, value: null})),
     }
-    const res = await request({method: 'POST', url, discoConfig, body})
+    const res = await net.request({method: 'POST', url, discoConfig, body})
     const data = (await res.json()) as EnvRemoveResponse
+    // --json returns the number right away, "disco deploy:output" follows the deployment
+    if (this.jsonEnabled()) {
+      return {deployment: data.deployment}
+    }
+
     if (data.deployment) {
       // stream deployment
       const deploymentUrl = `https://${discoConfig.host}/api/projects/${flags.project}/deployments/${data.deployment.number}/output`
-      readEventSource(deploymentUrl, discoConfig, {
+      net.readEventSource(deploymentUrl, discoConfig, {
         onMessage(event: MessageEvent) {
           const output = JSON.parse(event.data)
           process.stdout.write(output.text)
         },
       })
     }
+
+    return {deployment: data.deployment}
   }
 }

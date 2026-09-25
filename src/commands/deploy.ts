@@ -26,6 +26,8 @@ export const net = {readEventSource, request}
 export default class Deploy extends Command {
   static override description = 'deploy a project: a commit of its repository, or the files of a directory'
 
+  static override enableJsonFlag = true
+
   static override examples = [
     '<%= config.bin %> <%= command.id %> --project mysite',
     '<%= config.bin %> <%= command.id %> --project mysite --commit 7b5c8f935328c1af49c9037cac9dee7bf0bd8c7e',
@@ -44,13 +46,18 @@ export default class Deploy extends Command {
     disco: Flags.string({required: false}),
   }
 
-  public async run(): Promise<void> {
+  public async run(): Promise<DeployResponse> {
     const {flags} = await this.parse(Deploy)
     const discoConfig = getDisco(flags.disco || null)
 
     const deployment = flags.dir
       ? await this.deployDir(discoConfig, flags.project, path.resolve(flags.dir))
       : await this.deployCommit(discoConfig, flags.project, flags.commit)
+
+    // --json returns the number right away, "disco deploy:output" follows the deployment
+    if (this.jsonEnabled()) {
+      return {deployment}
+    }
 
     const deploymentUrl = `https://${discoConfig.host}/api/projects/${flags.project}/deployments/${deployment.number}/output`
     net.readEventSource(deploymentUrl, discoConfig, {
@@ -59,6 +66,7 @@ export default class Deploy extends Command {
         process.stdout.write(message.text)
       },
     })
+    return {deployment}
   }
 
   private async deployCommit(

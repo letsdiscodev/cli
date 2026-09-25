@@ -6,6 +6,16 @@ import {CreateResult, DefaultDomainError, chooseDefaultDomain, createWithFreeDom
 import {GithubReposResponse} from '../github/repos/list.js'
 import {ProjectCreateResponse} from '../postgres/addon/install.js'
 
+// the network, swappable in tests
+export const net = {readEventSource, request}
+
+export interface ProjectsAddResult {
+  project: {name: string}
+  // null with --no-domain
+  domain: null | string
+  deployment: {number: number} | null
+}
+
 export default class ProjectsAdd extends Command {
   static override args = {
     variables: Args.string({description: 'environment variables to set'}),
@@ -21,6 +31,8 @@ this will deploy the project. from that point on, every "git push" to the projec
 for most projects, you will need to pass a name and a github repo. you can optionally pass a domain name and environment variables as well.
 
 without --domain, the project gets <name>.<your disco host> automatically when your server uses a disco-provided host (something.ondis.co) or your own host has a wildcard dns record. pass --domain to choose the domain, or --no-domain for internal services (workers, databases) that do not serve http.`
+
+  static enableJsonFlag = true
 
   static examples = [
     '<%= config.bin %> <%= command.id %> --name myblog --github myuser/myblog',
@@ -59,7 +71,7 @@ without --domain, the project gets <name>.<your disco host> automatically when y
     disco: Flags.string({required: false, description: 'server to use'}),
   }
 
-  public async run(): Promise<void> {
+  public async run(): Promise<ProjectsAddResult> {
     const {argv, flags} = await this.parse(ProjectsAdd)
 
     if (flags.github !== undefined && !/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(flags.github)) {
@@ -87,7 +99,7 @@ or edit your GitHub repo permissions by running "disco github:apps:manage <your 
         branch: flags.branch,
         envVariables,
       }
-      const res = await request({method: 'POST', url, discoConfig, body, expectedStatuses})
+      const res = await net.request({method: 'POST', url, discoConfig, body, expectedStatuses})
       if (res.status === 422) {
         const text = await res.text()
         if (isDomainTaken(text)) {
@@ -135,17 +147,29 @@ or edit your GitHub repo permissions by running "disco github:apps:manage <your 
       this.log(`Domain: https://${domain}`)
     }
 
+    const result: ProjectsAddResult = {
+      project: data.project,
+      domain: flags.domain ?? domain ?? null,
+      deployment: data.deployment,
+    }
+    // --json returns right away, "disco deploy:output" follows the deployment
+    if (this.jsonEnabled()) {
+      return result
+    }
+
     if (data.deployment) {
       const project = flags.name
       this.log(`Deploying ${project}, version ${data.deployment.number}`)
       const url = `https://${discoConfig.host}/api/projects/${project}/deployments/${data.deployment.number}/output`
 
-      readEventSource(url, discoConfig, {
+      net.readEventSource(url, discoConfig, {
         onMessage(event: MessageEvent) {
           process.stdout.write(JSON.parse(event.data).text)
         },
       })
     }
+
+    return result
   }
 }
 
@@ -200,7 +224,7 @@ async function isGithubRepoAuthorized(discoConfig: DiscoConfig, repoBeingChecked
   // check if the user has access to the github repo
   const url = `https://${discoConfig.host}/api/github-app-repos`
 
-  const res = await request({method: 'GET', url, discoConfig})
+  const res = await net.request({method: 'GET', url, discoConfig})
   const data = (await res.json()) as GithubReposResponse
 
   const authorizedRepos = data.repos.map((r) => r.fullName)
