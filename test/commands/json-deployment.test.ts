@@ -182,3 +182,21 @@ describe('projects:add --json', () => {
       expect(ctx.stdout).to.contain('Deploying blog, version 1')
     })
 })
+
+describe('projects:add name length', () => {
+  run({project: {name: 'a'.repeat(43)}, deployment: null})
+    .command(['projects:add', '--name', 'a'.repeat(43), '--no-domain', '--disco', 'fake'])
+    .catch((error) => {
+      expect(error.message).to.contain('42 characters or fewer')
+    })
+    .it('rejects a name longer than 42 characters without calling the server', () => {
+      expect(requests).to.deep.equal([])
+    })
+
+  run({project: {name: 'a'.repeat(42)}, deployment: null})
+    .command(['projects:add', '--name', 'a'.repeat(42), '--no-domain', '--disco', 'fake', '--json'])
+    .it('sends a name of 42 characters to the server', () => {
+      expect(requests.map((r) => `${r.method} ${r.url}`)).to.deep.equal(['POST https://fake.test/api/projects'])
+      expect((requests[0].body as {name: string}).name).to.equal('a'.repeat(42))
+    })
+})
