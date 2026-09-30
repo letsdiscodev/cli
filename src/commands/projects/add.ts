@@ -74,6 +74,11 @@ without --domain, the project gets <name>.<your disco host> automatically when y
   public async run(): Promise<ProjectsAddResult> {
     const {argv, flags} = await this.parse(ProjectsAdd)
 
+    // docker names are max 63 chars: "disco-project-<name>-<deployment number>" fits up to deployment 999999
+    if (flags.name.length > 42) {
+      this.error('Project name must be 42 characters or fewer')
+    }
+
     if (flags.github !== undefined && !/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(flags.github)) {
       this.error('Invalid Github repository format, expected "user/repo"')
     }
