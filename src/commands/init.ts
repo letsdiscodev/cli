@@ -11,6 +11,8 @@ import {addDisco, isDiscoAlreadyInConfig} from '../config.js'
 import {SingleBar} from 'cli-progress'
 import {Readable} from 'node:stream'
 
+const PROVISION_DOMAIN_URL = 'https://backend.disco.cloud/api/installer/provision-domain'
+
 export default class Init extends Command {
   static args = {
     sshString: Args.string({required: true}),
@@ -21,7 +23,7 @@ export default class Init extends Command {
   static examples = [
     '<%= config.bin %> <%= command.id %> root@disco.example.com',
     '<%= config.bin %> <%= command.id %> root@disco.example.com --version 0.4.0',
-    '<%= config.bin %> <%= command.id %> root@203.0.113.7  # no domain yet: gets a free one, like the installer',
+    '<%= config.bin %> <%= command.id %> root@203.0.113.7  # automatically gets a domain',
   ]
 
   static flags = {
@@ -477,8 +479,6 @@ async function initDisco({
   const apiKey = extractApiKey(output)
   return apiKey
 }
-
-const PROVISION_DOMAIN_URL = 'https://backend.disco.cloud/api/installer/provision-domain'
 
 // the provision-domain answer, checked: a plain hostname, pointed at the ip we are connected to
 export function parseProvisionedDomain(output: string, sshHost: string): string {
