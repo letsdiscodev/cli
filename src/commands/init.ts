@@ -21,6 +21,7 @@ export default class Init extends Command {
   static examples = [
     '<%= config.bin %> <%= command.id %> root@disco.example.com',
     '<%= config.bin %> <%= command.id %> root@disco.example.com --version 0.4.0',
+    '<%= config.bin %> <%= command.id %> root@203.0.113.7  # no domain yet: gets a free one, like the installer',
   ]
 
   static flags = {
@@ -64,14 +65,11 @@ export default class Init extends Command {
     const image = imageFlag === undefined ? `letsdiscodev/daemon:${version}` : imageFlag
     const [argUsername, sshHost] = args.sshString.split('@')
 
-    // check that sshHost is not an ip address
-    if (!flags.host && net.isIP(sshHost)) {
-      this.error('host must be a domain name')
-    }
-
-    const host = flags.host === undefined ? sshHost : flags.host
+    // an ip without --host: once connected, ask disco.cloud for a domain from the server itself
+    const provisionDomain = flags.host === undefined && net.isIP(sshHost) !== 0
+    let host = flags.host === undefined ? sshHost : flags.host
     let username = argUsername
-    if (isDiscoAlreadyInConfig(host)) {
+    if (!provisionDomain && isDiscoAlreadyInConfig(host)) {
       this.error('host already present in .disco config')
     }
 
@@ -129,6 +127,32 @@ export default class Init extends Command {
       }
     }
 
+    if (provisionDomain) {
+      let output
+      try {
+        output = await runSshCommand({
+          ssh,
+          command: `curl -sS -m 30 -X POST ${PROVISION_DOMAIN_URL}`,
+          verbose,
+          progressBar: undefined,
+        })
+      } catch (error) {
+        this.error(`could not get a domain from disco.cloud (pass --host <your domain>, or try again later)\n${error}`)
+      }
+
+      try {
+        host = parseProvisionedDomain(output, sshHost)
+      } catch (error) {
+        this.error(`${(error as Error).message} (pass --host <your domain>, or try again later)`)
+      }
+
+      if (isDiscoAlreadyInConfig(host)) {
+        this.error(`host ${host} already present in .disco config`)
+      }
+
+      this.log(`Domain: ${host}`)
+    }
+
     const dockerAlreadyInstalled = await checkDockerInstalled(ssh)
     let progressBar
     if (!verbose) {
@@ -171,6 +195,11 @@ export default class Init extends Command {
     ssh.dispose()
     if (progressBar !== undefined) {
       progressBar.stop()
+    }
+
+    // a new domain: dns and the certificate can take a moment, so the next command would fail without this
+    if (provisionDomain && !(await waitForHttps(host, 5 * 60 * 1000))) {
+      this.error(`Disco is installed, but https://${host} did not answer within 5 minutes (port 443 blocked?)`)
     }
 
     this.log('Done')
@@ -447,6 +476,49 @@ async function initDisco({
   const output = await runSshCommand({ssh, command, verbose, progressBar})
   const apiKey = extractApiKey(output)
   return apiKey
+}
+
+const PROVISION_DOMAIN_URL = 'https://backend.disco.cloud/api/installer/provision-domain'
+
+// the provision-domain answer, checked: a plain hostname, pointed at the ip we are connected to
+export function parseProvisionedDomain(output: string, sshHost: string): string {
+  let body
+  try {
+    body = JSON.parse(output)
+  } catch {
+    throw new Error(`unexpected answer from disco.cloud: ${output.slice(0, 200)}`)
+  }
+
+  const {domain, public_ip: publicIp} = body ?? {}
+  if (typeof domain !== 'string' || !/^(?=.{1,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/.test(domain)) {
+    throw new Error(`unexpected domain from disco.cloud: ${JSON.stringify(domain)}`)
+  }
+
+  if (publicIp !== sshHost) {
+    throw new Error(
+      `the server reaches the internet as ${JSON.stringify(publicIp)}, not ${sshHost}: the domain would point there`,
+    )
+  }
+
+  return domain
+}
+
+async function waitForHttps(host: string, timeoutMs: number): Promise<boolean> {
+  const deadline = Date.now() + timeoutMs
+  while (Date.now() < deadline) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      await fetch(`https://${host}/`, {signal: AbortSignal.timeout(10_000)})
+      return true
+    } catch {
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((resolve) => {
+        setTimeout(resolve, 5000)
+      })
+    }
+  }
+
+  return false
 }
 
 export function extractApiKey(output: string): string {
