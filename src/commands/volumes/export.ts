@@ -9,6 +9,8 @@ import {confirm} from '@inquirer/prompts'
 import {getDisco} from '../../config.js'
 import {request} from '../../auth-request.js'
 
+export const net = {request}
+
 export default class VolumesExport extends Command {
   static override description = 'export a volume'
 
@@ -61,7 +63,7 @@ export default class VolumesExport extends Command {
 
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects/${flags.project}/volumes/${flags.volume}`
-    const res = await request({method: 'GET', url, discoConfig})
+    const res = await net.request({method: 'GET', url, discoConfig})
 
     // get binary data from response; the daemon ends the download early when tar fails
     let buffer: Buffer
