@@ -108,7 +108,7 @@ async function cliLine(options: UpdateCheckOptions): Promise<null | string> {
     return null
   }
 
-  return `${bin} ${latest} is out (you have ${version}), run ${bin} update`
+  return `A newer Disco CLI is available: ${latest} (you have ${version}). Update with: ${bin} update`
 }
 
 async function daemonLine(bin: string, disco: DiscoConfig, several: boolean): Promise<null | string> {
@@ -124,7 +124,7 @@ async function daemonLine(bin: string, disco: DiscoConfig, several: boolean): Pr
   }
 
   const upgrade = several ? `${bin} meta:upgrade --disco ${disco.name}` : `${bin} meta:upgrade`
-  return `${disco.name} runs daemon ${running}, ${latest} is out, run ${upgrade}`
+  return `Server ${disco.name} runs Disco ${running}, the latest is ${latest}. Upgrade with: ${upgrade}`
 }
 
 // swallows everything: a reminder must never turn into an error

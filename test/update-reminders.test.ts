@@ -72,12 +72,34 @@ describe('update reminders', () => {
     delete process.env.DISCO_CONFIG_PATH
   })
 
+  describe('the blank line', () => {
+    it('prints one empty line first, so the reminder stands apart from the command output', async () => {
+      useConfig(['alpha'])
+      answers[MANIFEST] = {version: '0.5.68'}
+      answers['https://alpha.test/api/disco/meta'] = {version: '0.32.0'}
+      answers[DAEMON_TAGS_URL] = tags('0.33.0')
+      await run()
+      expect(lines[0]).to.equal('')
+      expect(lines.slice(1)).to.have.length(2)
+      expect(lines.slice(1).every((line) => line !== '')).to.equal(true)
+    })
+
+    it('prints no blank line when there is nothing to say', async () => {
+      useConfig(['alpha'])
+      answers[MANIFEST] = {version: '0.5.67'}
+      answers['https://alpha.test/api/disco/meta'] = {version: '0.33.0'}
+      answers[DAEMON_TAGS_URL] = tags('0.33.0')
+      await run()
+      expect(lines).to.deep.equal([])
+    })
+  })
+
   describe('the cli itself', () => {
     it('prints one line and records the check when the manifest is newer', async () => {
       useConfig([])
       answers[MANIFEST] = {version: '0.5.68'}
       await run({commandHasDiscoFlag: false})
-      expect(lines).to.deep.equal(['', 'disco 0.5.68 is out (you have 0.5.67), run disco update'])
+      expect(lines).to.deep.equal(['', 'A newer Disco CLI is available: 0.5.68 (you have 0.5.67). Update with: disco update'])
       expect(readState().cli).to.deep.equal({checkedAt: NOW})
     })
 
@@ -165,7 +187,7 @@ describe('update reminders', () => {
       answers['https://alpha.test/api/disco/meta'] = {version: '0.32.0'}
       answers[DAEMON_TAGS_URL] = tags('latest', '0.33.0', '0.31.3')
       await run()
-      expect(lines).to.deep.equal(['', 'alpha runs daemon 0.32.0, 0.33.0 is out, run disco meta:upgrade'])
+      expect(lines).to.deep.equal(['', 'Server alpha runs Disco 0.32.0, the latest is 0.33.0. Upgrade with: disco meta:upgrade'])
       const meta = fetched.find((f) => f.url === 'https://alpha.test/api/disco/meta')
       expect(meta?.headers.Authorization).to.equal('Basic ' + Buffer.from('key-alpha:').toString('base64'))
       expect(readState().daemons).to.deep.equal({'alpha.test': {checkedAt: NOW}})
@@ -177,11 +199,11 @@ describe('update reminders', () => {
       answers['https://beta.test/api/disco/meta'] = {version: '0.31.3'}
       answers[DAEMON_TAGS_URL] = tags('0.33.0', 'latest')
       await run({argv: ['--project', 'x', '--disco', 'beta']})
-      expect(lines).to.deep.equal(['', 'beta runs daemon 0.31.3, 0.33.0 is out, run disco meta:upgrade --disco beta'])
+      expect(lines).to.deep.equal(['', 'Server beta runs Disco 0.31.3, the latest is 0.33.0. Upgrade with: disco meta:upgrade --disco beta'])
       lines = []
       writeState({})
       await run({argv: ['--disco=beta']})
-      expect(lines).to.deep.equal(['', 'beta runs daemon 0.31.3, 0.33.0 is out, run disco meta:upgrade --disco beta'])
+      expect(lines).to.deep.equal(['', 'Server beta runs Disco 0.31.3, the latest is 0.33.0. Upgrade with: disco meta:upgrade --disco beta'])
       expect(fetched.some((f) => f.url.includes('alpha.test'))).to.equal(false)
     })
 
@@ -247,10 +269,10 @@ describe('update reminders', () => {
       await run({argv: ['--disco', 'alpha']})
       expect(fetched).to.deep.equal([])
       await run({argv: ['--disco', 'beta']})
-      expect(lines).to.deep.equal(['', 'beta runs daemon 0.32.0, 0.33.0 is out, run disco meta:upgrade --disco beta'])
+      expect(lines).to.deep.equal(['', 'Server beta runs Disco 0.32.0, the latest is 0.33.0. Upgrade with: disco meta:upgrade --disco beta'])
       lines = []
       await run({argv: ['--disco', 'alpha'], now: NOW + DAEMON_CHECK_EVERY - 3 * 24 * 60 * 60 * 1000})
-      expect(lines).to.deep.equal(['', 'alpha runs daemon 0.32.0, 0.33.0 is out, run disco meta:upgrade --disco alpha'])
+      expect(lines).to.deep.equal(['', 'Server alpha runs Disco 0.32.0, the latest is 0.33.0. Upgrade with: disco meta:upgrade --disco alpha'])
     })
   })
 
