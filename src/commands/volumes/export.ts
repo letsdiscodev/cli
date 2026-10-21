@@ -1,4 +1,7 @@
 import * as fs from 'node:fs'
+import {Readable, Writable} from 'node:stream'
+import {pipeline} from 'node:stream/promises'
+import * as zlib from 'node:zlib'
 
 import {Command, Flags} from '@oclif/core'
 import {confirm} from '@inquirer/prompts'
@@ -29,6 +32,23 @@ export default class VolumesExport extends Command {
     }),
   }
 
+  // the daemon streams tar's output and cannot change the status once it has started:
+  // a tar that dies partway ends the download early, and whatever arrived is not an
+  // archive. the gzip stream carries a checksum and a length at its end, so reading it
+  // through (to nowhere) tells whether the download is whole
+  private async assertCompleteArchive(buffer: Buffer): Promise<void> {
+    const discard = new Writable({
+      write(_chunk, _encoding, callback) {
+        callback()
+      },
+    })
+    try {
+      await pipeline(Readable.from([buffer]), zlib.createGunzip(), discard)
+    } catch (error) {
+      this.error(`The downloaded archive is not complete (${(error as Error).message}). Nothing was written.`)
+    }
+  }
+
   private async confirmAction(): Promise<boolean> {
     return confirm({
       message: 'Binary data will be output to your terminal. Continue?',
@@ -43,9 +63,15 @@ export default class VolumesExport extends Command {
     const url = `https://${discoConfig.host}/api/projects/${flags.project}/volumes/${flags.volume}`
     const res = await request({method: 'GET', url, discoConfig})
 
-    // get binary data from response
-    const data = await res.arrayBuffer()
-    const buffer = Buffer.from(data)
+    // get binary data from response; the daemon ends the download early when tar fails
+    let buffer: Buffer
+    try {
+      buffer = Buffer.from(await res.arrayBuffer())
+    } catch (error) {
+      this.error(`The download ended before the archive was complete (${(error as Error).message}). Nothing was written.`)
+    }
+
+    await this.assertCompleteArchive(buffer)
 
     // Handle output to file if specified
     if (flags.output) {
