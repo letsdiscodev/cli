@@ -1,5 +1,7 @@
 import * as fs from 'node:fs'
-import {Readable, Writable} from 'node:stream'
+import * as os from 'node:os'
+import * as path from 'node:path'
+import {Readable, Transform, Writable} from 'node:stream'
 import {pipeline} from 'node:stream/promises'
 import * as zlib from 'node:zlib'
 
@@ -37,17 +39,47 @@ export default class VolumesExport extends Command {
   // the daemon streams tar's output and cannot change the status once it has started:
   // a tar that dies partway ends the download early, and whatever arrived is not an
   // archive. the gzip stream carries a checksum and a length at its end, so reading it
-  // through (to nowhere) tells whether the download is whole
-  private async assertCompleteArchive(buffer: Buffer): Promise<void> {
-    const discard = new Writable({
-      write(_chunk, _encoding, callback) {
+  // through gunzip (to nowhere) as it is written tells whether the download is whole,
+  // without holding the archive in memory
+  private async downloadVerified(body: Readable, tmpPath: string): Promise<void> {
+    const gunzip = zlib.createGunzip()
+    let gunzipError: Error | undefined
+    const gunzipDone = pipeline(
+      gunzip,
+      new Writable({
+        write(_chunk, _encoding, callback) {
+          callback()
+        },
+      }),
+    ).catch((error) => {
+      gunzipError = error as Error
+    })
+    const tee = new Transform({
+      transform(chunk, _encoding, callback) {
+        if (gunzipError || gunzip.write(chunk)) {
+          callback(null, chunk)
+        } else {
+          gunzip.once('drain', () => callback(null, chunk))
+        }
+      },
+      flush(callback) {
+        gunzip.end()
         callback()
       },
     })
     try {
-      await pipeline(Readable.from([buffer]), zlib.createGunzip(), discard)
+      await pipeline(body, tee, fs.createWriteStream(tmpPath))
     } catch (error) {
-      this.error(`The downloaded archive is not complete (${(error as Error).message}). Nothing was written.`)
+      gunzip.destroy()
+      await gunzipDone
+      fs.rmSync(tmpPath, {force: true})
+      this.error(`The download ended before the archive was complete (${(error as Error).message}). Nothing was written.`)
+    }
+
+    await gunzipDone
+    if (gunzipError) {
+      fs.rmSync(tmpPath, {force: true})
+      this.error(`The downloaded archive is not complete (${gunzipError.message}). Nothing was written.`)
     }
   }
 
@@ -64,23 +96,23 @@ export default class VolumesExport extends Command {
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects/${flags.project}/volumes/${flags.volume}`
     const res = await net.request({method: 'GET', url, discoConfig})
-
-    // get binary data from response; the daemon ends the download early when tar fails
-    let buffer: Buffer
-    try {
-      buffer = Buffer.from(await res.arrayBuffer())
-    } catch (error) {
-      this.error(`The download ended before the archive was complete (${(error as Error).message}). Nothing was written.`)
+    if (!res.body) {
+      this.error('The daemon sent no body')
     }
 
-    await this.assertCompleteArchive(buffer)
+    const body = res.body as unknown as Readable
 
     // Handle output to file if specified
     if (flags.output) {
-      fs.writeFileSync(flags.output, buffer)
+      const tmpPath = `${flags.output}.part`
+      await this.downloadVerified(body, tmpPath)
+      fs.renameSync(tmpPath, flags.output)
       this.log(`Volume exported to ${flags.output}`)
       return
     }
+
+    const tmpPath = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'disco-volume-')), 'volume.tar.gz')
+    await this.downloadVerified(body, tmpPath)
 
     // If in TTY and not forced, ask for confirmation
     if (process.stdout.isTTY && !flags.force) {
@@ -90,12 +122,14 @@ export default class VolumesExport extends Command {
 
       const confirmed = await this.confirmAction()
       if (!confirmed) {
+        fs.rmSync(tmpPath, {force: true})
         this.log('Export cancelled.')
         return
       }
     }
 
-    // Write binary data to stdout
-    process.stdout.write(buffer)
+    // Write the verified archive to stdout
+    await pipeline(fs.createReadStream(tmpPath), process.stdout, {end: false})
+    fs.rmSync(tmpPath, {force: true})
   }
 }
