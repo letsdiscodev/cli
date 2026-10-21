@@ -170,9 +170,14 @@ export async function checkForUpdates(options: UpdateCheckOptions): Promise<void
     // an unwritable ~/.disco only means the check runs again next time
   }
 
-  for (const line of await Promise.all(checks)) {
-    if (line !== null) {
-      options.log(line)
-    }
+  const lines = (await Promise.all(checks)).filter((line) => line !== null)
+  if (lines.length === 0) {
+    return
+  }
+
+  // a blank line first, so the reminder stands apart from the command's own output
+  options.log('')
+  for (const line of lines) {
+    options.log(line)
   }
 }
