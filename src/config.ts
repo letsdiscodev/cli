@@ -7,6 +7,51 @@ import {ux} from '@oclif/core'
 const configPath = () => process.env.DISCO_CONFIG_PATH || `${os.homedir()}/.disco/config.json`
 export const configFolder = () => path.dirname(configPath())
 
+// the config holds api keys, so only the user gets to read it. checked on every
+// read and write, which also fixes the files of installs from before this.
+// modes mean nothing on windows. replaceable for the tests.
+export const permissions = {
+  chmod: (target: string, mode: number): void => fs.chmodSync(target, mode),
+  platform: process.platform,
+  warn: (line: string): void => console.error(line),
+}
+const FILE_MODE = 0o600
+const FOLDER_MODE = 0o700
+const warned = new Set<string>()
+
+// only when group or others have any bit: a read-only file stays read-only
+function restrictPermissions(target: string, mode: number): void {
+  if (permissions.platform === 'win32') {
+    return
+  }
+
+  let current: number
+  try {
+    current = fs.statSync(target).mode % 0o1000
+  } catch {
+    return
+  }
+
+  if (current % 0o100 === 0) {
+    return
+  }
+
+  try {
+    permissions.chmod(target, mode)
+    permissions.warn(`Permissions of ${target} set to ${mode.toString(8)} (were ${current.toString(8)}): it holds API keys.`)
+  } catch (error) {
+    if (!warned.has(target)) {
+      warned.add(target)
+      permissions.warn(`Could not restrict the permissions of ${target} (${current.toString(8)}): ${error}`)
+    }
+  }
+}
+
+function restrictConfigPermissions(): void {
+  restrictPermissions(configFolder(), FOLDER_MODE)
+  restrictPermissions(configPath(), FILE_MODE)
+}
+
 export interface DiscoConfig {
   apiKey: string
   host: string
@@ -96,6 +141,7 @@ export function getConfig(): {discos: HostDiscoConfig} {
     return {discos: {}}
   }
 
+  restrictConfigPermissions()
   const configData = fs.readFileSync(configPath(), 'utf8')
   try {
     return JSON.parse(configData)
@@ -106,9 +152,11 @@ export function getConfig(): {discos: HostDiscoConfig} {
 
 export function saveConfig(config: {discos: HostDiscoConfig}): void {
   if (!fs.existsSync(configFolder())) {
-    fs.mkdirSync(configFolder(), {recursive: true})
+    fs.mkdirSync(configFolder(), {mode: FOLDER_MODE, recursive: true})
   }
 
   const configData = JSON.stringify(config, null, 4)
-  fs.writeFileSync(configPath(), configData, 'utf8')
+  // the mode only applies to a new file: existing ones are fixed below
+  fs.writeFileSync(configPath(), configData, {encoding: 'utf8', mode: FILE_MODE})
+  restrictConfigPermissions()
 }
