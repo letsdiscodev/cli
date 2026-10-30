@@ -6,6 +6,9 @@ import {Command, Flags} from '@oclif/core'
 
 import {request} from '../../auth-request.js'
 import {getDisco} from '../../config.js'
+import {checkTarGzFile, openValidatedStdin} from '../../tar-gz-check.js'
+
+export const net = {request}
 
 export default class VolumesImport extends Command {
   static override description = 'import a volume'
@@ -50,14 +53,15 @@ export default class VolumesImport extends Command {
     const discoConfig = getDisco(flags.disco || null)
     const url = `https://${discoConfig.host}/api/projects/${flags.project}/volumes/${flags.volume}`
 
-    let stream: Readable = process.stdin
-    stream.on('error', (err) => {
-      this.error(`Error reading from stdin: ${err.message}`)
-    })
-
+    let stream: Readable
     const extraHeaders: Record<string, string> = {}
 
     if (flags.input) {
+      try {
+        checkTarGzFile(flags.input)
+      } catch (error) {
+        this.error((error as Error).message)
+      }
       // if we are given the file, get its actual file size, and then
       // we'll pass it as a content-length header.
       // incredibly... this is the volumes to run volumes:import for raspberry pis
@@ -76,9 +80,19 @@ export default class VolumesImport extends Command {
       })
     } else if (process.stdin.isTTY) {
       this.error('No input provided. Please provide an input file with --input or pipe data to stdin')
+    } else {
+      try {
+        stream = await openValidatedStdin()
+      } catch (error) {
+        this.error((error as Error).message)
+      }
+
+      stream.on('error', (err) => {
+        this.error(`Error reading from stdin: ${err.message}`)
+      })
     }
 
-    const res = await request({method: 'PUT', url, discoConfig, bodyStream: stream, extraHeaders})
+    const res = await net.request({method: 'PUT', url, discoConfig, bodyStream: stream, extraHeaders})
     await res.json()
   }
 }
