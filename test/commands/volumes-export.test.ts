@@ -3,7 +3,8 @@ import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import {Readable} from 'node:stream'
-import * as zlib from 'node:zlib'
+
+import * as tar from 'tar'
 
 import {net} from '../../src/commands/volumes/export.js'
 
@@ -13,8 +14,10 @@ fs.writeFileSync(configFile, JSON.stringify({discos: {fake: {name: 'fake', host:
 const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'disco-volume-'))
 const output = path.join(outDir, 'volume.tar.gz')
 
-// a gzip stream of 200 KiB of random bytes, and the first half of it (tar's death partway)
-const whole = zlib.gzipSync(Buffer.from(Array.from({length: 200 * 1024}, () => Math.floor(Math.random() * 256))))
+// a tar.gz of 200 KiB of random bytes, and the first half of it (tar's death partway)
+fs.writeFileSync(path.join(outDir, 'random.bin'), Buffer.from(Array.from({length: 200 * 1024}, () => Math.floor(Math.random() * 256))))
+tar.c({gzip: true, sync: true, file: path.join(outDir, 'whole.tar.gz'), cwd: outDir}, ['random.bin'])
+const whole = fs.readFileSync(path.join(outDir, 'whole.tar.gz'))
 const cut = whole.subarray(0, Math.floor(whole.length / 2))
 
 const original = {...net}
