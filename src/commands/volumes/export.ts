@@ -1,15 +1,15 @@
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import {Readable, Transform, Writable} from 'node:stream'
+import {Readable} from 'node:stream'
 import {pipeline} from 'node:stream/promises'
-import * as zlib from 'node:zlib'
 
 import {Command, Flags} from '@oclif/core'
 import {confirm} from '@inquirer/prompts'
 
 import {getDisco} from '../../config.js'
 import {request} from '../../auth-request.js'
+import {BadArchive, copyVerified} from '../../tar-gz.js'
 
 export const net = {request}
 
@@ -37,49 +37,17 @@ export default class VolumesExport extends Command {
   }
 
   // the daemon streams tar's output and cannot change the status once it has started:
-  // a tar that dies partway ends the download early, and whatever arrived is not an
-  // archive. the gzip stream carries a checksum and a length at its end, so reading it
-  // through gunzip (to nowhere) as it is written tells whether the download is whole,
-  // without holding the archive in memory
+  // a tar that dies partway ends the download early, and whatever arrived is not an archive
   private async downloadVerified(body: Readable, tmpPath: string): Promise<void> {
-    const gunzip = zlib.createGunzip()
-    let gunzipError: Error | undefined
-    const gunzipDone = pipeline(
-      gunzip,
-      new Writable({
-        write(_chunk, _encoding, callback) {
-          callback()
-        },
-      }),
-    ).catch((error) => {
-      gunzipError = error as Error
-    })
-    const tee = new Transform({
-      transform(chunk, _encoding, callback) {
-        if (gunzipError || gunzip.write(chunk)) {
-          callback(null, chunk)
-        } else {
-          gunzip.once('drain', () => callback(null, chunk))
-        }
-      },
-      flush(callback) {
-        gunzip.end()
-        callback()
-      },
-    })
     try {
-      await pipeline(body, tee, fs.createWriteStream(tmpPath))
+      await copyVerified(body, fs.createWriteStream(tmpPath))
     } catch (error) {
-      gunzip.destroy()
-      await gunzipDone
       fs.rmSync(tmpPath, {force: true})
-      this.error(`The download ended before the archive was complete (${(error as Error).message}). Nothing was written.`)
-    }
+      if (error instanceof BadArchive) {
+        this.error(`The downloaded archive is not complete (${error.message}). Nothing was written.`)
+      }
 
-    await gunzipDone
-    if (gunzipError) {
-      fs.rmSync(tmpPath, {force: true})
-      this.error(`The downloaded archive is not complete (${gunzipError.message}). Nothing was written.`)
+      this.error(`The download ended before the archive was complete (${(error as Error).message}). Nothing was written.`)
     }
   }
 
